@@ -1,15 +1,15 @@
 "use client";
 
-import getRoles from "../_components/game/getroles";
-import assignRoles from "../_components/game/assignroles";
+import getRoles from "../components/game/getroles";
+import assignRoles from "../components/game/assignroles";
 import { useEffect, useMemo, useState } from "react";
-import createPlayers from "../_components/game/createplayers";
-import checkGameConditions from "../_components/game/checkgameconditions";
+import createPlayers from "../components/game/createplayers";
+import checkGameConditions from "../components/game/checkgameconditions";
 import {
   validateAbility,
   validateLynchingVote,
   validateWerewolfVote,
-} from "../_components/game/validator";
+} from "../components/game/validator";
 
 const discussionDuration = 10;
 const votingDuration = 5;

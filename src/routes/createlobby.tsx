@@ -51,7 +51,7 @@ export default function CreateLobby() {
   const [currentGamemode, setCurrentGamemode]: any = useState(gamemodes[0]);
   const [currentRoles, setCurrentRoles]: any = useState(gamemodes[0].roles);
 
-  function checkCurrentGamemode(e) {
+  function checkCurrentGamemode(e: any) {
     let newRoles = [...currentRoles];
     if (e.target.checked) {
       newRoles.push(e.target.value);

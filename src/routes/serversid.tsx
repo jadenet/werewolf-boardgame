@@ -1,6 +1,6 @@
 "use client";
 
-import Chat from "@/app/_components/Chat";
+import Chat from "../components/Chat";
 import { faker } from "@faker-js/faker";
 import { useState } from "react";
 
@@ -53,6 +53,10 @@ function getTrunucatedString(string: string, max: number) {
   } else {
     return string;
   }
+}
+
+export async function generateStaticParams() {
+ return ([{slug: 1}])
 }
 
 export default function Server() {

@@ -1,4 +1,5 @@
 import { faker } from "@faker-js/faker";
+import { Link } from "wouter";
 
 let lobbies: any[] = [];
 const gamemodes = ["Classic", "Custom"];
@@ -49,12 +50,7 @@ export default function Servers() {
                     </td>
 
                     <td>
-                      <a
-                        className="btn btn-outline w-24"
-                        href={`/servers/${lobby.id}`}
-                      >
-                        Join
-                      </a>
+                      <Link className="btn btn-outline w-24" href={`/servers/${lobby.id}`}>Join</Link>
                     </td>
                   </tr>
                 );
