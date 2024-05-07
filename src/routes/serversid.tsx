@@ -1,51 +1,7 @@
-"use client";
-
 import Chat from "../components/Chat";
 import { faker } from "@faker-js/faker";
 import { useState } from "react";
-
-const roles = [
-  {
-    name: "Doctor",
-    image:
-      "https://static.wikia.nocookie.net/werewolf-online/images/6/6c/Doctor.png",
-  },
-  {
-    name: "Headhunter",
-    image:
-      "https://static.wikia.nocookie.net/werewolf-online/images/0/06/Headhunter.png",
-  },
-  {
-    name: "Aura Seer",
-    image:
-      "https://static.wikia.nocookie.net/werewolf-online/images/2/2b/Aura_Seer.png",
-  },
-  {
-    name: "Regular Werewolf",
-    image:
-      "https://static.wikia.nocookie.net/werewolf-online/images/f/f5/Werewolf.png",
-  },
-  {
-    name: "Serial Killer",
-    image:
-      "https://static.wikia.nocookie.net/werewolf-online/images/c/ce/Serial_Killer.png",
-  },
-  {
-    name: "Beast Hunter",
-    image:
-      "https://static.wikia.nocookie.net/werewolf-online/images/d/d2/Beast_Hunter.png",
-  },
-  {
-    name: "Alpha Werewolf",
-    image:
-      "https://static.wikia.nocookie.net/werewolf-online/images/2/25/Alpha_Werewolf.png",
-  },
-  {
-    name: "Fool",
-    image:
-      "https://static.wikia.nocookie.net/werewolf-online/images/7/70/Fool.png",
-  },
-];
+import roles from "../../../backend/assets/roles.json"
 
 function getTrunucatedString(string: string, max: number) {
   if (string.length > max) {
@@ -56,13 +12,13 @@ function getTrunucatedString(string: string, max: number) {
 }
 
 export async function generateStaticParams() {
- return ([{slug: 1}])
+  return [{ slug: 1 }];
 }
 
 export default function Server() {
   let players: any[] = [];
 
-  for (let index = 0; index < 20; index++) {
+  for (let index = 0; index < 4; index++) {
     players.push(faker.internet.userName());
   }
 
@@ -71,7 +27,7 @@ export default function Server() {
   function handleDrawerchange() {
     setOpenedDrawer(!openedDrawer);
   }
-  
+
   return (
     <div className={`drawer drawer-end ${openedDrawer && "drawer-open"}`}>
       <input
@@ -93,6 +49,26 @@ export default function Server() {
           {openedDrawer ? ">" : "<"}
         </label>
 
+        {/* <div className="w-full mx-96 font-bold text-2xl">
+          {!winner
+            ? (phase === "Night" && `night: ${nightTime}`) ||
+              (phase === "Discussion" && `discussion: ${discussionTime}`) ||
+              (phase === "Voting" && `voting: ${votingTime}`) ||
+              (phase == "Interlude1" && "Interlude1") ||
+              (phase == "Interlude2" && "Interlude2")
+            : `Winner: ${winner || "No winner"}`}
+        </div>
+        <div className="flex flex-col">
+          {usedAbilities.map((ability) => {
+            return (
+              <div>
+                {ability.abilityName} {ability.targetedPlayers}{" "}
+                {ability.usedBy || "no one"}
+              </div>
+            );
+          })}
+        </div> */}
+
         <div className="flex flex-col items-center justify-center overflow-y-auto">
           <div className="flex flex-wrap items-center justify-center gap-6 p-8 mx-8">
             {players.map((playerId) => {
@@ -101,11 +77,17 @@ export default function Server() {
                   <button className="btn btn-ghost absolute top-0 right-0 text-lg">
                     ...
                   </button>
-                  <div className="w-full h-full bg-secondary opacity-5 rounded-2xl"></div>
+                  <div
+                    onClick={() => {
+                      handlePlayerClick(playerId);
+                    }}
+                    className="w-full h-full bg-secondary opacity-5 rounded-2xl"
+                  ></div>
                   <div className="absolute flex justify-between items-center p-3 bg-secondary-content bg-opacity-30 w-full text-center bottom-0 rounded-b-2xl">
                     <div className="tooltip" data-tip={playerId}>
                       <p className="text-sm">
                         {getTrunucatedString(playerId, 18)}
+                        {playerId.status}
                       </p>
                     </div>
                     <label className="swap">
@@ -143,6 +125,23 @@ export default function Server() {
   </div> */}
           </div>
         </div>
+        <div>
+          abilities
+          {/* {player.abilities.map((ability: any) => {
+                  return (
+                    <button
+                      className={`btn btn-sm btn-outline ${
+                        !ability.enabled && "btn-disabled"
+                      }`}
+                      onClick={() => {
+                        setCurrentAbilityUsing(ability.name);
+                      }}
+                    >
+                      {ability.displayName || ability.name}
+                    </button>
+                  );
+                })} */}
+        </div>
       </div>
       <div className="drawer-side">
         <div className="p-5 h-full min-w-96 max-w-96 bg-base-200">
@@ -175,7 +174,7 @@ export default function Server() {
                     return (
                       <div className="tooltip" data-tip={role.name}>
                         <img
-                          src={role.image}
+                          src={`../src/assets/Role_Images/${role.img}`}
                           alt={role.name}
                           className={`w-full aspect-square object-contain ${
                             role.name === "Aura Seer" && "opacity-20"

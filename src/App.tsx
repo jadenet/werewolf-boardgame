@@ -1,5 +1,4 @@
 import { Route, Switch } from "wouter";
-import Game from "./routes/game";
 import Page from "./routes/page";
 import CreateLobby from "./routes/createlobby";
 import Lobby from "./routes/lobby";
@@ -12,7 +11,6 @@ export default function App() {
     <RootLayout>
       <Switch>
         <Route path="/" component={Page} />
-        <Route path="/game" component={Game} />
         <Route path="/createlobby" component={CreateLobby} />
         <Route path="/lobby" component={Lobby} />
         <Route path="/servers" component={Servers} />

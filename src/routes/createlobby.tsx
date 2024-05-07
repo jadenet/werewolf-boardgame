@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import roles from "../../public/roles.json";
+import roles from "../../../backend/assets/roles.json";
 
 const chats = ["Video", "Audio", "Text"];
 const languages = ["English", "Dutch", "Spanish"];
@@ -167,7 +167,7 @@ export default function CreateLobby() {
                           data-tip={role.name}
                         >
                           <img
-                            src={`/Role_Images/${role.img}`}
+                            src={`../src/assets/Role_Images/${role.img}`}
                             alt={role.name}
                             className="aspect-square object-contain w-10"
                           />
