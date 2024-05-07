@@ -1,4 +1,7 @@
-export function validateWerewolfVote(player: { status: string; team: string; }, targetPlayer: { status: string; team: string; }) {
+export function validateWerewolfVote(
+  player: { status: string; team: string },
+  targetPlayer: { status: string; team: string }
+) {
   // check phase time too
   if (
     player.status === "Alive" &&
@@ -6,23 +9,33 @@ export function validateWerewolfVote(player: { status: string; team: string; }, 
     player.team === "Werewolves" &&
     targetPlayer.team !== "Werewolves"
   ) {
-    // add werewolf vote, check for alpha
-  }
+    console.log("sweet");
 
-  return true
+    return true;
+    // check for alpha
+  } else {
+    ("weird one");
+  }
 }
 
-export function validateLynchingVote(player: { status: string; }, targetPlayer: { status: string; }) {
+export function validateLynchingVote(
+  player: { status: string },
+  targetPlayer: { status: string }
+) {
   // check phase time
   // check if player is blocked
   if (player.status === "Alive" && targetPlayer.status === "Alive") {
     // add vote, check for mayor or added votes
   }
 
-  return true
+  return true;
 }
 
-export function validateAbility(player: { status: string; }, ability: { conditions: any[]; }, phase: any) {
+export function validateAbility(
+  player: { status: string },
+  ability: { conditions: any[] },
+  phase: any
+) {
   let valid = true;
 
   ability.conditions.map((conditionKey: any, conditionValue: any) => {

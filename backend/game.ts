@@ -12,13 +12,11 @@ const discussionDuration = 10;
 const votingDuration = 5;
 const nightDuration = 5;
 const interludeDuration = 3;
-const playerCount = 16;
 let currentChats = ["Werewolves", "Medium and dead", "Lovers"];
 
 import express from "express";
 import { createServer } from "node:http";
 import { Server } from "socket.io";
-import { faker } from "@faker-js/faker";
 const app = express();
 const server = createServer(app);
 const io = new Server(server);
@@ -26,19 +24,11 @@ const port = 3000;
 
 const rooms = ["-all", "-werewolves", "-dead", "-alive", "-lovers"];
 
-const randomPlayers: any = [];
-
-for (let index = 0; index < 2; index++) {
-  randomPlayers.push({
-    name: faker.internet.userName(),
-  });
-}
-
-let lobbies: lobby[] = [
-  { id: 1, players: randomPlayers, gameStarted: false, max_players: 4 },
+let lobbies: Lobby[] = [
+  { id: 1, players: [], gameStarted: false, maxPlayers: 4 },
 ];
 
-interface ability {
+interface Ability {
   name: string;
   displayName?: string;
   img: string;
@@ -46,22 +36,26 @@ interface ability {
   conditions: {};
 }
 
-interface player {
+interface Player {
   name: string;
   role?: string;
   status?: string;
-  abilities?: ability[];
+  abilities?: Ability[];
 }
 
-interface lobby {
+interface Lobby {
   id: number;
   createdAt?: Date;
-  max_players: number;
-  players: player[];
+  maxPlayers: number;
+  players: Player[];
   playerHost?: number;
   gamemode?: string;
   gameStarted: boolean;
 }
+
+let handlePlayerClick = (a, b) => {
+  console.log("this is null");
+};
 
 function getLobbyFromId(id) {
   return lobbies.find((lobby) => {
@@ -73,16 +67,19 @@ io.on("connection", (socket) => {
   socket.on("lobbyjoin", (lobbyId, playerName) => {
     let lobby = getLobbyFromId(lobbyId);
     if (lobby) {
-      const playerLength = lobby.players.length;
-      if (playerLength < lobby.max_players && !lobby.gameStarted) {
+      if (lobby.players.length < lobby.maxPlayers && !lobby.gameStarted) {
         socket.join(lobbyId);
         lobby.players.push({ name: playerName });
-        io.to(lobbyId).emit("playersChanged", lobby.players)
+        io.to(lobbyId).emit("playersChanged", lobby.players);
       }
-      
-      if (playerLength === lobby.max_players) {
+
+      if (lobby.players.length === lobby.maxPlayers) {
         Game(lobby);
       }
+
+      socket.on("playerClicked", (playerClicked, playerTarget) => {
+        handlePlayerClick(playerClicked, playerTarget);
+      });
 
       socket.on("disconnect", () => {
         const playerIndex = lobby.players.findIndex(
@@ -95,8 +92,8 @@ io.on("connection", (socket) => {
   });
 });
 
-function newLobby(lobbyId: lobby["id"]) {
-  lobbies.push({ id: lobbyId, players: [], gameStarted: false });
+function newLobby(lobbyId: Lobby["id"]) {
+  lobbies.push({ id: lobbyId, players: [], gameStarted: false, maxPlayers: 4 });
 }
 
 server.listen(port, () => {
@@ -104,10 +101,10 @@ server.listen(port, () => {
 });
 
 export default function Game(lobby) {
-  console.log("START GAME")
   let winner: string | null = null;
-  const roles = getRoles(playerCount);
-  assignRoles(players, roles);
+  const roles = getRoles(lobby.players.length);
+  assignRoles(lobby.players, roles);
+  io.to(lobby.id).emit("playersChanged", lobby.players);
   let phase = "Night";
   let nightTime = nightDuration;
   let discussionTime = discussionDuration;
@@ -131,7 +128,7 @@ export default function Game(lobby) {
 
     // send death alert
 
-    const possibleWinner = checkGameConditions(players, roles);
+    const possibleWinner = checkGameConditions(lobby.players, roles);
 
     winner = possibleWinner;
   }
@@ -140,7 +137,7 @@ export default function Game(lobby) {
     if (phase === "Voting") {
     } else if (phase === "Night") {
     }
-    players
+    lobby.players
       .filter((player) => player.status === "Alive")
       .map((player) => {
         const playerRole = roles.find((role) => {
@@ -154,15 +151,15 @@ export default function Game(lobby) {
                 ["Discussion", "Voting"].includes(phase))) &&
             (!ability.useLimit || ability.useLimit > 0)
           ) {
-            players[players.findIndex((a) => a === player)].abilities[
-              index
-            ].enabled = true;
+            lobby.players[
+              lobby.players.findIndex((a) => a === player)
+            ].abilities[index].enabled = true;
             // check other ability conditions
             // playerRole.abilities[index].useLimit -= 1;
           } else {
-            players[players.findIndex((a) => a === player)].abilities[
-              index
-            ].enabled = false;
+            lobby.players[
+              lobby.players.findIndex((a) => a === player)
+            ].abilities[index].enabled = false;
             // lock out ability
           }
         });
@@ -173,22 +170,50 @@ export default function Game(lobby) {
     currentChats = ["All"];
 
     function intervalFunc(countdown) {
+      console.log("night...", countdown);
       nightTime = countdown;
     }
 
     function afterFunc(countdown) {
-      !checkGameConditions(players, roles) && interlude1();
+      const totalWerewolfVotes = werewolvesVotes.map((vote) => {
+        return vote.targetPlayer.name;
+      });
+
+      if (totalWerewolfVotes.length > 0) {
+        let frequencies = {};
+        for (const vote of totalWerewolfVotes) {
+          frequencies[vote] = frequencies[vote] ? frequencies[vote] + 1 : 1;
+        }
+
+        let highestVotesNumber = 0;
+        let highestPlayerName = "";
+
+        for (const key in frequencies) {
+          highestVotesNumber =
+            frequencies[key] > highestVotesNumber ? frequencies[key] : 0;
+          highestPlayerName = key;
+        }
+
+        const playerIndex = lobby.players.findIndex(
+          (player) => player.name === highestPlayerName
+        );
+        lobby.players[playerIndex].status = "Killed by werewolves";
+        io.to(lobby.id).emit("playersChanged", lobby.players);
+
+      }
+      !checkGameConditions(lobby.players, roles) && interlude1();
     }
     createTimer(intervalFunc, afterFunc, nightDuration);
   }
 
   function interlude1() {
     function intervalFunc(countdown) {
+      console.log("interlude...", countdown);
       interludeTime = countdown;
     }
 
     function afterFunc(countdown) {
-      !checkGameConditions(players, roles) && discussion();
+      !checkGameConditions(lobby.players, roles) && discussion();
     }
     createTimer(intervalFunc, afterFunc, interludeDuration);
   }
@@ -197,33 +222,36 @@ export default function Game(lobby) {
     currentChats = ["All"];
 
     function intervalFunc(countdown) {
+      console.log("discussion...", countdown);
       discussionTime = countdown;
     }
 
     function afterFunc(countdown) {
-      !checkGameConditions(players, roles) && voting();
+      !checkGameConditions(lobby.players, roles) && voting();
     }
     createTimer(intervalFunc, afterFunc, discussionDuration);
   }
 
   function voting() {
     function intervalFunc(countdown) {
+      console.log("voting...", countdown);
       votingTime = countdown;
     }
 
     function afterFunc(countdown) {
-      !checkGameConditions(players, roles) && interlude2();
+      !checkGameConditions(lobby.players, roles) && interlude2();
     }
     createTimer(intervalFunc, afterFunc, votingDuration);
   }
 
   function interlude2() {
     function intervalFunc(countdown) {
+      console.log("interlude2...", countdown);
       interludeTime = countdown;
     }
 
     function afterFunc(countdown) {
-      !checkGameConditions(players, roles) && nightPhase();
+      !checkGameConditions(lobby.players, roles) && nightPhase();
     }
     createTimer(intervalFunc, afterFunc, interludeDuration);
   }
@@ -240,28 +268,32 @@ export default function Game(lobby) {
     }
   }
 
-  function handlePlayerClick(player: any) {
-    const playerClicked = player;
+  handlePlayerClick = (playerClicked: any, playerTarget) => {
     if (currentabilityUsing) {
       usedAbilities.push({
         abilityName: currentabilityUsing,
-        targetedPlayers: [player.name],
+        targetedPlayers: [playerTarget.name],
         usedBy: null,
       });
       currentabilityUsing = null;
     } else if (
       phase === "Night" &&
-      validateWerewolfVote(playerClicked, player)
+      validateWerewolfVote(playerClicked, playerTarget)
     ) {
       werewolvesVotes.push({
         playerVoting: playerClicked,
-        targetPlayer: player,
+        targetPlayer: playerTarget,
       });
     } else if (
       phase === "Voting" &&
-      validateLynchingVote(playerClicked, player)
+      validateLynchingVote(playerClicked, playerTarget)
     ) {
-      lynchVotes.push({ playerVoting: playerClicked, targetPlayer: player });
+      lynchVotes.push({
+        playerVoting: playerClicked,
+        targetPlayer: playerTarget,
+      });
     }
-  }
+  };
+
+  nightPhase();
 }

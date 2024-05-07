@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import roles from "../../../backend/assets/roles.json";
 import { io } from "socket.io-client";
 import { useParams } from "wouter";
+import { faker } from "@faker-js/faker";
 
 function getTrunucatedString(string: string, max: number) {
   if (string.length > max) {
@@ -12,33 +13,37 @@ function getTrunucatedString(string: string, max: number) {
   }
 }
 
+const playerName = faker.internet.displayName();
+
 export default function Server() {
   const lobbyId = Number(useParams()["id"]);
-  
-  
+  const [socket, setSocket] = useState(null);
+
   useEffect(() => {
     const socket = io("http://localhost:3000");
-    
+    setSocket(socket);
+
     socket.on("connect", () => {
-      socket.emit("lobbyjoin", lobbyId, "alice");
+      socket.emit("lobbyjoin", lobbyId, playerName);
     });
 
     socket.on("playersChanged", (newPlayers) => {
-      setPlayers(newPlayers)
+      setPlayers(newPlayers);
     });
-  
+
     // socket.on("abilityUsed", (ability) => {});
-  
+
     socket.on("chatMessage", (message) => {
       setChatMessages([...chatMessages, message]);
     });
 
-    return(() => {
-      socket.disconnect()
-    })
-  }, [])
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
-  const [players, setPlayers] = useState([])
+  const [players, setPlayers] = useState([]);
+  const currentPlayer = players.find((player) => player.name == playerName)
   const [chatMessages, setChatMessages] = useState([]);
   const currentPlayerId = null;
 
@@ -49,7 +54,11 @@ export default function Server() {
   }
 
   return (
-    <div className={`drawer min-h-screen drawer-end ${openedDrawer && "drawer-open"}`}>
+    <div
+      className={`drawer min-h-screen drawer-end ${
+        openedDrawer && "drawer-open"
+      }`}
+    >
       <input
         id="my-drawer-2"
         type="checkbox"
@@ -95,22 +104,27 @@ export default function Server() {
           <div className="flex flex-wrap items-center justify-center gap-6 p-8 mx-8">
             {players.map((player) => {
               return (
-                <div className="relative flex w-56 aspect-square rounded-2xl">
+                <div
+                  className="relative flex w-56 aspect-square rounded-2xl"
+                  onClick={() => {
+                    socket.emit("playerClicked", currentPlayer, player);
+                  }}
+                >
                   <button className="btn btn-ghost absolute top-0 right-0 text-lg">
                     ...
                   </button>
+                  <div className="w-full h-full bg-secondary opacity-5 rounded-2xl"></div>
                   <div
-                    // onClick={() => {
-                    //   handlePlayerClick(player);
-                    // }}
-                    className="w-full h-full bg-secondary opacity-5 rounded-2xl"
-                  ></div>
-                  <div className="absolute flex justify-between items-center p-3 bg-secondary-content bg-opacity-30 w-full text-center bottom-0 rounded-b-2xl">
+                    className={`${
+                      player.name === currentPlayer.name && "bg-red-500"
+                    } absolute flex justify-between items-center p-3 bg-secondary-content bg-opacity-30 w-full text-center bottom-0 rounded-b-2xl`}
+                  >
                     <div className="tooltip" data-tip={player.name}>
                       <p className="text-sm">
                         {getTrunucatedString(player.name, 18)}
-                        {player.status}
                       </p>
+                      <p>{player.status}</p>
+                      <p>{player.role}</p>
                     </div>
                     <label className="swap">
                       <input type="checkbox" defaultChecked />
