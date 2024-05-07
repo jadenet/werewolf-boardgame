@@ -6,8 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx --watch ./game.ts",
-    "build": "vite build",
-    "preview": "vite preview"
+    "build": "tsx ./game.ts"
   },
   "author": "",
   "license": "ISC",
