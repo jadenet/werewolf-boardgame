@@ -1,1 +1,1 @@
-{"tabs": [{"displayName": "terminal","script": "npm run dev"}]}
+{"tabs": [{"displayName": "frontend","script": "npm run dev", "directory": "frontend"}, {"displayName": "backend","script": "npm run dev", "directory": "backend"}]}

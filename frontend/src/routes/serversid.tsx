@@ -1,7 +1,8 @@
 import Chat from "../components/Chat";
-import { faker } from "@faker-js/faker";
-import { useState } from "react";
-import roles from "../../../backend/assets/roles.json"
+import { useEffect, useState } from "react";
+import roles from "../../../backend/assets/roles.json";
+import { io } from "socket.io-client";
+import { useParams } from "wouter";
 
 function getTrunucatedString(string: string, max: number) {
   if (string.length > max) {
@@ -11,16 +12,35 @@ function getTrunucatedString(string: string, max: number) {
   }
 }
 
-export async function generateStaticParams() {
-  return [{ slug: 1 }];
-}
-
 export default function Server() {
-  let players: any[] = [];
+  const lobbyId = Number(useParams()["id"]);
+  
+  
+  useEffect(() => {
+    const socket = io("http://localhost:3000");
+    
+    socket.on("connect", () => {
+      socket.emit("lobbyjoin", lobbyId, "alice");
+    });
 
-  for (let index = 0; index < 4; index++) {
-    players.push(faker.internet.userName());
-  }
+    socket.on("playersChanged", (newPlayers) => {
+      setPlayers(newPlayers)
+    });
+  
+    // socket.on("abilityUsed", (ability) => {});
+  
+    socket.on("chatMessage", (message) => {
+      setChatMessages([...chatMessages, message]);
+    });
+
+    return(() => {
+      socket.disconnect()
+    })
+  }, [])
+
+  const [players, setPlayers] = useState([])
+  const [chatMessages, setChatMessages] = useState([]);
+  const currentPlayerId = null;
 
   const [openedDrawer, setOpenedDrawer] = useState(true);
 
@@ -29,7 +49,7 @@ export default function Server() {
   }
 
   return (
-    <div className={`drawer drawer-end ${openedDrawer && "drawer-open"}`}>
+    <div className={`drawer min-h-screen drawer-end ${openedDrawer && "drawer-open"}`}>
       <input
         id="my-drawer-2"
         type="checkbox"
@@ -48,6 +68,8 @@ export default function Server() {
         >
           {openedDrawer ? ">" : "<"}
         </label>
+
+        {/* <div>{timer}</div> */}
 
         {/* <div className="w-full mx-96 font-bold text-2xl">
           {!winner
@@ -71,23 +93,23 @@ export default function Server() {
 
         <div className="flex flex-col items-center justify-center overflow-y-auto">
           <div className="flex flex-wrap items-center justify-center gap-6 p-8 mx-8">
-            {players.map((playerId) => {
+            {players.map((player) => {
               return (
                 <div className="relative flex w-56 aspect-square rounded-2xl">
                   <button className="btn btn-ghost absolute top-0 right-0 text-lg">
                     ...
                   </button>
                   <div
-                    onClick={() => {
-                      handlePlayerClick(playerId);
-                    }}
+                    // onClick={() => {
+                    //   handlePlayerClick(player);
+                    // }}
                     className="w-full h-full bg-secondary opacity-5 rounded-2xl"
                   ></div>
                   <div className="absolute flex justify-between items-center p-3 bg-secondary-content bg-opacity-30 w-full text-center bottom-0 rounded-b-2xl">
-                    <div className="tooltip" data-tip={playerId}>
+                    <div className="tooltip" data-tip={player.name}>
                       <p className="text-sm">
-                        {getTrunucatedString(playerId, 18)}
-                        {playerId.status}
+                        {getTrunucatedString(player.name, 18)}
+                        {player.status}
                       </p>
                     </div>
                     <label className="swap">
@@ -156,7 +178,10 @@ export default function Server() {
             />
 
             <div role="tabpanel" className="tab-content">
-              <Chat />
+              <Chat
+                chatMessages={chatMessages}
+                currentPlayerId={currentPlayerId}
+              />
             </div>
 
             <input
@@ -187,7 +212,7 @@ export default function Server() {
                 <div className="flex flex-col gap-3 p-4 outline outline-base-300 outline-2 rounded-lg">
                   <p className="text-center text-lg">Players</p>
                   {players.map((player) => {
-                    return <div>{player}</div>;
+                    return <div>{player.name}</div>;
                   })}
                 </div>
               </div>

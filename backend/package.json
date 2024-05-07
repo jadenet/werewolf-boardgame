@@ -1,0 +1,24 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "game.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx --watch ./game.ts",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@faker-js/faker": "^8.4.1",
+    "express": "^4.19.2",
+    "kysely": "^0.27.3",
+    "socket.io": "^4.7.5",
+    "typescript": "^5.4.5"
+  },
+  "devDependencies": {
+    "tsx": "^4.9.3"
+  }
+}
