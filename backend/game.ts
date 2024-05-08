@@ -1,3 +1,4 @@
+import "dotenv/config";
 import getRoles from "./game/getroles";
 import assignRoles from "./game/assignroles";
 import checkGameConditions from "./game/checkgameconditions";
@@ -19,7 +20,7 @@ import { createServer } from "node:http";
 import { Server } from "socket.io";
 const app = express();
 const server = createServer(app);
-const io = new Server(server);
+const io = new Server(server, {cors: {origin: ["https://werewolf-peom.onrender.com"]}});
 const port = 3000;
 
 const rooms = ["-all", "-werewolves", "-dead", "-alive", "-lovers"];
@@ -64,6 +65,7 @@ function getLobbyFromId(id) {
 }
 
 io.on("connection", (socket) => {
+  console.log("it owrked")
   socket.on("lobbyjoin", (lobbyId, playerName) => {
     let lobby = getLobbyFromId(lobbyId);
     if (lobby) {
@@ -92,13 +94,11 @@ io.on("connection", (socket) => {
   });
 });
 
+server.listen(process.env.SERVER_PORT);
+
 function newLobby(lobbyId: Lobby["id"]) {
   lobbies.push({ id: lobbyId, players: [], gameStarted: false, maxPlayers: 4 });
 }
-
-server.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
-});
 
 export default function Game(lobby) {
   let winner: string | null = null;
@@ -199,7 +199,6 @@ export default function Game(lobby) {
         );
         lobby.players[playerIndex].status = "Killed by werewolves";
         io.to(lobby.id).emit("playersChanged", lobby.players);
-
       }
       !checkGameConditions(lobby.players, roles) && interlude1();
     }

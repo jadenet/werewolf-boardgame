@@ -20,7 +20,7 @@ export default function Server() {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const socket = io("http://localhost:3000");
+    const socket = io("https://werewolf-peom.onrender.com");
     setSocket(socket);
 
     socket.on("connect", () => {
