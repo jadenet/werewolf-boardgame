@@ -20,8 +20,7 @@ import { createServer } from "node:http";
 import { Server } from "socket.io";
 const app = express();
 const server = createServer(app);
-const io = new Server(server, {cors: {origin: ["https://werewolf-peom.onrender.com"]}});
-const port = 3000;
+const io = new Server(server);
 
 const rooms = ["-all", "-werewolves", "-dead", "-alive", "-lovers"];
 
@@ -65,7 +64,6 @@ function getLobbyFromId(id) {
 }
 
 io.on("connection", (socket) => {
-  console.log("it owrked")
   socket.on("lobbyjoin", (lobbyId, playerName) => {
     let lobby = getLobbyFromId(lobbyId);
     if (lobby) {
@@ -94,7 +92,7 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(process.env.SERVER_PORT);
+server.listen(Number(process.env.SERVER_PORT), "0.0.0.0");
 
 function newLobby(lobbyId: Lobby["id"]) {
   lobbies.push({ id: lobbyId, players: [], gameStarted: false, maxPlayers: 4 });
