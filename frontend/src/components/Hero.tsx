@@ -1,14 +1,14 @@
 const images = [
   {
-    src: "../src/assets/Role_Images/Villager.png",
+    src: "/images/roles/Villager.png",
     alt: "Villager avatar",
   },
   {
-    src: "../src/assets/Role_Images/Werewolf.png",
+    src: "/images/roles/Werewolf.png",
     alt: "Werewolf avatar",
   },
   {
-    src: "../src/assets/Role_Images/Serial_Killer.png",
+    src: "/images/roles/Serial_Killer.png",
     alt: "Serial Killer avatar",
   },
 ];

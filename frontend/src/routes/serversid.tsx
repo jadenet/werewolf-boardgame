@@ -213,7 +213,7 @@ export default function Server() {
                     return (
                       <div className="tooltip" data-tip={role.name}>
                         <img
-                          src={`../src/assets/Role_Images/${role.img}`}
+                          src={`/images/roles/${role.img}`}
                           alt={role.name}
                           className={`w-full aspect-square object-contain ${
                             role.name === "Aura Seer" && "opacity-20"

@@ -167,7 +167,7 @@ export default function CreateLobby() {
                           data-tip={role.name}
                         >
                           <img
-                            src={`../src/assets/Role_Images/${role.img}`}
+                            src={`/images/roles/${role.img}`}
                             alt={role.name}
                             className="aspect-square object-contain w-10"
                           />
@@ -205,7 +205,7 @@ export default function CreateLobby() {
                           data-tip={role.name}
                         >
                           <img
-                            src={`/Role_Images/${role.img}`}
+                            src={`/images/roles/${role.img}`}
                             alt={role.name}
                             className="aspect-square object-contain w-10"
                           />
@@ -243,7 +243,7 @@ export default function CreateLobby() {
                           data-tip={role.name}
                         >
                           <img
-                            src={`/Role_Images/${role.img}`}
+                            src={`/images/roles/${role.img}`}
                             alt={role.name}
                             className="aspect-square object-contain w-10"
                           />
