@@ -1,28 +1,33 @@
 import { faker } from "@faker-js/faker";
 import { Link } from "wouter";
 
-let lobbies: any[] = [];
+const lobbies: any[] = [];
 const gamemodes = ["Classic", "Custom"];
-const chats = ["Video","Audio", "Text"];
+const chats = ["Video", "Audio", "Text"];
+const ages = ["13+", "16+", "18+"];
 const languages = ["English", "Dutch", "Spanish"];
 const sorts = ["Player count"];
 
 for (let index = 0; index < 16; index++) {
   const maxPlayers = 16;
-  let lobby = {
+  const lobby = {
     id: faker.number.int(),
     maxPlayers: maxPlayers,
     playerCount: faker.number.int({ min: 1, max: maxPlayers - 1 }),
     playerHost: faker.internet.userName(),
     gamemode: faker.helpers.arrayElement(gamemodes),
-    tags: faker.helpers.arrayElements(chats.concat(languages)),
+    potentialRoles: [],
+    ages: faker.helpers.arrayElement(ages),
+    chats: faker.helpers.arrayElements(chats),
+    languages: faker.helpers.arrayElements(languages),
+    inviteOnly: false,
   };
   lobbies.push(lobby);
 }
 
 export default function Servers() {
   return (
-    <div className="drawer lg:drawer-open">
+    <div className="drawer lg:drawer-open min-h-screen">
       <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
       <div className="drawer-content flex flex-col mx-10 my-6">
         <div className="overflow-x-auto">
@@ -31,7 +36,9 @@ export default function Servers() {
               <tr>
                 <th>Gamemode</th>
                 <th>Players</th>
-                <th>Tags</th>
+                <th>Chat</th>
+                <th>Languages</th>
+                <th>Age</th>
                 <th></th>
               </tr>
             </thead>
@@ -43,14 +50,37 @@ export default function Servers() {
                     <td>
                       {lobby.playerCount} / {lobby.maxPlayers}
                     </td>
-                    <td className="flex flex-wrap gap-4 max-w-96">
-                      {lobby.tags.map((tag: any) => {
-                        return <div className="badge badge-outline">{tag}</div>;
-                      })}
+                    <td className="max-w-52">
+                      <div className="flex flex-wrap gap-4">
+                        {lobby.chats.map((tag: any) => {
+                          return (
+                            <div className="badge badge-lg badge-outline">
+                              {tag}
+                            </div>
+                          );
+                        })}
+                      </div>
                     </td>
+                    <td className="gap-4 max-w-52">
+                      <div className="flex flex-wrap gap-4">
+                        {lobby.languages.map((tag: any) => {
+                          return (
+                            <div className="badge badge-lg badge-outline">
+                              {tag}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </td>
+                    <td>{lobby.ages}</td>
 
                     <td>
-                      <Link className="btn btn-outline w-24" href={`/servers/${lobby.id}`}>Join</Link>
+                      <Link
+                        className="btn btn-outline w-24"
+                        href={`/servers/${lobby.id}`}
+                      >
+                        Join
+                      </Link>
                     </td>
                   </tr>
                 );
@@ -65,7 +95,7 @@ export default function Servers() {
           Open drawer
         </label>
       </div>
-      <div className="drawer-side max-h-screen bg-base-200">
+      <div className="drawer-side h-full bg-base-200">
         <label
           htmlFor="my-drawer-2"
           aria-label="close sidebar"
@@ -113,9 +143,6 @@ export default function Servers() {
             <div className="collapse-title text-xl">Chat</div>
             <div className="collapse-content">
               <div className="flex flex-wrap gap-3">
-                <button className="btn btn-primary btn-xs font-normal">
-                  All
-                </button>
                 {chats.map((chat, index) => {
                   return (
                     <button className="btn btn-outline btn-xs" key={index}>
@@ -137,6 +164,35 @@ export default function Servers() {
                     <button className="btn btn-outline btn-xs" key={index}>
                       {language}
                     </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          <div className="collapse collapse-arrow bg-base-200">
+            <input type="checkbox" defaultChecked />
+            <div className="collapse-title text-xl">Ages</div>
+            <div className="collapse-content">
+              <div className="flex flex-wrap gap-3">
+                {ages.map((age, index) => {
+                  return (
+                    <>
+                      <input
+                        type="radio"
+                        name="ages"
+                        id={age}
+                        value={age}
+                        className="hidden"
+                      />
+                      <label
+                        htmlFor={age}
+                        className="btn btn-outline btn-xs"
+                        key={index}
+                      >
+                        {age}
+                      </label>
+                    </>
                   );
                 })}
               </div>
