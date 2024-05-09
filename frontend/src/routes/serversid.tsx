@@ -13,15 +13,16 @@ function getTrunucatedString(string: string, max: number) {
   }
 }
 
-export default function Server() {
-  const playerName = faker.internet.displayName();
-  const socketUrl = import.meta.env.PROD
-    ? "https://werewolf-backend.onrender.com"
-    : "http://localhost:10000";
+const playerName = faker.internet.displayName();
+
+export default function ServerId() {
   const lobbyId = Number(useParams()["id"]);
   const [socket, setSocket] = useState(null);
-
+  
   useEffect(() => {
+    const socketUrl = import.meta.env.PROD
+      ? "https://werewolf-backend.onrender.com"
+      : "http://localhost:10000";
     const socket = io(socketUrl, { port: 10000 });
     setSocket(socket);
 
