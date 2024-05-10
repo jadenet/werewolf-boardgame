@@ -1,5 +1,5 @@
 import Chat from "../components/Chat";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import roles from "../../../backend/assets/roles.json";
 import { io } from "socket.io-client";
 import { useParams } from "wouter";
@@ -25,8 +25,8 @@ export default function ServerId() {
   const currentPlayer = players.find((player) => player.name == playerName);
   const [chatMessages, setChatMessages] = useState([]);
   const [openedDrawer, setOpenedDrawer] = useState(true);
-  const [currentPhase, setCurrentPhase] = useState("Day");
-  const gameStarted = false;
+  const [currentPhase, setCurrentPhase] = useState(null);
+  const [gameStarted, setGameStarted] = useState(false);
 
   useEffect(() => {
     const socketUrl = import.meta.env.PROD
@@ -47,6 +47,14 @@ export default function ServerId() {
 
     socket.on("chatMessage", (message) => {
       setChatMessages([...chatMessages, message]);
+    });
+
+    socket.on("phaseChange", (phase) => {
+      setCurrentPhase(phase);
+    });
+
+    socket.on("gameStarted", () => {
+      setGameStarted(true);
     });
 
     return () => {

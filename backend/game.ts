@@ -132,6 +132,8 @@ export default function Game(lobby) {
   let werewolvesVotes: any[] = [];
   let lynchVotes: any[] = [];
 
+  io.to(lobby.id).emit("gameStarted")
+
   function endGame() {
     currentChats = ["All"];
     // remove all abilities and end day/night cycle
@@ -186,6 +188,7 @@ export default function Game(lobby) {
 
   function nightPhase() {
     currentChats = ["All"];
+    io.to(lobby.id).emit("phaseChange", "Night")
 
     function intervalFunc(countdown) {
       console.log("night...", countdown);
@@ -237,6 +240,7 @@ export default function Game(lobby) {
 
   function discussion() {
     currentChats = ["All"];
+    io.to(lobby.id).emit("phaseChange", "Discussion")
 
     function intervalFunc(countdown) {
       console.log("discussion...", countdown);
@@ -250,6 +254,8 @@ export default function Game(lobby) {
   }
 
   function voting() {
+    io.to(lobby.id).emit("phaseChange", "Voting")
+
     function intervalFunc(countdown) {
       console.log("voting...", countdown);
       votingTime = countdown;
