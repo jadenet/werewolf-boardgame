@@ -72,7 +72,7 @@ export default function ServerId() {
 
   return (
     <div
-      className={`drawer min-h-screen drawer-end ${
+      className={`drawer h-[92vh] drawer-end ${
         openedDrawer && "drawer-open"
       }`}
     >
@@ -83,7 +83,7 @@ export default function ServerId() {
         checked={openedDrawer}
         onChange={handleDrawerchange}
       />
-      <div className="drawer-content">
+      <div className="drawer-content flex flex-col justify-between">
         <label
           htmlFor="my-drawer-2"
           className={`drawer-button btn btn-primary ${
@@ -177,8 +177,9 @@ export default function ServerId() {
   </div> */}
           </div>
         </div>
-        <div>
-          abilities
+        <div className="flex items-center sticky bottom-0 gap-12 w-full h-24 p-4 bg-base-200">
+          <p>Phase: {currentPhase || "None"}</p>
+          <p>Abilities: None</p>
           {/* {player.abilities.map((ability: any) => {
                   return (
                     <button
@@ -195,7 +196,7 @@ export default function ServerId() {
                 })} */}
         </div>
       </div>
-      <div className="drawer-side">
+      <div className="drawer-side h-[92vh]">
         <div className="p-5 h-full min-w-96 max-w-96 bg-base-200">
           <div role="tablist" className="tabs tabs-lifted max-h-screen">
             <input
@@ -228,7 +229,7 @@ export default function ServerId() {
             <div role="tabpanel" className="tab-content">
               <div className="flex flex-col gap-6 mx-2 my-8">
                 <div className="grid grid-cols-5 items-center p-4 outline outline-2 outline-base-300 h-40 gap-x-4 rounded-lg">
-                  {roles.map((role) => {
+                  {/* {roles.map((role) => {
                     return (
                       <div className="tooltip" data-tip={role.name}>
                         <img
@@ -240,7 +241,7 @@ export default function ServerId() {
                         />
                       </div>
                     );
-                  })}
+                  })} */}
                 </div>
                 <div className="flex flex-col gap-3 p-4 outline outline-base-300 outline-2 rounded-lg">
                   <p className="text-center text-lg">Players</p>

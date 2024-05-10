@@ -9,7 +9,7 @@ export default function Chat(props) {
         This is the beginning of the chat. Remember to be respectful and to play
         fairly.
       </p>
-      <div className="flex flex-col-reverse gap-3 overflow-y-scroll h-[32rem] mx-2 my-8">
+      <div className="flex flex-col-reverse gap-3 overflow-y-scroll h-[31rem] mx-2 my-8">
         <div>
           {props.chatMessages.map((chat) => {
             return (
