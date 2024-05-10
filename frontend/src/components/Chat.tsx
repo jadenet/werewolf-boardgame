@@ -1,4 +1,8 @@
+import { useState } from "react";
+
 export default function Chat(props) {
+  const [inputValue, setInputValue] = useState("");
+
   return (
     <>
       <p className="opacity-40 my-8">
@@ -28,9 +32,23 @@ export default function Chat(props) {
         <input
           type="text"
           placeholder="Type a message"
+          name="text"
+          id="text input"
+          value={inputValue}
+          onChange={(e) => {
+            setInputValue(e.target.value);
+          }}
           className="input input-bordered w-full"
         />
-        <button className="btn btn-outline">Send</button>
+        <button
+          type="submit"
+          className="btn btn-outline"
+          onClick={() => {
+            props.onClick(inputValue);
+          }}
+        >
+          Send
+        </button>
       </div>
     </>
   );

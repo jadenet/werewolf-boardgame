@@ -18,7 +18,12 @@ const playerName = faker.internet.displayName();
 export default function ServerId() {
   const lobbyId = Number(useParams()["id"]);
   const [socket, setSocket] = useState(null);
-  
+  const [players, setPlayers] = useState([]);
+  const currentPlayer = players.find((player) => player.name == playerName);
+  const [chatMessages, setChatMessages] = useState([]);
+  const currentPlayerId = null;
+  const [openedDrawer, setOpenedDrawer] = useState(true);
+
   useEffect(() => {
     const socketUrl = import.meta.env.PROD
       ? "https://werewolf-backend.onrender.com"
@@ -43,14 +48,11 @@ export default function ServerId() {
     return () => {
       socket.disconnect();
     };
-  }, []);
+  }, [chatMessages]);
 
-  const [players, setPlayers] = useState([]);
-  const currentPlayer = players.find((player) => player.name == playerName);
-  const [chatMessages, setChatMessages] = useState([]);
-  const currentPlayerId = null;
-
-  const [openedDrawer, setOpenedDrawer] = useState(true);
+  useEffect(() => {
+    
+  }, [socket, chatMessages]);
 
   function handleDrawerchange() {
     setOpenedDrawer(!openedDrawer);
@@ -197,6 +199,9 @@ export default function ServerId() {
               <Chat
                 chatMessages={chatMessages}
                 currentPlayerId={currentPlayerId}
+                onClick={(message) => {
+                  socket.emit("messageSent", message, currentPlayer);
+                }}
               />
             </div>
 

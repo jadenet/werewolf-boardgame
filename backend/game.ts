@@ -25,12 +25,12 @@ const originUrl =
     ? "https://werewolf-peom.onrender.com"
     : "http://localhost:10000";
 
-const io = new Server(server, {cors: {origin: originUrl}});
+const io = new Server(server, { cors: { origin: originUrl } });
 
 const rooms = ["-all", "-werewolves", "-dead", "-alive", "-lovers"];
 
 let lobbies: Lobby[] = [
-  { id: 1, players: [], gameStarted: false, maxPlayers: 4 },
+  { id: 1, players: [], gameStarted: false, maxPlayers: 4, chatMessages: [] },
 ];
 
 interface Ability {
@@ -52,10 +52,12 @@ interface Lobby {
   id: number;
   createdAt?: Date;
   maxPlayers: number;
+  potentialRoles?: [];
   players: Player[];
   playerHost?: number;
   gamemode?: string;
   gameStarted: boolean;
+  chatMessages: [];
 }
 
 let handlePlayerClick = (a, b) => {
@@ -86,6 +88,13 @@ io.on("connection", (socket) => {
         handlePlayerClick(playerClicked, playerTarget);
       });
 
+      socket.on("messageSent", (message, currentPlayer) => {
+        io.to(lobbyId).emit("chatMessage", {
+          playerId: currentPlayer.name,
+          message: message,
+        });
+      });
+
       socket.on("disconnect", () => {
         const playerIndex = lobby.players.findIndex(
           (player) => player.name === playerName
@@ -97,10 +106,16 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(Number(process.env.SERVER_PORT), "0.0.0.0", () => {console.log('listening')});
+server.listen(Number(process.env.SERVER_PORT), "0.0.0.0", () => {});
 
 function newLobby(lobbyId: Lobby["id"]) {
-  lobbies.push({ id: lobbyId, players: [], gameStarted: false, maxPlayers: 4 });
+  lobbies.push({
+    id: lobbyId,
+    players: [],
+    gameStarted: false,
+    maxPlayers: 4,
+    chatMessages: [],
+  });
 }
 
 export default function Game(lobby) {
