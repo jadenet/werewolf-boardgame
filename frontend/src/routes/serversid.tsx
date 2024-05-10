@@ -1,5 +1,5 @@
 import Chat from "../components/Chat";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import roles from "../../../backend/assets/roles.json";
 import { io } from "socket.io-client";
 import { useParams } from "wouter";
@@ -16,13 +16,17 @@ function getTrunucatedString(string: string, max: number) {
 const playerName = faker.internet.displayName();
 
 export default function ServerId() {
+  const [themePreference, setThemePreference] = useState(
+    localStorage.getItem("themePreference")
+  );
   const lobbyId = Number(useParams()["id"]);
   const [socket, setSocket] = useState(null);
   const [players, setPlayers] = useState([]);
   const currentPlayer = players.find((player) => player.name == playerName);
   const [chatMessages, setChatMessages] = useState([]);
-  const currentPlayerId = null;
   const [openedDrawer, setOpenedDrawer] = useState(true);
+  const [currentPhase, setCurrentPhase] = useState("Day");
+  const gameStarted = false;
 
   useEffect(() => {
     const socketUrl = import.meta.env.PROD
@@ -51,8 +55,8 @@ export default function ServerId() {
   }, [chatMessages]);
 
   useEffect(() => {
-    
-  }, [socket, chatMessages]);
+    localStorage.setItem("themePreference", themePreference);
+  }, [themePreference]);
 
   function handleDrawerchange() {
     setOpenedDrawer(!openedDrawer);
@@ -108,6 +112,8 @@ export default function ServerId() {
         <div className="flex flex-col items-center justify-center overflow-y-auto">
           <div className="flex flex-wrap items-center justify-center gap-6 p-8 mx-8">
             {players.map((player) => {
+              const isCurrentPlayer =
+                currentPlayer && player.name === currentPlayer.name;
               return (
                 <div
                   className="relative flex w-56 aspect-square rounded-2xl"
@@ -119,7 +125,7 @@ export default function ServerId() {
                     ...
                   </button>
                   <div className="w-full h-full bg-secondary opacity-5 rounded-2xl"></div>
-                  {player.name === currentPlayer.name ? (
+                  {isCurrentPlayer ? (
                     <div className="bg-red-500 absolute flex justify-between items-center p-3 bg-opacity-30 w-full text-center bottom-0 rounded-b-2xl">
                       <div className="tooltip" data-tip={player.name}>
                         <p className="text-sm">
@@ -131,9 +137,8 @@ export default function ServerId() {
                       <label className="swap">
                         <input type="checkbox" defaultChecked />
 
-                        <div className="swap-on">{"<"}</div>
-
-                        <div className="swap-off">-</div>
+                        <div className="swap-on">mic</div>
+                        <div className="swap-off">off</div>
                       </label>
                     </div>
                   ) : (
@@ -149,7 +154,6 @@ export default function ServerId() {
                         <input type="checkbox" defaultChecked />
 
                         <div className="swap-on">{"<"}</div>
-
                         <div className="swap-off">-</div>
                       </label>
                     </div>
@@ -198,7 +202,7 @@ export default function ServerId() {
             <div role="tabpanel" className="tab-content">
               <Chat
                 chatMessages={chatMessages}
-                currentPlayerId={currentPlayerId}
+                currentPlayerId={currentPlayer ? currentPlayer.name : ""}
                 onClick={(message) => {
                   socket.emit("messageSent", message, currentPlayer);
                 }}
@@ -251,11 +255,10 @@ export default function ServerId() {
               <div className="flex flex-col gap-6 mx-2 my-8">
                 <div className="flex flex-col gap-3 p-4 outline outline-base-300 outline-2 rounded-lg">
                   <div className="text-center text-lg">Game Settings</div>
-                  <div>Gamemode: Wild</div>
+                  <div>Gamemode: Classic</div>
                   <div>Max players: 16</div>
                   <div>Age: 16+</div>
                   <div>Chat: Mic only</div>
-                  <div>Tone: Casual</div>
                   <div>Languages: English</div>
                 </div>
 
@@ -281,9 +284,42 @@ export default function ServerId() {
                 <div className="flex flex-col gap-4 p-4 outline outline-base-300 outline-2 rounded-lg">
                   <div className="text-center text-lg">Theme</div>
                   <div className="grid grid-cols-3 gap-2">
-                    <button className="btn btn-primary">Dynamic</button>
-                    <button className="btn btn-outline">Light</button>
-                    <button className="btn btn-outline">Dark</button>
+                    <input
+                      type="radio"
+                      name="theme-selector"
+                      value={
+                        !gameStarted
+                          ? "default"
+                          : currentPhase !== "Night"
+                          ? "light"
+                          : "dark"
+                      }
+                      className="btn btn-outline theme-controller"
+                      defaultChecked={
+                        themePreference === "Default" ||
+                        themePreference === null
+                      }
+                      onClick={() => setThemePreference("Default")}
+                      aria-label="Dynamic"
+                    />
+                    <input
+                      type="radio"
+                      name="theme-selector"
+                      value="light"
+                      className="btn btn-outline theme-controller"
+                      defaultChecked={themePreference === "Light"}
+                      onClick={() => setThemePreference("Light")}
+                      aria-label="Light"
+                    />
+                    <input
+                      type="radio"
+                      name="theme-selector"
+                      value="dark"
+                      className="btn btn-outline theme-controller"
+                      defaultChecked={themePreference === "Dark"}
+                      onClick={() => setThemePreference("Dark")}
+                      aria-label="Dark"
+                    />
                   </div>
                 </div>
 

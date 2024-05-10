@@ -13,7 +13,18 @@ const config: Config = {
   },
   plugins: [require("daisyui")],
   daisyui: {
-    themes: ["nord", "dracula"],
+    themes: {
+      light: {
+        ...require("daisyui/src/theming/themes")["light"],
+        primary: "blue",
+        secondary: "teal",
+      },
+      dark: {
+        ...require("daisyui/src/theming/themes")["light"],
+        primary: "blue",
+        secondary: "teal",
+      },
+    },
   },
 };
 export default config;

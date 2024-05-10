@@ -9,7 +9,7 @@ import Footer from "./components/Footer";
 
 export default function App() {
   return (
-    <html lang="en" data-theme="dracula">
+    <html lang="en">
       <body>
         <Navbar />
         <Switch>

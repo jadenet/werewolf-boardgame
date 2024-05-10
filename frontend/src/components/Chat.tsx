@@ -14,8 +14,10 @@ export default function Chat(props) {
           {props.chatMessages.map((chat) => {
             return (
               <div
-                className={`chat grid-cols-[2.5rem_auto] chat-${
-                  chat.playerId === props.currentPlayerId ? "end" : "start"
+                className={`chat chat-${
+                  chat.playerId === props.currentPlayerId
+                    ? "end grid-cols-[auto_2.5rem] "
+                    : "start grid-cols-[2.5rem_auto] "
                 }`}
               >
                 <div className="chat-image avatar">
