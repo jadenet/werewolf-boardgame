@@ -205,7 +205,7 @@ export default function CreateLobby() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-8 w-1/3 px-10">
+          <div className="flex flex-col gap-8 w-1/3 px-10 bg-base-200 py-12 rounded-2xl h-fit">
             <div className="flex flex-col gap-4">
               <div className="w-full text-lg">Gamemode</div>
               <div className="flex flex-wrap gap-3">
