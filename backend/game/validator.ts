@@ -1,34 +1,34 @@
 export function validateWerewolfVote(
   player: { status: string; team: string },
-  targetPlayer: { status: string; team: string }
+  targetPlayer: { status: string; team: string },
+  phase: string
 ) {
-  // check phase time too
   if (
     player.status === "Alive" &&
     targetPlayer.status === "Alive" &&
-    player.team === "Werewolves" &&
-    targetPlayer.team !== "Werewolves"
+    player.team.includes("Werewolves") &&
+    !targetPlayer.team.includes("Werewolves") &&
+    phase === "Night"
   ) {
-    console.log("sweet");
-
     return true;
     // check for alpha
-  } else {
-    ("weird one");
   }
 }
 
 export function validateLynchingVote(
   player: { status: string },
-  targetPlayer: { status: string }
+  targetPlayer: { status: string },
+  phase: string
 ) {
-  // check phase time
   // check if player is blocked
-  if (player.status === "Alive" && targetPlayer.status === "Alive") {
+  if (
+    player.status === "Alive" &&
+    targetPlayer.status === "Alive" &&
+    phase === "Voting"
+  ) {
     // add vote, check for mayor or added votes
+    return true;
   }
-
-  return true;
 }
 
 export function validateAbility(

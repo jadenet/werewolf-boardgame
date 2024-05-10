@@ -1,6 +1,5 @@
 import Chat from "../components/Chat";
 import { useEffect, useState } from "react";
-import roles from "../../../backend/assets/roles.json";
 import { io } from "socket.io-client";
 import { useParams } from "wouter";
 import { faker } from "@faker-js/faker";
@@ -27,6 +26,7 @@ export default function ServerId() {
   const [openedDrawer, setOpenedDrawer] = useState(true);
   const [currentPhase, setCurrentPhase] = useState(null);
   const [gameStarted, setGameStarted] = useState(false);
+  const [winner, setWinner] = useState(null);
 
   useEffect(() => {
     const socketUrl = import.meta.env.PROD
@@ -57,6 +57,10 @@ export default function ServerId() {
       setGameStarted(true);
     });
 
+    socket.on("winner", (winner) => {
+      setWinner(winner);
+    });
+
     return () => {
       socket.disconnect();
     };
@@ -72,9 +76,7 @@ export default function ServerId() {
 
   return (
     <div
-      className={`drawer h-[92vh] drawer-end ${
-        openedDrawer && "drawer-open"
-      }`}
+      className={`drawer h-[92vh] drawer-end ${openedDrawer && "drawer-open"}`}
     >
       <input
         id="my-drawer-2"
@@ -180,6 +182,7 @@ export default function ServerId() {
         <div className="flex items-center sticky bottom-0 gap-12 w-full h-24 p-4 bg-base-200">
           <p>Phase: {currentPhase || "None"}</p>
           <p>Abilities: None</p>
+          <p>Winner: {winner || "None"}</p>
           {/* {player.abilities.map((ability: any) => {
                   return (
                     <button
