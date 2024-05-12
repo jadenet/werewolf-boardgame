@@ -4,6 +4,7 @@ export function validateWerewolfVote(
   phase: string
 ) {
   if (
+    player !== targetPlayer && 
     player.status === "Alive" &&
     targetPlayer.status === "Alive" &&
     player.team.includes("Werewolves") &&
@@ -22,6 +23,7 @@ export function validateLynchingVote(
 ) {
   // check if player is blocked
   if (
+    player !== targetPlayer &&
     player.status === "Alive" &&
     targetPlayer.status === "Alive" &&
     phase === "Voting"

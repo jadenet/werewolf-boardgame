@@ -27,6 +27,8 @@ export default function ServerId() {
   const [currentPhase, setCurrentPhase] = useState(null);
   const [gameStarted, setGameStarted] = useState(false);
   const [winner, setWinner] = useState(null);
+  const [werewolvesVotes, setWerewolvesVotes] = useState([]);
+  const [lynchVotes, setLynchVotes] = useState([]);
 
   useEffect(() => {
     const socketUrl = import.meta.env.PROD
@@ -57,8 +59,16 @@ export default function ServerId() {
       setGameStarted(true);
     });
 
-    socket.on("winner", (winner) => {
-      setWinner(winner);
+    socket.on("winner", (newWinner) => {
+      setWinner(newWinner);
+    });
+
+    socket.on("werewolvesVotesChange", (newWerewolvesVotes) => {
+      setWerewolvesVotes(newWerewolvesVotes);
+    });
+
+    socket.on("lynchVotesChange", (newLynchVotes) => {
+      setLynchVotes(newLynchVotes);
     });
 
     return () => {
@@ -72,6 +82,25 @@ export default function ServerId() {
 
   function handleDrawerchange() {
     setOpenedDrawer(!openedDrawer);
+  }
+
+  function getVotesOnPlayerId(votes, playerId) {
+    let votesNum = 0;
+
+    votes.map((vote) => {
+      if (vote.targetPlayer.name === playerId) {
+        votesNum += 1;
+      }
+    });
+
+    return votesNum;
+  }
+
+  function getTargetPlayerVoteFromPlayerId(votes, playerId) {
+    const vote = votes.find((vote) => {
+      return vote.playerVoting.name === playerId;
+    });
+    return vote && vote.targetPlayer;
   }
 
   return (
@@ -124,6 +153,18 @@ export default function ServerId() {
             {players.map((player) => {
               const isCurrentPlayer =
                 currentPlayer && player.name === currentPlayer.name;
+              const votesOnPlayer =
+                currentPhase === "Night"
+                  ? getVotesOnPlayerId(werewolvesVotes, player.name)
+                  : getVotesOnPlayerId(lynchVotes, player.name);
+
+              const playerIsVoting =
+                currentPhase === "Night"
+                  ? getTargetPlayerVoteFromPlayerId(
+                      werewolvesVotes,
+                      player.name
+                    )
+                  : getTargetPlayerVoteFromPlayerId(lynchVotes, player.name);
               return (
                 <div
                   className="relative flex w-56 aspect-square rounded-2xl"
@@ -131,9 +172,9 @@ export default function ServerId() {
                     socket.emit("playerClicked", currentPlayer, player);
                   }}
                 >
-                  <button className="btn btn-ghost absolute top-0 right-0 text-lg">
-                    ...
-                  </button>
+                  <p className="btn btn-ghost absolute top-0 right-0 text-lg">
+                    {votesOnPlayer > 0 && votesOnPlayer}
+                  </p>
                   <div className="w-full h-full bg-secondary opacity-5 rounded-2xl"></div>
                   {isCurrentPlayer ? (
                     <div className="bg-red-500 absolute flex justify-between items-center p-3 bg-opacity-30 w-full text-center bottom-0 rounded-b-2xl">
@@ -143,6 +184,9 @@ export default function ServerId() {
                         </p>
                         <p>{player.status}</p>
                         <p>{player.role}</p>
+                        <p>
+                          Voting: {playerIsVoting && playerIsVoting.name}
+                        </p>
                       </div>
                       <label className="swap">
                         <input type="checkbox" defaultChecked />
@@ -159,6 +203,9 @@ export default function ServerId() {
                         </p>
                         <p>{player.status}</p>
                         <p>{player.role}</p>
+                        <p>
+                          Voting: {playerIsVoting && playerIsVoting.name}
+                        </p>
                       </div>
                       <label className="swap">
                         <input type="checkbox" defaultChecked />

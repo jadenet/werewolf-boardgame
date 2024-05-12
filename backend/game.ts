@@ -198,38 +198,22 @@ export default function Game(lobby) {
     }
 
     function afterFunc(countdown) {
-      const totalWerewolfVotes = werewolvesVotes.map((vote) => {
-        return vote.targetPlayer.name;
-      });
-
-      if (totalWerewolfVotes.length > 0) {
-        let frequencies = {};
-        for (const vote of totalWerewolfVotes) {
-          frequencies[vote] = frequencies[vote] ? frequencies[vote] + 1 : 1;
-        }
-
-        let highestVotesNumber = 0;
-        let highestPlayerName = "";
-
-        for (const key in frequencies) {
-          highestVotesNumber =
-            frequencies[key] > highestVotesNumber ? frequencies[key] : 0;
-          highestPlayerName = key;
-        }
-
-        const playerIndex = lobby.players.findIndex(
-          (player) => player.name === highestPlayerName
-        );
-        lobby.players[playerIndex].status = "Killed by werewolves";
+      const votedPlayer = getHighestVotes(werewolvesVotes);
+      if (votedPlayer && votedPlayer !== -1) {
+        lobby.players[votedPlayer].status = "Killed by werewolves";
         io.to(lobby.id).emit("playersChanged", lobby.players);
       }
+
+      werewolvesVotes = [];
+      io.to(lobby.id).emit("werewolvesVotesChange", []);
+
       const winner = checkGameConditions(lobby.players, roles);
-      !winner ? interlude1() : endGame(winner);
+      !winner ? interlude("Night") : endGame(winner);
     }
     createTimer(intervalFunc, afterFunc, nightDuration);
   }
 
-  function interlude1() {
+  function interlude(previousPhase) {
     function intervalFunc(countdown) {
       console.log("interlude...", countdown);
       interludeTime = countdown;
@@ -237,7 +221,12 @@ export default function Game(lobby) {
 
     function afterFunc(countdown) {
       const winner = checkGameConditions(lobby.players, roles);
-      !winner ? discussion() : endGame(winner);
+
+      !winner
+        ? previousPhase === "Night"
+          ? discussion()
+          : nightPhase()
+        : endGame(winner);
     }
     createTimer(intervalFunc, afterFunc, interludeDuration);
   }
@@ -259,6 +248,42 @@ export default function Game(lobby) {
     createTimer(intervalFunc, afterFunc, discussionDuration);
   }
 
+  function getHighestVotes(votes) {
+    const totalVotes = votes.map((vote) => {
+      return vote.targetPlayer.name;
+    });
+
+    if (totalVotes.length > 0) {
+      let frequencies = {};
+      for (const vote of totalVotes) {
+        frequencies[vote] = frequencies[vote] ? frequencies[vote] + 1 : 1;
+      }
+
+      let secondHighestVotesNumber = 0;
+      let highestVotesNumber = 0;
+      let highestPlayerName = "";
+
+      for (const key in frequencies) {
+        const isHigher = frequencies[key] > highestVotesNumber;
+        if (isHigher) {
+          secondHighestVotesNumber = highestVotesNumber;
+          highestVotesNumber = frequencies[key];
+          highestPlayerName = key;
+        } else if (frequencies[key] === highestVotesNumber) {
+          highestPlayerName = "";
+        }
+      }
+
+      if (highestVotesNumber > secondHighestVotesNumber) {
+        const playerIndex = lobby.players.findIndex((player) => {
+          return player.name === highestPlayerName;
+        });
+
+        return playerIndex;
+      }
+    }
+  }
+
   function voting() {
     phase = "Voting";
     io.to(lobby.id).emit("phaseChange", "Voting");
@@ -269,49 +294,19 @@ export default function Game(lobby) {
     }
 
     function afterFunc(countdown) {
-      const totalLynchingVotes = lynchVotes.map((vote) => {
-        return vote.targetPlayer.name;
-      });
-
-      if (totalLynchingVotes.length > 0) {
-        let frequencies = {};
-        for (const vote of totalLynchingVotes) {
-          frequencies[vote] = frequencies[vote] ? frequencies[vote] + 1 : 1;
-        }
-
-        let highestVotesNumber = 0;
-        let highestPlayerName = "";
-
-        for (const key in frequencies) {
-          highestVotesNumber =
-            frequencies[key] > highestVotesNumber ? frequencies[key] : 0;
-          highestPlayerName = key;
-        }
-
-        const playerIndex = lobby.players.findIndex(
-          (player) => player.name === highestPlayerName
-        );
-        lobby.players[playerIndex].status = "Lynched";
+      const votedPlayer = getHighestVotes(lynchVotes);
+      if (votedPlayer && votedPlayer !== -1) {
+        lobby.players[votedPlayer].status = "Lynched";
         io.to(lobby.id).emit("playersChanged", lobby.players);
       }
 
+      lynchVotes = [];
+      io.to(lobby.id).emit("lynchVotesChange", []);
+
       const winner = checkGameConditions(lobby.players, roles);
-      !winner ? interlude2() : endGame(winner);
+      !winner ? interlude("Voting") : endGame(winner);
     }
     createTimer(intervalFunc, afterFunc, votingDuration);
-  }
-
-  function interlude2() {
-    function intervalFunc(countdown) {
-      console.log("interlude2...", countdown);
-      interludeTime = countdown;
-    }
-
-    function afterFunc(countdown) {
-      const winner = checkGameConditions(lobby.players, roles);
-      !winner ? nightPhase() : endGame(winner);
-    }
-    createTimer(intervalFunc, afterFunc, interludeDuration);
   }
 
   let currentabilityUsing = null;
@@ -326,6 +321,12 @@ export default function Game(lobby) {
     }
   }
 
+  function playerHasVotedBefore(votes, playerClicked) {
+    return votes.findIndex((vote) => {
+      return vote.playerVoting.name === playerClicked.name;
+    });
+  }
+
   handlePlayerClick = (playerClicked: any, playerTarget) => {
     if (currentabilityUsing) {
       usedAbilities.push({
@@ -335,15 +336,27 @@ export default function Game(lobby) {
       });
       currentabilityUsing = null;
     } else if (validateWerewolfVote(playerClicked, playerTarget, phase)) {
-      werewolvesVotes.push({
-        playerVoting: playerClicked,
-        targetPlayer: playerTarget,
-      });
+      const voteIndex = playerHasVotedBefore(werewolvesVotes, playerClicked);
+      if (voteIndex !== -1) {
+        werewolvesVotes[voteIndex].targetPlayer = playerTarget;
+      } else {
+        werewolvesVotes.push({
+          playerVoting: playerClicked,
+          targetPlayer: playerTarget,
+        });
+      }
+      io.to(lobby.id).emit("werewolvesVotesChange", werewolvesVotes);
     } else if (validateLynchingVote(playerClicked, playerTarget, phase)) {
-      lynchVotes.push({
-        playerVoting: playerClicked,
-        targetPlayer: playerTarget,
-      });
+      const voteIndex = playerHasVotedBefore(lynchVotes, playerClicked);
+      if (voteIndex !== -1) {
+        lynchVotes[voteIndex].targetPlayer = playerTarget;
+      } else {
+        lynchVotes.push({
+          playerVoting: playerClicked,
+          targetPlayer: playerTarget,
+        });
+      }
+      io.to(lobby.id).emit("lynchVotesChange", lynchVotes);
     }
   };
 
