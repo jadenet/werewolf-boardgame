@@ -18,6 +18,11 @@ export default function ServerId() {
   const [themePreference, setThemePreference] = useState(
     localStorage.getItem("themePreference")
   );
+
+  if (themePreference === null) {
+    setThemePreference("Default");
+  }
+
   const lobbyId = Number(useParams()["id"]);
   const [socket, setSocket] = useState(null);
   const [players, setPlayers] = useState([]);
@@ -162,9 +167,7 @@ export default function ServerId() {
                         </p>
                         <p>{player.status}</p>
                         <p>{player.role}</p>
-                        <p>
-                          Voting: {playerIsVoting && playerIsVoting.name}
-                        </p>
+                        <p>Voting: {playerIsVoting && playerIsVoting.name}</p>
                       </div>
                       <label className="swap">
                         <input type="checkbox" defaultChecked />
@@ -181,9 +184,7 @@ export default function ServerId() {
                         </p>
                         <p>{player.status}</p>
                         <p>{player.role}</p>
-                        <p>
-                          Voting: {playerIsVoting && playerIsVoting.name}
-                        </p>
+                        <p>Voting: {playerIsVoting && playerIsVoting.name}</p>
                       </div>
                       <label className="swap">
                         <input type="checkbox" defaultChecked />
@@ -274,7 +275,11 @@ export default function ServerId() {
                 <div className="flex flex-col gap-3 p-4 outline outline-base-300 outline-2 rounded-lg">
                   <p className="text-center text-lg">Players</p>
                   {players.map((player) => {
-                    return <div>{player.name}</div>;
+                    if (!gameStarted || player.status === "Alive") {
+                      return <p>{player.name}</p>;
+                    } else {
+                      return <s className="opacity-15">{player.name} (dead)</s>;
+                    }
                   })}
                 </div>
               </div>
@@ -332,10 +337,7 @@ export default function ServerId() {
                           : "dark"
                       }
                       className="btn btn-outline theme-controller"
-                      defaultChecked={
-                        themePreference === "Default" ||
-                        themePreference === null
-                      }
+                      defaultChecked={themePreference === "Default"}
                       onClick={() => setThemePreference("Default")}
                       aria-label="Dynamic"
                     />
@@ -360,7 +362,33 @@ export default function ServerId() {
                   </div>
                 </div>
 
-                <div className="btn btn-error btn-outline">Leave/End game</div>
+                <button
+                  className="btn btn-error btn-outline"
+                  onClick={() =>
+                    document.getElementById("my_modal_5").showModal()
+                  }
+                >
+                  Leave/End game
+                </button>
+                <dialog
+                  id="my_modal_5"
+                  className="modal modal-bottom sm:modal-middle"
+                >
+                  <div className="modal-box">
+                    <p className="py-4">
+                      Are you sure you want to leave the game?
+                    </p>
+                    <div className="modal-action flex flex-2">
+                      <form method="dialog">
+                        <button className="btn">No</button>
+                      </form>
+                      <button className="btn">Yes</button>
+                    </div>
+                  </div>
+                  <form method="dialog" className="modal-backdrop">
+                    <button>close</button>
+                  </form>
+                </dialog>
               </div>
             </div>
           </div>
