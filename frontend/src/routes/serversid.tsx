@@ -364,9 +364,12 @@ export default function ServerId() {
 
                 <button
                   className="btn btn-error btn-outline"
-                  onClick={() =>
-                    document.getElementById("my_modal_5").showModal()
-                  }
+                  onClick={() => {
+                    const element = document.getElementById(
+                      "my_modal_5"
+                    ) as HTMLDialogElement;
+                    element?.showModal();
+                  }}
                 >
                   Leave/End game
                 </button>
