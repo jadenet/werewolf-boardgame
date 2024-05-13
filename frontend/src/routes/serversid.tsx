@@ -74,7 +74,7 @@ export default function ServerId() {
     return () => {
       socket.disconnect();
     };
-  }, [chatMessages]);
+  }, [chatMessages, lobbyId]);
 
   useEffect(() => {
     localStorage.setItem("themePreference", themePreference);
@@ -125,28 +125,6 @@ export default function ServerId() {
         >
           {openedDrawer ? ">" : "<"}
         </label>
-
-        {/* <div>{timer}</div> */}
-
-        {/* <div className="w-full mx-96 font-bold text-2xl">
-          {!winner
-            ? (phase === "Night" && `night: ${nightTime}`) ||
-              (phase === "Discussion" && `discussion: ${discussionTime}`) ||
-              (phase === "Voting" && `voting: ${votingTime}`) ||
-              (phase == "Interlude1" && "Interlude1") ||
-              (phase == "Interlude2" && "Interlude2")
-            : `Winner: ${winner || "No winner"}`}
-        </div>
-        <div className="flex flex-col">
-          {usedAbilities.map((ability) => {
-            return (
-              <div>
-                {ability.abilityName} {ability.targetedPlayers}{" "}
-                {ability.usedBy || "no one"}
-              </div>
-            );
-          })}
-        </div> */}
 
         <div className="flex flex-col items-center justify-center overflow-y-auto">
           <div className="flex flex-wrap items-center justify-center gap-6 p-8 mx-8">

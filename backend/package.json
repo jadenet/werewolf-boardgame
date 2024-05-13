@@ -2,11 +2,11 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "game.ts",
+  "main": "index.ts",
   "type": "module",
   "scripts": {
-    "dev": "tsx --watch ./game.ts",
-    "build": "tsx ./game.ts"
+    "dev": "tsx --watch ./index.ts",
+    "build": "tsx ./index.ts"
   },
   "author": "",
   "license": "ISC",
