@@ -1,1 +1,1 @@
-{"tabs": [{"displayName": "frontend","script": "xdg-open http://localhost:5173/ && npm run dev", "directory": "frontend"}, {"displayName": "backend","script": "npm run dev", "directory": "backend"}]}
+{"tabs": [{"displayName": "frontend","script": ["npm run dev"], "directory": "frontend"}, {"displayName": "backend","script": "npm run dev", "directory": "backend"}]}
