@@ -89,7 +89,9 @@ export default function CreateLobby() {
                     return (
                       <div
                         className={`flex h-full justify-between items-center outline-secondary rounded-lg${
-                          !isChecked ? " outline outline-1 outline-secondary opacity-15" : " bg-secondary bg-opacity-15"
+                          !isChecked
+                            ? " outline outline-1 outline-secondary opacity-15"
+                            : " bg-secondary bg-opacity-15"
                         }`}
                       >
                         <input
@@ -103,8 +105,7 @@ export default function CreateLobby() {
                         />
                         <label
                           htmlFor={role.name}
-                          className="tooltip flex gap-4 items-center w-full p-2 px-4"
-                          data-tip={role.name}
+                          className="flex gap-4 items-center w-full p-2 px-4"
                         >
                           <img
                             src={`/images/roles/${role.img}`}
@@ -130,9 +131,11 @@ export default function CreateLobby() {
                     const isChecked = currentGamemode.roles.includes(role.name);
                     return (
                       <div
-                      className={`flex h-full justify-between items-center outline-secondary rounded-lg${
-                        !isChecked ? " outline outline-1 outline-secondary opacity-15" : " bg-secondary bg-opacity-15"
-                      }`}
+                        className={`flex h-full justify-between items-center outline-secondary rounded-lg${
+                          !isChecked
+                            ? " outline outline-1 outline-secondary opacity-15"
+                            : " bg-secondary bg-opacity-15"
+                        }`}
                       >
                         <input
                           type="checkbox"
@@ -145,8 +148,7 @@ export default function CreateLobby() {
                         />
                         <label
                           htmlFor={role.name}
-                          className="tooltip flex gap-4 items-center w-full p-2 px-4"
-                          data-tip={role.name}
+                          className="flex gap-4 items-center w-full p-2 px-4"
                         >
                           <img
                             src={`/images/roles/${role.img}`}
@@ -172,9 +174,11 @@ export default function CreateLobby() {
                     const isChecked = currentGamemode.roles.includes(role.name);
                     return (
                       <div
-                      className={`flex h-full justify-between items-center outline-secondary rounded-lg${
-                        !isChecked ? " outline outline-1 outline-secondary opacity-15" : " bg-secondary bg-opacity-15"
-                      }`}
+                        className={`flex h-full justify-between items-center outline-secondary rounded-lg${
+                          !isChecked
+                            ? " outline outline-1 outline-secondary opacity-15"
+                            : " bg-secondary bg-opacity-15"
+                        }`}
                       >
                         <input
                           type="checkbox"
@@ -187,8 +191,7 @@ export default function CreateLobby() {
                         />
                         <label
                           htmlFor={role.name}
-                          className="tooltip flex gap-4 items-center w-full p-2 px-4"
-                          data-tip={role.name}
+                          className="flex gap-4 items-center w-full p-2 px-4"
                         >
                           <img
                             src={`/images/roles/${role.img}`}
