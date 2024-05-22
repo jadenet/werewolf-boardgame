@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import roles from "../../../backend/assets/roles.json";
 
-const chats = ["Video", "Audio"];
+const chats = ["Audio", "Video"];
 const visibilityTypes = ["Public", "Invite Only"];
 
 let gamemodes = [
