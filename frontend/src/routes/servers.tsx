@@ -4,7 +4,6 @@ import { Link } from "wouter";
 const lobbies: any[] = [];
 const gamemodes = ["Classic", "Custom"];
 const chats = ["Video", "Audio"];
-const ages = ["13+", "16+", "18+"];
 const sorts = ["Player count"];
 
 for (let index = 0; index < 16; index++) {
@@ -16,7 +15,6 @@ for (let index = 0; index < 16; index++) {
     playerHost: faker.internet.userName(),
     gamemode: faker.helpers.arrayElement(gamemodes),
     potentialRoles: [],
-    ages: faker.helpers.arrayElement(ages),
     chats: faker.helpers.arrayElements(chats),
     inviteOnly: false,
   };
@@ -35,7 +33,6 @@ export default function Servers() {
                 <th>Gamemode</th>
                 <th>Players</th>
                 <th>Chat</th>
-                <th>Age</th>
                 <th></th>
               </tr>
             </thead>
@@ -58,7 +55,6 @@ export default function Servers() {
                         })}
                       </div>
                     </td>
-                    <td>{lobby.ages}</td>
 
                     <td>
                       <Link
@@ -134,35 +130,6 @@ export default function Servers() {
                     <button className="btn btn-outline btn-xs" key={index}>
                       {chat}
                     </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          <div className="collapse collapse-arrow bg-base-200">
-            <input type="checkbox" defaultChecked />
-            <div className="collapse-title text-xl">Ages</div>
-            <div className="collapse-content">
-              <div className="flex flex-wrap gap-3">
-                {ages.map((age, index) => {
-                  return (
-                    <>
-                      <input
-                        type="radio"
-                        name="ages"
-                        id={age}
-                        value={age}
-                        className="hidden"
-                      />
-                      <label
-                        htmlFor={age}
-                        className="btn btn-outline btn-xs"
-                        key={index}
-                      >
-                        {age}
-                      </label>
-                    </>
                   );
                 })}
               </div>
