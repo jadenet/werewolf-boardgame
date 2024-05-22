@@ -1,4 +1,3 @@
-import Chat from "../components/Chat";
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { useParams } from "wouter";
@@ -27,7 +26,6 @@ export default function ServerId() {
   const [socket, setSocket] = useState(null);
   const [players, setPlayers] = useState([]);
   const currentPlayer = players.find((player) => player.name == playerName);
-  const [chatMessages, setChatMessages] = useState([]);
   const [openedDrawer, setOpenedDrawer] = useState(true);
   const [currentPhase, setCurrentPhase] = useState(null);
   const [gameStarted, setGameStarted] = useState(false);
@@ -52,10 +50,6 @@ export default function ServerId() {
 
     // socket.on("abilityUsed", (ability) => {});
 
-    socket.on("chatMessage", (message) => {
-      setChatMessages([...chatMessages, message]);
-    });
-
     socket.on("phaseChange", (phase) => {
       setCurrentPhase(phase);
     });
@@ -79,7 +73,7 @@ export default function ServerId() {
     return () => {
       socket.disconnect();
     };
-  }, [chatMessages, lobbyId]);
+  }, [lobbyId]);
 
   useEffect(() => {
     localStorage.setItem("themePreference", themePreference);
@@ -231,28 +225,10 @@ export default function ServerId() {
             <input
               type="radio"
               name="sidebar"
-              aria-label="Chat"
-              role="tab"
-              className="tab"
-              defaultChecked
-            />
-
-            <div role="tabpanel" className="tab-content">
-              <Chat
-                chatMessages={chatMessages}
-                currentPlayerId={currentPlayer ? currentPlayer.name : ""}
-                onClick={(message) => {
-                  socket.emit("messageSent", message, currentPlayer);
-                }}
-              />
-            </div>
-
-            <input
-              type="radio"
-              name="sidebar"
               aria-label="Players"
               role="tab"
               className="tab"
+              defaultChecked
             />
 
             <div role="tabpanel" className="tab-content">

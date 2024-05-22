@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import roles from "../../../backend/assets/roles.json";
 
-const chats = ["Video", "Audio", "Text"];
+const chats = ["Video", "Audio"];
 const visibilityTypes = ["Public", "Invite Only"];
 
 let gamemodes = [
@@ -243,7 +243,7 @@ export default function CreateLobby() {
                       className="btn btn-outline btn-sm"
                       key={index}
                       value={chat}
-                      defaultChecked={chat === "Audio" || chat === "Text"}
+                      defaultChecked={chat === "Audio"}
                     />
                   );
                 })}

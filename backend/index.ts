@@ -13,7 +13,7 @@ const originUrl =
 const io = new Server(server, { cors: { origin: originUrl } });
 
 let lobbies: Lobby[] = [
-  { id: 1, players: [], gameStarted: false, maxPlayers: 4, chatMessages: [] },
+  { id: 1, players: [], gameStarted: false, maxPlayers: 4 },
 ];
 
 function createLobby(lobbyId: Lobby["id"]) {
@@ -22,7 +22,6 @@ function createLobby(lobbyId: Lobby["id"]) {
     players: [],
     gameStarted: false,
     maxPlayers: 4,
-    chatMessages: [],
   });
 }
 
@@ -54,13 +53,6 @@ io.on("connection", (socket) => {
       if (lobby.players.length >= 4) {
         Game(lobby, io, socket);
       }
-
-      socket.on("messageSent", (message, currentPlayer) => {
-        io.to(lobbyId).emit("chatMessage", {
-          playerId: currentPlayer.name,
-          message: message,
-        });
-      });
 
       socket.on("disconnect", () => {
         const playerIndex = lobby.players.findIndex(

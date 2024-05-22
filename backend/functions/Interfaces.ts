@@ -22,5 +22,4 @@ export interface Lobby {
   playerHost?: number;
   gamemode?: string;
   gameStarted: boolean;
-  chatMessages: [];
 }

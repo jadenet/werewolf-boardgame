@@ -3,7 +3,7 @@ import { Link } from "wouter";
 
 const lobbies: any[] = [];
 const gamemodes = ["Classic", "Custom"];
-const chats = ["Video", "Audio", "Text"];
+const chats = ["Video", "Audio"];
 const ages = ["13+", "16+", "18+"];
 const sorts = ["Player count"];
 
