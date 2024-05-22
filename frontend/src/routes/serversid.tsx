@@ -301,7 +301,6 @@ export default function ServerId() {
                   <div>Max players: 16</div>
                   <div>Age: 16+</div>
                   <div>Chat: Mic only</div>
-                  <div>Languages: English</div>
                 </div>
 
                 <div className="flex flex-col gap-4 p-4 outline outline-base-300 outline-2 rounded-lg">

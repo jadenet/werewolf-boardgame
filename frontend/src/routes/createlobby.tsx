@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import roles from "../../../backend/assets/roles.json";
 
 const chats = ["Video", "Audio", "Text"];
-const languages = ["English", "Dutch", "Spanish"];
 const visibilityTypes = ["Public", "Invite Only"];
 
 let gamemodes = [
@@ -245,25 +244,6 @@ export default function CreateLobby() {
                       key={index}
                       value={chat}
                       defaultChecked={chat === "Audio" || chat === "Text"}
-                    />
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-4">
-              <div className="w-full text-lg">Languages</div>
-              <div className="flex flex-wrap gap-3">
-                {languages.map((language, index) => {
-                  return (
-                    <input
-                      type="checkbox"
-                      aria-label={language}
-                      name="language"
-                      className="btn btn-outline btn-sm"
-                      key={index}
-                      value={language}
-                      defaultChecked={language === "English"}
                     />
                   );
                 })}

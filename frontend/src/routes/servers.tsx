@@ -5,7 +5,6 @@ const lobbies: any[] = [];
 const gamemodes = ["Classic", "Custom"];
 const chats = ["Video", "Audio", "Text"];
 const ages = ["13+", "16+", "18+"];
-const languages = ["English", "Dutch", "Spanish"];
 const sorts = ["Player count"];
 
 for (let index = 0; index < 16; index++) {
@@ -19,7 +18,6 @@ for (let index = 0; index < 16; index++) {
     potentialRoles: [],
     ages: faker.helpers.arrayElement(ages),
     chats: faker.helpers.arrayElements(chats),
-    languages: faker.helpers.arrayElements(languages),
     inviteOnly: false,
   };
   lobbies.push(lobby);
@@ -37,7 +35,6 @@ export default function Servers() {
                 <th>Gamemode</th>
                 <th>Players</th>
                 <th>Chat</th>
-                <th>Languages</th>
                 <th>Age</th>
                 <th></th>
               </tr>
@@ -53,17 +50,6 @@ export default function Servers() {
                     <td className="max-w-52">
                       <div className="flex flex-wrap gap-4">
                         {lobby.chats.map((tag: any) => {
-                          return (
-                            <div className="badge badge-lg badge-outline">
-                              {tag}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </td>
-                    <td className="gap-4 max-w-52">
-                      <div className="flex flex-wrap gap-4">
-                        {lobby.languages.map((tag: any) => {
                           return (
                             <div className="badge badge-lg badge-outline">
                               {tag}
@@ -147,22 +133,6 @@ export default function Servers() {
                   return (
                     <button className="btn btn-outline btn-xs" key={index}>
                       {chat}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          <div className="collapse collapse-arrow bg-base-200">
-            <input type="checkbox" defaultChecked />
-            <div className="collapse-title text-xl">Languages</div>
-            <div className="collapse-content">
-              <div className="flex flex-wrap gap-3">
-                {languages.map((language, index) => {
-                  return (
-                    <button className="btn btn-outline btn-xs" key={index}>
-                      {language}
                     </button>
                   );
                 })}
