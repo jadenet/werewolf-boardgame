@@ -158,18 +158,20 @@ export default function ServerId() {
                   {isCurrentPlayer ? (
                     <div className="bg-red-500 absolute flex justify-between items-center p-3 bg-opacity-30 w-full text-center bottom-0 rounded-b-2xl">
                       <div className="tooltip" data-tip={player.name}>
-                        <p className="text-sm">
+                        <p className="text-md">
                           {getTrunucatedString(player.name, 18)}
                         </p>
                         <p>{player.status}</p>
                         <p>{player.role}</p>
-                        <p>Voting: {playerIsVoting && playerIsVoting.name}</p>
+                        {currentPhase === "Voting" && (
+                          <p>Voting: {playerIsVoting && playerIsVoting.name}</p>
+                        )}
                       </div>
                       <label className="swap">
                         <input type="checkbox" defaultChecked />
 
-                        <div className="swap-on">mic</div>
-                        <div className="swap-off">off</div>
+                        <div className="swap-on">{"<"}</div>
+                        <div className="swap-off">-</div>
                       </label>
                     </div>
                   ) : (
@@ -180,7 +182,9 @@ export default function ServerId() {
                         </p>
                         <p>{player.status}</p>
                         <p>{player.role}</p>
-                        <p>Voting: {playerIsVoting && playerIsVoting.name}</p>
+                        {currentPhase === "Voting" && (
+                          <p>Voting: {playerIsVoting && playerIsVoting.name}</p>
+                        )}
                       </div>
                       <label className="swap">
                         <input type="checkbox" defaultChecked />
