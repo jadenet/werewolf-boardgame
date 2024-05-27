@@ -2,11 +2,16 @@
 
 import { useMemo, useState } from "react";
 import roles from "../../../backend/assets/roles.json";
+import { useLocation } from "wouter";
 
 const chats = ["Audio", "Video"];
 const visibilityTypes = ["Public", "Invite Only"];
+const serverUrl =
+  process.env.NODE_ENV === "production"
+    ? "https://werewolf-backend.onrender.com"
+    : "http://localhost:10000";
 
-let gamemodes = [
+const gamemodes = [
   {
     name: "Classic",
     role_percentages: { werewolves: 5, solos: 5, villagers: 90 },
@@ -48,11 +53,14 @@ const soloRoles = roles
 export default function CreateLobby() {
   const [currentGamemode, setCurrentGamemode]: any = useState(gamemodes[0]);
   const [currentRoles, setCurrentRoles]: any = useState(gamemodes[0].roles);
+  const [hostPlayerName, setHostPlayerName]: any = useState("");
+  const [formErrors, setFormErrors]: any = useState([]);
+  const [location, setLocation] = useLocation();
   const customGamemode = useMemo(() => currentRoles, [currentRoles]);
   gamemodes[1].roles = customGamemode;
 
   function checkCurrentGamemode(e: any) {
-    let newRoles = [...currentRoles];
+    const newRoles = [...currentRoles];
     if (e.target.checked) {
       newRoles.push(e.target.value);
       setCurrentRoles(newRoles);
@@ -70,8 +78,36 @@ export default function CreateLobby() {
 
   return (
     <>
+      {formErrors.map((formError) => {
+        return (
+          <div className="toast">
+            <div className="alert alert-error">
+              <span>{formError}</span>
+            </div>
+          </div>
+        );
+      })}
       <form
-        method="POST"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          const response = await fetch(serverUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              roles: currentGamemode.roles,
+              gamemode: currentGamemode.name,
+              hostPlayerName: hostPlayerName,
+            }),
+          });
+
+          const responseJson = await response.json();
+
+          if (responseJson.status === "success") {
+            setLocation(`/servers/${responseJson.id}`);
+          } else {
+            setFormErrors(responseJson.errors);
+          }
+        }}
         className="flex flex-col gap-8 items-center py-4 mb-20 w-full"
       >
         <div className="max-h-xl flex justify-center gap-4 p-8 w-full max-w-7xl min-h-screen rounded-lg">
@@ -269,9 +305,21 @@ export default function CreateLobby() {
               </div>
             </div>
 
-            <button type="submit" className="btn btn-primary w-full">
-              Submit
-            </button>
+            <div className="flex flex-col gap-4">
+              <div className="w-full text-lg">Name</div>
+              <input
+                type="text"
+                placeholder="Type here"
+                aria-label={hostPlayerName}
+                name="hostPlayerName"
+                className="input input-bordered w-full max-w-xs"
+                onChange={(e) => {
+                  setHostPlayerName(e.target.value);
+                }}
+              />
+            </div>
+
+            <button className="btn btn-primary w-full">Submit</button>
           </div>
         </div>
       </form>

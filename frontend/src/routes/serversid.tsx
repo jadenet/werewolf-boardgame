@@ -22,7 +22,7 @@ export default function ServerId() {
     setThemePreference("Default");
   }
 
-  const lobbyId = Number(useParams()["id"]);
+  const lobbyId = useParams()["id"];
   const [socket, setSocket] = useState(null);
   const [players, setPlayers] = useState([]);
   const currentPlayer = players.find((player) => player.name == playerName);
