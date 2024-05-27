@@ -1,7 +1,7 @@
+import { faker } from "@faker-js/faker";
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
-import { useParams } from "wouter";
-import { faker } from "@faker-js/faker";
+import { useParams, useSearch } from "wouter";
 
 function getTrunucatedString(string: string, max: number) {
   if (string.length > max) {
@@ -11,7 +11,7 @@ function getTrunucatedString(string: string, max: number) {
   }
 }
 
-const playerName = faker.internet.displayName();
+const fakePlayerName = faker.internet.userName();
 
 export default function ServerId() {
   const [themePreference, setThemePreference] = useState(
@@ -22,6 +22,8 @@ export default function ServerId() {
     setThemePreference("Default");
   }
 
+  const searchParams = new URLSearchParams(useSearch());
+  const playerName = searchParams.get("name") || fakePlayerName;
   const lobbyId = useParams()["id"];
   const [socket, setSocket] = useState(null);
   const [players, setPlayers] = useState([]);
@@ -73,7 +75,7 @@ export default function ServerId() {
     return () => {
       socket.disconnect();
     };
-  }, [lobbyId]);
+  }, [lobbyId, playerName]);
 
   useEffect(() => {
     localStorage.setItem("themePreference", themePreference);
@@ -346,7 +348,9 @@ export default function ServerId() {
                     element?.showModal();
                   }}
                 >
-                  Leave/End game
+                  {currentPlayer && currentPlayer.isHost
+                    ? "End Game"
+                    : "Leave Game"}
                 </button>
                 <dialog
                   id="my_modal_5"
@@ -354,13 +358,18 @@ export default function ServerId() {
                 >
                   <div className="modal-box">
                     <p className="py-4">
-                      Are you sure you want to leave the game?
+                      Are you sure you want to{" "}
+                      {currentPlayer && currentPlayer.isHost ? "end" : "leave"}{" "}
+                      the game?
+                      {currentPlayer &&
+                        currentPlayer.isHost &&
+                        " This will kick all of the players and delete the lobby."}
                     </p>
                     <div className="modal-action flex flex-2">
                       <form method="dialog">
-                        <button className="btn">No</button>
+                        <button className="btn w-16">No</button>
                       </form>
-                      <button className="btn">Yes</button>
+                      <button className="btn btn-error w-16">Yes</button>
                     </div>
                   </div>
                   <form method="dialog" className="modal-backdrop">
