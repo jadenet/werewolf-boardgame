@@ -1,25 +1,19 @@
-import { faker } from "@faker-js/faker";
 import { Link } from "wouter";
 
-const lobbies: any[] = [];
+const serverUrl =
+  process.env.NODE_ENV === "production"
+    ? "https://werewolf-backend.onrender.com"
+    : "http://localhost:10000";
+
+const lobbiesResponse = await fetch(serverUrl + "/lobbies", {
+  method: "GET",
+  headers: { "Content-Type": "application/json" },
+});
+const lobbies = await lobbiesResponse.json();
+
 const gamemodes = ["Classic", "Custom"];
 const chats = ["Video", "Audio"];
 const sorts = ["Player count"];
-
-for (let index = 0; index < 16; index++) {
-  const maxPlayers = 16;
-  const lobby = {
-    id: faker.number.int(),
-    maxPlayers: maxPlayers,
-    playerCount: faker.number.int({ min: 1, max: maxPlayers - 1 }),
-    playerHost: faker.internet.userName(),
-    gamemode: faker.helpers.arrayElement(gamemodes),
-    potentialRoles: [],
-    chats: faker.helpers.arrayElements(chats),
-    inviteOnly: false,
-  };
-  lobbies.push(lobby);
-}
 
 export default function Servers() {
   return (
@@ -42,7 +36,7 @@ export default function Servers() {
                   <tr className="hover">
                     <td>{lobby.gamemode}</td>
                     <td>
-                      {lobby.playerCount} / {lobby.maxPlayers}
+                      {lobby.players.length} / {lobby.maxPlayers}
                     </td>
                     <td className="max-w-52">
                       <div className="flex flex-wrap gap-4">

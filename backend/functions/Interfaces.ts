@@ -18,6 +18,7 @@ export interface Player {
 export interface Lobby {
   id: string;
   createdAt?: Date;
+  chats: string[];
   maxPlayers: number;
   potentialRoles?: any[];
   players: Player[];

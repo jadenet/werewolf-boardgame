@@ -12,14 +12,22 @@ const io = new Server(server, {
 });
 
 let lobbies: Lobby[] = [
-  { id: "1", players: [], gameStarted: false, maxPlayers: 4 },
+  {
+    id: "1",
+    players: [],
+    gameStarted: false,
+    maxPlayers: 4,
+    chats: ["Video"],
+    gamemode: "Classic",
+  },
 ];
 
-function createLobby(potentialRoles: any[], gamemode) {
+function createLobby(potentialRoles: any[], gamemode: any, chats?: string[]) {
   const lobby = {
     id: crypto.randomUUID(),
     players: [],
     gameStarted: false,
+    chats: ["Audio"],
     maxPlayers: 4,
     potentialRoles: potentialRoles,
     gamemode: gamemode,
@@ -83,7 +91,7 @@ io.on("connection", (socket) => {
 
 app.use(bodyParser.json());
 
-app.post("/", async (req, res) => {
+app.post("/lobbies", async (req, res) => {
   let formErrors: string[] = [];
   if (req.body.hostPlayerName === "") {
     formErrors.push("Enter a name");
@@ -95,6 +103,10 @@ app.post("/", async (req, res) => {
   } else {
     res.send(JSON.stringify({ status: "error", errors: formErrors }));
   }
+});
+
+app.get("/lobbies", async (req, res) => {
+  res.send(JSON.stringify(lobbies));
 });
 
 server.listen(Number(process.env.SERVER_PORT), "0.0.0.0", () => {});

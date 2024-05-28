@@ -90,7 +90,7 @@ export default function CreateLobby() {
       <form
         onSubmit={async (e) => {
           e.preventDefault();
-          const response = await fetch(serverUrl, {
+          const response = await fetch(serverUrl + "/lobbies", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
