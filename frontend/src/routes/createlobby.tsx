@@ -55,7 +55,7 @@ export default function CreateLobby() {
   const [currentRoles, setCurrentRoles]: any = useState(gamemodes[0].roles);
   const [hostPlayerName, setHostPlayerName]: any = useState("");
   const [formErrors, setFormErrors]: any = useState([]);
-  const [location, setLocation] = useLocation();
+  const [, setLocation] = useLocation();
   const customGamemode = useMemo(() => currentRoles, [currentRoles]);
   gamemodes[1].roles = customGamemode;
 
