@@ -1,3 +1,4 @@
+import { useMemo, useState } from "react";
 import { Link } from "wouter";
 
 const serverUrl =
@@ -5,17 +6,25 @@ const serverUrl =
     ? "https://werewolf-backend.onrender.com"
     : "http://localhost:10000";
 
-const lobbiesResponse = await fetch(serverUrl + "/lobbies", {
-  method: "GET",
-  headers: { "Content-Type": "application/json" },
-});
-const lobbies = await lobbiesResponse.json();
-
 const gamemodes = ["Classic", "Custom"];
 const chats = ["Video", "Audio"];
 const sorts = ["Player count"];
 
 export default function Servers() {
+  const [lobbies, setLobbies] = useState([]);
+  const lobbiesMemo = useMemo(async () => {
+    const lobbiesResponse = await fetch(serverUrl + "/lobbies", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+    const lobbiesJson = await lobbiesResponse.json();
+    return lobbiesJson;
+  }, []);
+
+  lobbiesMemo.then((val) => {
+    setLobbies(val);
+  });
+
   return (
     <div className="drawer lg:drawer-open min-h-screen">
       <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
@@ -31,7 +40,7 @@ export default function Servers() {
               </tr>
             </thead>
             <tbody>
-              {lobbies.map((lobby: any) => {
+              {lobbies.map((lobby) => {
                 return (
                   <tr className="hover">
                     <td>{lobby.gamemode}</td>
@@ -40,7 +49,7 @@ export default function Servers() {
                     </td>
                     <td className="max-w-52">
                       <div className="flex flex-wrap gap-4">
-                        {lobby.chats.map((tag: any) => {
+                        {lobby.chats.map((tag) => {
                           return (
                             <div className="badge badge-lg badge-outline">
                               {tag}
