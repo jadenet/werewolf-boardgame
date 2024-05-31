@@ -45,7 +45,7 @@ function getLobbyFromId(id: string) {
 }
 
 io.on("connection", (socket) => {
-  socket.on("lobbyjoin", (lobbyId, playerName) => {
+  socket.on("lobbyjoin", (lobbyId, playerName, callback) => {
     let lobby = getLobbyFromId(lobbyId);
     if (lobby) {
       const playerId = crypto.randomUUID();
@@ -87,6 +87,9 @@ io.on("connection", (socket) => {
           );
         }
       });
+      callback({ isValidId: true });
+    } else {
+      callback({ isValidId: false });
     }
   });
 });

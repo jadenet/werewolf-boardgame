@@ -1,7 +1,7 @@
 import { faker } from "@faker-js/faker";
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
-import { useParams, useSearch } from "wouter";
+import { useLocation, useParams, useSearch } from "wouter";
 
 function getTrunucatedString(string: string, max: number) {
   if (string.length > max) {
@@ -34,6 +34,7 @@ export default function ServerId() {
   const [winner, setWinner] = useState(null);
   const [werewolvesVotes, setWerewolvesVotes] = useState([]);
   const [lynchVotes, setLynchVotes] = useState([]);
+  const [, setLocation] = useLocation();
 
   useEffect(() => {
     const socketUrl = import.meta.env.PROD
@@ -43,7 +44,14 @@ export default function ServerId() {
     setSocket(socket);
 
     socket.on("connect", () => {
-      socket.emit("lobbyjoin", lobbyId, playerName);
+      console.log("connected");
+      socket
+        .timeout(5000)
+        .emit("lobbyjoin", lobbyId, playerName, (err, res) => {
+          if (!res.isValidId) {
+            setLocation("/servers?invalidId=true", { replace: true });
+          }
+        });
     });
 
     socket.on("playersChanged", (newPlayers) => {
