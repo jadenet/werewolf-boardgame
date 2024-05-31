@@ -2,10 +2,12 @@ import "dotenv/config";
 import Game from "./functions/game";
 import { Lobby, Ability, Player } from "./functions/Interfaces";
 import express from "express";
+import cors from "cors";
 import bodyParser from "body-parser";
 import { createServer } from "node:http";
 import { Server } from "socket.io";
 const app = express();
+app.use(cors({ origin: "https://werewolf-peom.onrender.com" }));
 const server = createServer(app);
 const io = new Server(server, {
   cors: { origin: "https://werewolf-peom.onrender.com" },
