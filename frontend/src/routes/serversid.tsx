@@ -47,11 +47,16 @@ export default function ServerId() {
       console.log("connected");
       socket
         .timeout(5000)
-        .emit("lobbyjoin", lobbyId, playerName, (err, res) => {
-          if (!res.isValidId) {
-            setLocation("/servers?invalidId=true", { replace: true });
+        .emit(
+          "lobbyjoin",
+          lobbyId,
+          playerName,
+          (_: never, res: { isValidId: boolean }) => {
+            if (!res.isValidId) {
+              setLocation("/servers?invalidId=true", { replace: true });
+            }
           }
-        });
+        );
     });
 
     socket.on("playersChanged", (newPlayers) => {
@@ -83,7 +88,7 @@ export default function ServerId() {
     return () => {
       socket.disconnect();
     };
-  }, [lobbyId, playerName]);
+  }, [lobbyId, playerName, setLocation]);
 
   useEffect(() => {
     localStorage.setItem("themePreference", themePreference);
