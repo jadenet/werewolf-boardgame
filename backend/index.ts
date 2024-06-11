@@ -67,6 +67,18 @@ io.on("connection", (socket) => {
         }
       });
 
+      socket.on("nameEnter", (name) => {
+        const playerFromId = lobby.players.find((player) => {
+          return player.id === playerId;
+        });
+
+        if (playerFromId) {
+          playerFromId.name = name;
+        }
+
+        io.to(lobbyId).emit("playersChanged", lobby.players);
+      });
+
       if (lobby.players.length >= 4) {
         Game(lobby, io, socket);
       }

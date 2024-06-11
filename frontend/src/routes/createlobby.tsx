@@ -53,7 +53,6 @@ const soloRoles = roles
 export default function CreateLobby() {
   const [currentGamemode, setCurrentGamemode]: any = useState(gamemodes[0]);
   const [currentRoles, setCurrentRoles]: any = useState(gamemodes[0].roles);
-  const [hostPlayerName, setHostPlayerName]: any = useState("");
   const [formErrors, setFormErrors]: any = useState([]);
   const [, setLocation] = useLocation();
   const customGamemode = useMemo(() => currentRoles, [currentRoles]);
@@ -96,14 +95,13 @@ export default function CreateLobby() {
             body: JSON.stringify({
               roles: currentGamemode.roles,
               gamemode: currentGamemode.name,
-              hostPlayerName: hostPlayerName,
             }),
           });
 
           const responseJson = await response.json();
 
           if (responseJson.status === "success") {
-            setLocation(`/lobbies/${responseJson.id}?name=${hostPlayerName}`);
+            setLocation(`/lobbies/${responseJson.id}`);
           } else {
             setFormErrors(responseJson.errors);
           }
@@ -303,20 +301,6 @@ export default function CreateLobby() {
                   );
                 })}
               </div>
-            </div>
-
-            <div className="flex flex-col gap-4">
-              <div className="w-full text-lg">Name</div>
-              <input
-                type="text"
-                placeholder="Type here"
-                aria-label={hostPlayerName}
-                name="hostPlayerName"
-                className="input input-bordered w-full max-w-xs"
-                onChange={(e) => {
-                  setHostPlayerName(e.target.value);
-                }}
-              />
             </div>
 
             <button className="btn btn-primary w-full">Submit</button>
