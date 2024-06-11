@@ -53,7 +53,7 @@ export default function ServerId() {
           playerName,
           (_: never, res: { isValidId: boolean }) => {
             if (!res.isValidId) {
-              setLocation("/servers?invalidId=true", { replace: true });
+              setLocation("/lobbies?invalidId=true", { replace: true });
             }
           }
         );

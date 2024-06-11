@@ -103,7 +103,7 @@ export default function CreateLobby() {
           const responseJson = await response.json();
 
           if (responseJson.status === "success") {
-            setLocation(`/servers/${responseJson.id}?name=${hostPlayerName}`);
+            setLocation(`/lobbies/${responseJson.id}?name=${hostPlayerName}`);
           } else {
             setFormErrors(responseJson.errors);
           }

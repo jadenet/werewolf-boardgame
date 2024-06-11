@@ -35,7 +35,7 @@ export default function Hero() {
           <div className="flex flex-col max-w-lg mx-auto lg:flex-row">
             <Link
               className="btn font-semibold text-lg btn-primary grid flex-grow h-16 rounded-box"
-              href="/servers"
+              href="/lobbies"
             >
               Join a lobby
             </Link>

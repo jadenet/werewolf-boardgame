@@ -10,7 +10,7 @@ const gamemodes = ["Classic", "Custom"];
 const chats = ["Video", "Audio"];
 const sorts = ["Player count"];
 
-export default function Servers() {
+export default function Lobbies() {
   const [lobbies, setLobbies] = useState([]);
   const lobbiesMemo = useMemo(async () => {
     const lobbiesResponse = await fetch(serverUrl + "/lobbies", {
@@ -62,7 +62,7 @@ export default function Servers() {
                     <td>
                       <Link
                         className="btn btn-outline w-24"
-                        href={`/servers/${lobby.id}`}
+                        href={`/lobbies/${lobby.id}`}
                       >
                         Join
                       </Link>
