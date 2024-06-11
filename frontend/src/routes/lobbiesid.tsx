@@ -27,7 +27,6 @@ export default function ServerId() {
   const lobbyId = useParams()["id"];
   const [socket, setSocket] = useState(null);
   const [players, setPlayers] = useState([]);
-  const currentPlayer = players.find((player) => player.name == playerName);
   const [openedDrawer, setOpenedDrawer] = useState(true);
   const [currentPhase, setCurrentPhase] = useState(null);
   const [gameStarted, setGameStarted] = useState(false);
@@ -35,6 +34,11 @@ export default function ServerId() {
   const [werewolvesVotes, setWerewolvesVotes] = useState([]);
   const [lynchVotes, setLynchVotes] = useState([]);
   const [, setLocation] = useLocation();
+  const [currentPlayer, setCurrentPlayer] = useState({
+    id: null,
+    name: null,
+    isHost: false,
+  });
 
   useEffect(() => {
     const socketUrl = import.meta.env.PROD
@@ -45,18 +49,24 @@ export default function ServerId() {
 
     socket.on("connect", () => {
       console.log("connected");
-      socket
-        .timeout(5000)
-        .emit(
-          "lobbyjoin",
-          lobbyId,
-          playerName,
-          (_: never, res: { isValidId: boolean }) => {
-            if (!res.isValidId) {
-              setLocation("/lobbies?invalidId=true", { replace: true });
-            }
+      socket.timeout(5000).emit(
+        "lobbyjoin",
+        lobbyId,
+        playerName,
+        (
+          _: never,
+          res: {
+            isValidId: boolean;
+            player: { id: string; name: string; isHost: boolean };
           }
-        );
+        ) => {
+          if (res.isValidId) {
+            setCurrentPlayer(res.player);
+          } else {
+            setLocation("/lobbies?invalidId=true", { replace: true });
+          }
+        }
+      );
     });
 
     socket.on("playersChanged", (newPlayers) => {
@@ -144,24 +154,21 @@ export default function ServerId() {
           <div className="flex flex-wrap items-center justify-center gap-6 p-8 mx-8">
             {players.map((player) => {
               const isCurrentPlayer =
-                currentPlayer && player.name === currentPlayer.name;
+                currentPlayer.id && player.id === currentPlayer.id;
               const votesOnPlayer =
                 currentPhase === "Night"
-                  ? getVotesOnPlayerId(werewolvesVotes, player.name)
-                  : getVotesOnPlayerId(lynchVotes, player.name);
+                  ? getVotesOnPlayerId(werewolvesVotes, player.id)
+                  : getVotesOnPlayerId(lynchVotes, player.id);
 
               const playerIsVoting =
                 currentPhase === "Night"
-                  ? getTargetPlayerVoteFromPlayerId(
-                      werewolvesVotes,
-                      player.name
-                    )
-                  : getTargetPlayerVoteFromPlayerId(lynchVotes, player.name);
+                  ? getTargetPlayerVoteFromPlayerId(werewolvesVotes, player.id)
+                  : getTargetPlayerVoteFromPlayerId(lynchVotes, player.id);
               return (
                 <div
                   className="relative flex w-56 aspect-square rounded-2xl"
                   onClick={() => {
-                    socket.emit("playerClicked", currentPlayer, player);
+                    socket.emit("playerClicked", currentPlayer.id, player);
                   }}
                 >
                   <p className="btn btn-ghost absolute top-0 right-0 text-lg">

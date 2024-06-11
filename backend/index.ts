@@ -50,13 +50,14 @@ io.on("connection", (socket) => {
     if (lobby) {
       const playerId = crypto.randomUUID();
       let handlePlayerClick = (a, b) => {};
+      const player = {
+        id: playerId,
+        name: playerName,
+        isHost: lobby.players.length === 0,
+      };
       if (lobby.players.length < lobby.maxPlayers && !lobby.gameStarted) {
         socket.join(lobbyId);
-        lobby.players.push({
-          id: playerId,
-          name: playerName,
-          isHost: lobby.players.length === 0,
-        });
+        lobby.players.push(player);
         io.to(lobbyId).emit("playersChanged", lobby.players);
       }
 
@@ -87,7 +88,7 @@ io.on("connection", (socket) => {
           );
         }
       });
-      callback({ isValidId: true });
+      callback({ isValidId: true, player: player });
     } else {
       callback({ isValidId: false });
     }
