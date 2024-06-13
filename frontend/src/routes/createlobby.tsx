@@ -5,7 +5,6 @@ import roles from "../../../backend/assets/roles.json";
 import { useLocation } from "wouter";
 
 const chats = ["Audio", "Video"];
-const visibilityTypes = ["Public", "Invite Only"];
 const serverUrl =
   process.env.NODE_ENV === "production"
     ? "https://werewolf-backend.onrender.com"
