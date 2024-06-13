@@ -284,25 +284,6 @@ export default function CreateLobby() {
               </div>
             </div>
 
-            <div className="flex flex-col gap-4">
-              <div className="w-full text-lg">Visibility</div>
-              <div className="flex flex-wrap gap-3">
-                {visibilityTypes.map((visibility, index) => {
-                  return (
-                    <input
-                      type="radio"
-                      aria-label={visibility}
-                      name="visibility"
-                      className="btn btn-outline btn-sm"
-                      key={index}
-                      value={visibility}
-                      defaultChecked={visibility === "Public"}
-                    />
-                  );
-                })}
-              </div>
-            </div>
-
             <button className="btn btn-primary w-full">Submit</button>
           </div>
         </div>
