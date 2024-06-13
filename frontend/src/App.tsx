@@ -1,7 +1,6 @@
 import { Route, Switch } from "wouter";
 import Page from "./routes/page";
 import CreateLobby from "./routes/createlobby";
-import Lobby from "./routes/lobby";
 import lobbiesId from "./routes/lobbiesid";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
