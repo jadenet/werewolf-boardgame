@@ -130,19 +130,20 @@ export default function ServerId() {
     <>
       <dialog className="modal" ref={nameModal}>
         <div className="modal-box">
-          <h3 className="font-bold text-lg">Enter Name</h3>
+          <h3 className="font-bold text-lg">What is your name?</h3>
+          <input
+            type="text"
+            name="nameinput"
+            onChange={(e) => {
+              setNameInputValue(e.target.value);
+            }}
+            placeholder="Enter name here"
+            className="input input-bordered w-full mt-4"
+          />
           <div className="modal-action">
             <form method="dialog">
-              <input
-                type="text"
-                name="nameinput"
-                onChange={(e) => {
-                  setNameInputValue(e.target.value);
-                }}
-                className="input-lg"
-              />
               <button
-                className="btn"
+                className="btn btn-primary"
                 onClick={() => {
                   setPlayerName(nameInputValue);
                   socket.emit("nameEnter", nameInputValue);
