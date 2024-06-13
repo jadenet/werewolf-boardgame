@@ -14,7 +14,6 @@ export default function App() {
         <Switch>
           <Route path="/" component={Page} />
           <Route path="/createlobby" component={CreateLobby} />
-          <Route path="/lobby" component={Lobby} />
           <Route path="/lobbies/:id" component={lobbiesId} />
 
           <Route>404: No such page!</Route>
