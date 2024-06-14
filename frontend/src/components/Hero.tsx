@@ -32,21 +32,12 @@ export default function Hero() {
             })}
           </div>
           <h1 className="text-4xl font-bold py-12">Whose side are you on?</h1>
-          <div className="flex flex-col max-w-lg mx-auto lg:flex-row">
-            <Link
-              className="btn font-semibold text-lg btn-primary grid flex-grow h-16 rounded-box"
-              href="/lobbies"
-            >
-              Join a lobby
-            </Link>
-            <div className="divider lg:divider-horizontal">OR</div>
-            <Link
-              className="btn font-semibold text-lg btn-secondary grid flex-grow h-16 rounded-box"
-              href="/createlobby"
-            >
-              Create your own
-            </Link>
-          </div>
+          <Link
+            className="btn btn-primary px-12 pt-6 pb-10"
+            href="/createlobby"
+          >
+            Create a lobby
+          </Link>
         </div>
       </div>
     </div>
