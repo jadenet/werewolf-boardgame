@@ -2,12 +2,15 @@
 
 import { useMemo, useState } from "react";
 import roles from "../../../backend/assets/roles.json";
+import { useLocation } from "wouter";
 
-const chats = ["Video", "Audio", "Text"];
-const languages = ["English", "Dutch", "Spanish"];
-const visibilityTypes = ["Public", "Invite Only"];
+const chats = ["Audio", "Video"];
+const serverUrl =
+  process.env.NODE_ENV === "production"
+    ? "https://werewolf-backend.onrender.com"
+    : "http://localhost:10000";
 
-let gamemodes = [
+const gamemodes = [
   {
     name: "Classic",
     role_percentages: { werewolves: 5, solos: 5, villagers: 90 },
@@ -49,11 +52,13 @@ const soloRoles = roles
 export default function CreateLobby() {
   const [currentGamemode, setCurrentGamemode]: any = useState(gamemodes[0]);
   const [currentRoles, setCurrentRoles]: any = useState(gamemodes[0].roles);
+  const [formErrors, setFormErrors]: any = useState([]);
+  const [, setLocation] = useLocation();
   const customGamemode = useMemo(() => currentRoles, [currentRoles]);
   gamemodes[1].roles = customGamemode;
 
   function checkCurrentGamemode(e: any) {
-    let newRoles = [...currentRoles];
+    const newRoles = [...currentRoles];
     if (e.target.checked) {
       newRoles.push(e.target.value);
       setCurrentRoles(newRoles);
@@ -71,8 +76,35 @@ export default function CreateLobby() {
 
   return (
     <>
+      {formErrors.map((formError) => {
+        return (
+          <div className="toast">
+            <div className="alert alert-error">
+              <span>{formError}</span>
+            </div>
+          </div>
+        );
+      })}
       <form
-        method="POST"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          const response = await fetch(serverUrl + "/lobbies", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              roles: currentGamemode.roles,
+              gamemode: currentGamemode.name,
+            }),
+          });
+
+          const responseJson = await response.json();
+
+          if (responseJson.status === "success") {
+            setLocation(`/lobbies/${responseJson.id}`);
+          } else {
+            setFormErrors(responseJson.errors);
+          }
+        }}
         className="flex flex-col gap-8 items-center py-4 mb-20 w-full"
       >
         <div className="max-h-xl flex justify-center gap-4 p-8 w-full max-w-7xl min-h-screen rounded-lg">
@@ -89,7 +121,9 @@ export default function CreateLobby() {
                     return (
                       <div
                         className={`flex h-full justify-between items-center outline-secondary rounded-lg${
-                          !isChecked ? " outline outline-1 outline-secondary opacity-15" : " bg-secondary bg-opacity-15"
+                          !isChecked
+                            ? " outline outline-1 outline-secondary opacity-15"
+                            : " bg-secondary bg-opacity-15"
                         }`}
                       >
                         <input
@@ -103,8 +137,7 @@ export default function CreateLobby() {
                         />
                         <label
                           htmlFor={role.name}
-                          className="tooltip flex gap-4 items-center w-full p-2 px-4"
-                          data-tip={role.name}
+                          className="flex gap-4 items-center w-full p-2 px-4"
                         >
                           <img
                             src={`/images/roles/${role.img}`}
@@ -130,9 +163,11 @@ export default function CreateLobby() {
                     const isChecked = currentGamemode.roles.includes(role.name);
                     return (
                       <div
-                      className={`flex h-full justify-between items-center outline-secondary rounded-lg${
-                        !isChecked ? " outline outline-1 outline-secondary opacity-15" : " bg-secondary bg-opacity-15"
-                      }`}
+                        className={`flex h-full justify-between items-center outline-secondary rounded-lg${
+                          !isChecked
+                            ? " outline outline-1 outline-secondary opacity-15"
+                            : " bg-secondary bg-opacity-15"
+                        }`}
                       >
                         <input
                           type="checkbox"
@@ -145,8 +180,7 @@ export default function CreateLobby() {
                         />
                         <label
                           htmlFor={role.name}
-                          className="tooltip flex gap-4 items-center w-full p-2 px-4"
-                          data-tip={role.name}
+                          className="flex gap-4 items-center w-full p-2 px-4"
                         >
                           <img
                             src={`/images/roles/${role.img}`}
@@ -172,9 +206,11 @@ export default function CreateLobby() {
                     const isChecked = currentGamemode.roles.includes(role.name);
                     return (
                       <div
-                      className={`flex h-full justify-between items-center outline-secondary rounded-lg${
-                        !isChecked ? " outline outline-1 outline-secondary opacity-15" : " bg-secondary bg-opacity-15"
-                      }`}
+                        className={`flex h-full justify-between items-center outline-secondary rounded-lg${
+                          !isChecked
+                            ? " outline outline-1 outline-secondary opacity-15"
+                            : " bg-secondary bg-opacity-15"
+                        }`}
                       >
                         <input
                           type="checkbox"
@@ -187,8 +223,7 @@ export default function CreateLobby() {
                         />
                         <label
                           htmlFor={role.name}
-                          className="tooltip flex gap-4 items-center w-full p-2 px-4"
-                          data-tip={role.name}
+                          className="flex gap-4 items-center w-full p-2 px-4"
                         >
                           <img
                             src={`/images/roles/${role.img}`}
@@ -241,54 +276,14 @@ export default function CreateLobby() {
                       className="btn btn-outline btn-sm"
                       key={index}
                       value={chat}
-                      defaultChecked={chat === "Audio" || chat === "Text"}
+                      defaultChecked={chat === "Audio"}
                     />
                   );
                 })}
               </div>
             </div>
 
-            <div className="flex flex-col gap-4">
-              <div className="w-full text-lg">Languages</div>
-              <div className="flex flex-wrap gap-3">
-                {languages.map((language, index) => {
-                  return (
-                    <input
-                      type="checkbox"
-                      aria-label={language}
-                      name="language"
-                      className="btn btn-outline btn-sm"
-                      key={index}
-                      value={language}
-                      defaultChecked={language === "English"}
-                    />
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-4">
-              <div className="w-full text-lg">Visibility</div>
-              <div className="flex flex-wrap gap-3">
-                {visibilityTypes.map((visibility, index) => {
-                  return (
-                    <input
-                      type="radio"
-                      aria-label={visibility}
-                      name="visibility"
-                      className="btn btn-outline btn-sm"
-                      key={index}
-                      value={visibility}
-                      defaultChecked={visibility === "Public"}
-                    />
-                  );
-                })}
-              </div>
-            </div>
-
-            <button type="submit" className="btn btn-primary w-full">
-              Submit
-            </button>
+            <button className="btn btn-primary w-full">Submit</button>
           </div>
         </div>
       </form>

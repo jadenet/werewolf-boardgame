@@ -1,6 +1,6 @@
 export default function getHighestVotes(votes, lobby) {
   const totalVotes = votes.map((vote) => {
-    return vote.targetPlayer.name;
+    return vote.targetPlayer.id;
   });
 
   if (totalVotes.length > 0) {
@@ -26,7 +26,7 @@ export default function getHighestVotes(votes, lobby) {
 
     if (highestVotesNumber > secondHighestVotesNumber) {
       const playerIndex = lobby.players.findIndex((player) => {
-        return player.name === highestPlayerName;
+        return player.id === highestPlayerName;
       });
 
       return playerIndex;

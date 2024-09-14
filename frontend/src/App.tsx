@@ -1,9 +1,7 @@
 import { Route, Switch } from "wouter";
 import Page from "./routes/page";
 import CreateLobby from "./routes/createlobby";
-import Lobby from "./routes/lobby";
-import Servers from "./routes/servers";
-import ServersId from "./routes/serversid";
+import lobbiesId from "./routes/lobbiesid";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
@@ -15,9 +13,7 @@ export default function App() {
         <Switch>
           <Route path="/" component={Page} />
           <Route path="/createlobby" component={CreateLobby} />
-          <Route path="/lobby" component={Lobby} />
-          <Route path="/servers" component={Servers} />
-          <Route path="/servers/:id" component={ServersId} />
+          <Route path="/lobbies/:id" component={lobbiesId} />
 
           <Route>404: No such page!</Route>
         </Switch>

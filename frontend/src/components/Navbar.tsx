@@ -4,7 +4,6 @@ export default function Navbar() {
   return (
     <div className="navbar h-[8vh] bg-base-100">
       <div className="navbar-start">
-        <Link className="btn btn-ghost" href="/servers">Lobbies</Link>
       </div>
       <div className="navbar-center">
         <Link className="btn btn-ghost text-xl font-bold" href="/">WEREWOLF</Link>

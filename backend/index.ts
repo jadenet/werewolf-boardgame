@@ -2,46 +2,62 @@ import "dotenv/config";
 import Game from "./functions/game";
 import { Lobby, Ability, Player } from "./functions/Interfaces";
 import express from "express";
+import cors from "cors";
+import bodyParser from "body-parser";
 import { createServer } from "node:http";
 import { Server } from "socket.io";
 const app = express();
+app.use(cors({ origin: "https://werewolf-peom.onrender.com" }));
 const server = createServer(app);
-const originUrl =
-  process.env.NODE_ENV === "production"
-    ? "https://werewolf-peom.onrender.com"
-    : "http://localhost:10000";
-const io = new Server(server, { cors: { origin: originUrl } });
+const io = new Server(server, {
+  cors: { origin: "https://werewolf-peom.onrender.com" },
+});
 
 let lobbies: Lobby[] = [
-  { id: 1, players: [], gameStarted: false, maxPlayers: 4, chatMessages: [] },
-];
-
-function createLobby(lobbyId: Lobby["id"]) {
-  lobbies.push({
-    id: lobbyId,
+  {
+    id: "1",
     players: [],
     gameStarted: false,
     maxPlayers: 4,
-    chatMessages: [],
-  });
+    chats: ["Video"],
+    gamemode: "Classic",
+  },
+];
+
+function createLobby(potentialRoles: any[], gamemode: any, chats?: string[]) {
+  const lobby = {
+    id: crypto.randomUUID(),
+    players: [],
+    gameStarted: false,
+    chats: ["Audio"],
+    maxPlayers: 4,
+    potentialRoles: potentialRoles,
+    gamemode: gamemode,
+  };
+  lobbies.push(lobby);
+  return lobby;
 }
 
-function getLobbyFromId(id: number) {
+function getLobbyFromId(id: string) {
   return lobbies.find((lobby) => {
     return lobby.id === id;
   });
 }
 
 io.on("connection", (socket) => {
-  socket.on("lobbyjoin", (lobbyId, playerName) => {
+  socket.on("lobbyjoin", (lobbyId, playerName, callback) => {
     let lobby = getLobbyFromId(lobbyId);
     if (lobby) {
-      let handlePlayerClick = (a, b) => {
-        return "not woriing";
+      const playerId = crypto.randomUUID();
+      let handlePlayerClick = (a, b) => {};
+      const player = {
+        id: playerId,
+        name: playerName,
+        isHost: lobby.players.length === 0,
       };
       if (lobby.players.length < lobby.maxPlayers && !lobby.gameStarted) {
         socket.join(lobbyId);
-        lobby.players.push({ name: playerName });
+        lobby.players.push(player);
         io.to(lobbyId).emit("playersChanged", lobby.players);
       }
 
@@ -51,26 +67,64 @@ io.on("connection", (socket) => {
         }
       });
 
+      socket.on("nameEnter", (name) => {
+        const playerFromId = lobby.players.find((player) => {
+          return player.id === playerId;
+        });
+
+        if (playerFromId) {
+          playerFromId.name = name;
+        }
+
+        io.to(lobbyId).emit("playersChanged", lobby.players);
+      });
+
       if (lobby.players.length >= 4) {
         Game(lobby, io, socket);
       }
 
-      socket.on("messageSent", (message, currentPlayer) => {
-        io.to(lobbyId).emit("chatMessage", {
-          playerId: currentPlayer.name,
-          message: message,
-        });
-      });
-
       socket.on("disconnect", () => {
         const playerIndex = lobby.players.findIndex(
-          (player) => player.name === playerName
+          (player) => player.id === playerId
         );
-        lobby.players.splice(playerIndex, 1);
-        io.to(lobbyId).emit("playersChanged", lobby.players);
+        playerIndex !== -1 && lobby.players.splice(playerIndex, 1);
+
+        if (lobby.players.length > 0) {
+          io.to(lobbyId).emit("playersChanged", lobby.players);
+        } else {
+          lobbies.splice(
+            lobbies.findIndex((lob) => {
+              lob.id === lobbyId;
+            }),
+            1
+          );
+        }
       });
+      callback({ isValidId: true, player: player });
+    } else {
+      callback({ isValidId: false });
     }
   });
+});
+
+app.use(bodyParser.json());
+
+app.post("/lobbies", async (req, res) => {
+  let formErrors: string[] = [];
+  if (req.body.hostPlayerName === "") {
+    formErrors.push("Enter a name");
+  }
+
+  if (formErrors.length === 0) {
+    const lobby = createLobby(req.body.roles, req.body.gamemode);
+    res.send(JSON.stringify({ status: "success", id: lobby.id }));
+  } else {
+    res.send(JSON.stringify({ status: "error", errors: formErrors }));
+  }
+});
+
+app.get("/lobbies", async (req, res) => {
+  res.send(JSON.stringify(lobbies));
 });
 
 server.listen(Number(process.env.SERVER_PORT), "0.0.0.0", () => {});

@@ -1,31 +1,30 @@
-import { faker } from "@faker-js/faker";
+import { useMemo, useState } from "react";
 import { Link } from "wouter";
 
-const lobbies: any[] = [];
+const serverUrl =
+  process.env.NODE_ENV === "production"
+    ? "https://werewolf-backend.onrender.com"
+    : "http://localhost:10000";
+
 const gamemodes = ["Classic", "Custom"];
-const chats = ["Video", "Audio", "Text"];
-const ages = ["13+", "16+", "18+"];
-const languages = ["English", "Dutch", "Spanish"];
+const chats = ["Video", "Audio"];
 const sorts = ["Player count"];
 
-for (let index = 0; index < 16; index++) {
-  const maxPlayers = 16;
-  const lobby = {
-    id: faker.number.int(),
-    maxPlayers: maxPlayers,
-    playerCount: faker.number.int({ min: 1, max: maxPlayers - 1 }),
-    playerHost: faker.internet.userName(),
-    gamemode: faker.helpers.arrayElement(gamemodes),
-    potentialRoles: [],
-    ages: faker.helpers.arrayElement(ages),
-    chats: faker.helpers.arrayElements(chats),
-    languages: faker.helpers.arrayElements(languages),
-    inviteOnly: false,
-  };
-  lobbies.push(lobby);
-}
+export default function Lobbies() {
+  const [lobbies, setLobbies] = useState([]);
+  const lobbiesMemo = useMemo(async () => {
+    const lobbiesResponse = await fetch(serverUrl + "/lobbies", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+    const lobbiesJson = await lobbiesResponse.json();
+    return lobbiesJson;
+  }, []);
 
-export default function Servers() {
+  lobbiesMemo.then((val) => {
+    setLobbies(val);
+  });
+
   return (
     <div className="drawer lg:drawer-open min-h-screen">
       <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
@@ -37,22 +36,20 @@ export default function Servers() {
                 <th>Gamemode</th>
                 <th>Players</th>
                 <th>Chat</th>
-                <th>Languages</th>
-                <th>Age</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
-              {lobbies.map((lobby: any) => {
+              {lobbies.map((lobby) => {
                 return (
                   <tr className="hover">
                     <td>{lobby.gamemode}</td>
                     <td>
-                      {lobby.playerCount} / {lobby.maxPlayers}
+                      {lobby.players.length} / {lobby.maxPlayers}
                     </td>
                     <td className="max-w-52">
                       <div className="flex flex-wrap gap-4">
-                        {lobby.chats.map((tag: any) => {
+                        {lobby.chats.map((tag) => {
                           return (
                             <div className="badge badge-lg badge-outline">
                               {tag}
@@ -61,23 +58,11 @@ export default function Servers() {
                         })}
                       </div>
                     </td>
-                    <td className="gap-4 max-w-52">
-                      <div className="flex flex-wrap gap-4">
-                        {lobby.languages.map((tag: any) => {
-                          return (
-                            <div className="badge badge-lg badge-outline">
-                              {tag}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </td>
-                    <td>{lobby.ages}</td>
 
                     <td>
                       <Link
                         className="btn btn-outline w-24"
-                        href={`/servers/${lobby.id}`}
+                        href={`/lobbies/${lobby.id}`}
                       >
                         Join
                       </Link>
@@ -148,51 +133,6 @@ export default function Servers() {
                     <button className="btn btn-outline btn-xs" key={index}>
                       {chat}
                     </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          <div className="collapse collapse-arrow bg-base-200">
-            <input type="checkbox" defaultChecked />
-            <div className="collapse-title text-xl">Languages</div>
-            <div className="collapse-content">
-              <div className="flex flex-wrap gap-3">
-                {languages.map((language, index) => {
-                  return (
-                    <button className="btn btn-outline btn-xs" key={index}>
-                      {language}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          <div className="collapse collapse-arrow bg-base-200">
-            <input type="checkbox" defaultChecked />
-            <div className="collapse-title text-xl">Ages</div>
-            <div className="collapse-content">
-              <div className="flex flex-wrap gap-3">
-                {ages.map((age, index) => {
-                  return (
-                    <>
-                      <input
-                        type="radio"
-                        name="ages"
-                        id={age}
-                        value={age}
-                        className="hidden"
-                      />
-                      <label
-                        htmlFor={age}
-                        className="btn btn-outline btn-xs"
-                        key={index}
-                      >
-                        {age}
-                      </label>
-                    </>
                   );
                 })}
               </div>
