@@ -1,5 +1,5 @@
 import { Route, Switch } from "wouter";
-import Page from "./routes/page";
+import Home from "./routes/home";
 import CreateLobby from "./routes/createlobby";
 import lobbiesId from "./routes/lobbiesid";
 import Navbar from "./components/Navbar";
@@ -11,7 +11,7 @@ export default function App() {
       <body>
         <Navbar />
         <Switch>
-          <Route path="/" component={Page} />
+          <Route path="/" component={Home} />
           <Route path="/createlobby" component={CreateLobby} />
           <Route path="/lobbies/:id" component={lobbiesId} />
 
