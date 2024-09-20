@@ -20,7 +20,7 @@ let lobbies: Lobby[] = [
     gameStarted: false,
     maxPlayers: 4,
     chats: ["Video"],
-    gamemode: "Classic",
+    gamemode: "Classic"
   },
 ];
 
@@ -32,7 +32,7 @@ function createLobby(potentialRoles: any[], gamemode: any, chats?: string[]) {
     chats: ["Audio"],
     maxPlayers: 4,
     potentialRoles: potentialRoles,
-    gamemode: gamemode,
+    gamemode: gamemode
   };
   lobbies.push(lobby);
   return lobby;
@@ -54,6 +54,7 @@ io.on("connection", (socket) => {
         id: playerId,
         name: playerName,
         isHost: lobby.players.length === 0,
+        
       };
       if (lobby.players.length < lobby.maxPlayers && !lobby.gameStarted) {
         socket.join(lobbyId);
@@ -100,7 +101,11 @@ io.on("connection", (socket) => {
           );
         }
       });
-      callback({ isValidId: true, player: player });
+
+      socket.on("newPeerId", (id) => {
+        lobby.peerIds.push(id)
+      })
+      callback({ isValidId: true, player: player, peerIds: lobby.peerIds });
     } else {
       callback({ isValidId: false });
     }

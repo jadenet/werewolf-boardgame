@@ -1,14 +1,10 @@
+import Peer from "peerjs";
 import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import { useLocation, useParams } from "wouter";
-
-function getTrunucatedString(string: string, max: number) {
-  if (string.length > max) {
-    return string.substring(0, max - 3) + "...";
-  } else {
-    return string;
-  }
-}
+import getTrunucatedString from "../functions/getTrunucatedString";
+import getTargetPlayerVoteFromPlayerId from "../functions/getTargetPlayerVoteFromPlayerId.ts"
+import getVotesOnPlayerId from "../functions/getVotesOnPlayerId.ts";
 
 export default function ServerId() {
   const [themePreference, setThemePreference] = useState(
@@ -72,8 +68,6 @@ export default function ServerId() {
       setPlayers(newPlayers);
     });
 
-    // socket.on("abilityUsed", (ability) => {});
-
     socket.on("phaseChange", (phase) => {
       setCurrentPhase(phase);
     });
@@ -103,28 +97,51 @@ export default function ServerId() {
     localStorage.setItem("themePreference", themePreference);
   }, [themePreference]);
 
-  function handleDrawerchange() {
-    setOpenedDrawer(!openedDrawer);
-  }
+  useEffect(() => {
+    const peer = new Peer(currentPlayer.id);
 
-  function getVotesOnPlayerId(votes, playerId) {
-    let votesNum = 0;
-
-    votes.map((vote) => {
-      if (vote.targetPlayer.name === playerId) {
-        votesNum += 1;
-      }
+    peer.on("close", () => {
+      navigator.mediaDevices.getUserMedia({ audio: false, video: false });
     });
 
-    return votesNum;
-  }
+    navigator.mediaDevices
+      .getUserMedia({ video: true, audio: true })
+      .then((localStream) => {
+        const videoElement = document.getElementById(
+          "video-" + currentPlayer.id
+        );
 
-  function getTargetPlayerVoteFromPlayerId(votes, playerId) {
-    const vote = votes.find((vote) => {
-      return vote.playerVoting.name === playerId;
-    });
-    return vote && vote.targetPlayer;
-  }
+        videoElement.srcObject = localStream;
+
+        peer.on("call", (call) => {
+          call.answer(localStream);
+          call.on("stream", (stream) => {
+            const videoElement2 = document.getElementById("video-" + call.peer);
+            videoElement2.srcObject = stream;
+          });
+        });
+
+        players.forEach((player) => {
+          if (
+            player.id !== currentPlayer.id &&
+            currentPlayer.id &&
+            players.length > 1
+          ) {
+            const call = peer.call(player.id, localStream);
+
+            call.on("stream", (stream) => {
+              const videoElement = document.getElementById(
+                "video-" + player.id
+              );
+              videoElement.srcObject = stream;
+            });
+          }
+        });
+      })
+      .catch((error) => {
+        console.error("Error accessing media devices.", error);
+      });
+  }, [currentPlayer, players]);
 
   return (
     <>
@@ -165,7 +182,7 @@ export default function ServerId() {
           type="checkbox"
           className="drawer-toggle"
           checked={openedDrawer}
-          onChange={handleDrawerchange}
+          onChange={() => {setOpenedDrawer(!openedDrawer);}}
         />
         <div className="drawer-content flex flex-col justify-between">
           <label
@@ -198,7 +215,7 @@ export default function ServerId() {
                     : getTargetPlayerVoteFromPlayerId(lynchVotes, player.id);
                 return (
                   <div
-                    className="relative flex w-56 aspect-square rounded-2xl"
+                    className="relative flex flex-col w-56 aspect-square rounded-2xl"
                     onClick={() => {
                       socket.emit("playerClicked", currentPlayer.id, player);
                     }}
@@ -206,9 +223,15 @@ export default function ServerId() {
                     <p className="btn btn-ghost absolute top-0 right-0 text-lg">
                       {votesOnPlayer > 0 && votesOnPlayer}
                     </p>
-                    <div className="w-full h-full bg-secondary opacity-5 rounded-2xl"></div>
+                    <video
+                      id={"video-" + player.id}
+                      autoPlay
+                      playsInline
+                      controls={false}
+                      className="w-full bg-secondary rounded-t-2xl object-fill aspect-video"
+                    />
                     {isCurrentPlayer ? (
-                      <div className="bg-red-500 absolute flex justify-between items-center p-3 bg-opacity-30 w-full text-center bottom-0 rounded-b-2xl">
+                      <div className="bg-red-500 h-10 flex justify-between items-center p-3 bg-opacity-30 w-full text-center bottom-0 rounded-b-2xl">
                         <div className="tooltip" data-tip={player.name}>
                           <p className="text-md">
                             {getTrunucatedString(player.name, 18)}
@@ -229,7 +252,7 @@ export default function ServerId() {
                         </label>
                       </div>
                     ) : (
-                      <div className="absolute flex justify-between items-center p-3 bg-secondary-content bg-opacity-30 w-full text-center bottom-0 rounded-b-2xl">
+                      <div className="flex h-10 justify-between items-center p-3 bg-secondary-content bg-opacity-30 w-full text-center bottom-0 rounded-b-2xl">
                         <div className="tooltip" data-tip={player.name}>
                           <p className="text-sm">
                             {getTrunucatedString(player.name, 18)}
