@@ -26,6 +26,7 @@ export default function Hero() {
                 <img
                   src={image.src}
                   alt={image.alt}
+                  key={image.alt}
                   className="w-52 aspect-square object-contain"
                 />
               );
