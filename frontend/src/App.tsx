@@ -7,7 +7,6 @@ import Footer from "./components/Footer";
 
 export default function App() {
   return (
-    <html lang="en">
       <body>
         <Navbar />
         <Switch>
@@ -19,6 +18,5 @@ export default function App() {
         </Switch>
         <Footer />
       </body>
-    </html>
   );
 }
