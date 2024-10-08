@@ -156,28 +156,10 @@ export default function Lobbiesid() {
                     <div className="text-center text-lg">Game Settings</div>
                     {[
                       "Gamemode: Classic",
-                      "Max players: 16",
-                      "Age: 16+",
-                      "Chat: Mic only",
+                      "Chat: Audio",
                     ].map((text, i) => (
                       <div key={i}>{text}</div>
                     ))}
-                  </div>
-
-                  <div className="flex flex-col gap-4 p-4 outline outline-base-300 outline-2 rounded-lg">
-                    <div className="text-center text-lg">Volume</div>
-                    <input
-                      type="range"
-                      min={0}
-                      max="100"
-                      defaultValue="80"
-                      className="range"
-                    />
-                    <div className="w-full flex justify-between text-xs px-2">
-                      {[0, 20, 40, 60, 80, 100].map((num, i) => (
-                        <span key={i}>{num}</span>
-                      ))}
-                    </div>
                   </div>
 
                   <div className="flex flex-col gap-4 p-4 outline outline-base-300 outline-2 rounded-lg">
