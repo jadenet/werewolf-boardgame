@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import roles from "../../../backend/assets/roles.json";
 import { useLocation } from "wouter";
+import { getRoleNames, getRolesFromTeam } from "../functions/getRolesFromTeam";
 
 const chats = ["Audio", "Video"];
 const serverUrl =
@@ -14,9 +14,7 @@ const gamemodes = [
   {
     name: "Classic",
     role_percentages: { werewolves: 5, solos: 5, villagers: 90 },
-    roles: roles.map((role) => {
-      return role.name;
-    }),
+    roles: getRoleNames(),
   },
   {
     name: "Custom",
@@ -25,29 +23,11 @@ const gamemodes = [
   },
 ];
 
-const villageRoles = roles
-  .filter((role) => {
-    return role.team[0] === "Village";
-  })
-  .sort((a, b) => {
-    return a.name > b.name ? 1 : -1;
-  });
-
-const werewolfRoles = roles
-  .filter((role) => {
-    return role.team[0] === "Werewolves";
-  })
-  .sort((a, b) => {
-    return a.name > b.name ? 1 : -1;
-  });
-
-const soloRoles = roles
-  .filter((role) => {
-    return role.team[0] === "Solo";
-  })
-  .sort((a, b) => {
-    return a.name > b.name ? 1 : -1;
-  });
+const roleTeams = [
+  { name: "Village", roles: getRolesFromTeam("Village") },
+  { name: "Werewolf", roles: getRolesFromTeam("Werewolves") },
+  { name: "Solo", roles: getRolesFromTeam("Solo") },
+]
 
 export default function CreateLobby() {
   const [currentGamemode, setCurrentGamemode] = useState(gamemodes[0]);
@@ -61,11 +41,10 @@ export default function CreateLobby() {
     const newRoles = [...currentRoles];
     if (e.target.checked) {
       newRoles.push(e.target.value);
-      setCurrentRoles(newRoles);
     } else {
       newRoles.splice(newRoles.indexOf(e.target.value), 1);
-      setCurrentRoles(newRoles);
     }
+    setCurrentRoles(newRoles);
 
     if (gamemodes[0].roles.sort().join() === newRoles.sort().join()) {
       setCurrentGamemode(gamemodes[0]);
@@ -109,138 +88,56 @@ export default function CreateLobby() {
       >
         <div className="max-h-xl flex justify-center gap-4 p-8 w-full max-w-7xl min-h-screen rounded-lg">
           <div className="flex flex-col gap-4 items-center max-w-3xl">
-            <div className="collapse collapse-arrow bg-base-200">
-              <input type="radio" name="roles" defaultChecked />
-              <div className="collapse-title text-xl font-medium">
-                Village Roles
-              </div>
-              <div className="collapse-content">
-                <div className="grid auto-rows-fr grid-cols-3 gap-4 justify-center items-center p-4">
-                  {villageRoles.map((role, i) => {
-                    const isChecked = currentGamemode.roles.includes(role.name);
-                    return (
-                      <div
-                        key={i}
-                        className={`flex h-full justify-between items-center outline-secondary rounded-lg${
-                          !isChecked
-                            ? " outline outline-1 outline-secondary opacity-15"
-                            : " bg-secondary bg-opacity-15"
-                        }`}
-                      >
-                        <input
-                          type="checkbox"
-                          name="role"
-                          id={role.name}
-                          value={role.name}
-                          defaultChecked={isChecked}
-                          onChange={checkCurrentGamemode}
-                          className="accent-secondary hidden"
-                        />
-                        <label
-                          htmlFor={role.name}
-                          className="flex gap-4 items-center w-full p-2 px-4"
-                        >
-                          <img
-                            src={`/images/roles/${role.img}`}
-                            alt={role.name}
-                            className="aspect-square object-contain w-8"
-                          />
-                          <p className="text-start">{role.name}</p>
-                        </label>
-                      </div>
-                    );
-                  })}
+          {roleTeams.map((roleTeam) => {
+            return (
+                <div className="collapse collapse-arrow bg-base-200">
+                  <input type="radio" name="roles" defaultChecked={roleTeam.name == "Village"} />
+                  <div className="collapse-title text-xl font-medium">
+                    {roleTeam.name} Roles
+                  </div>
+                  <div className="collapse-content">
+                    <div className="grid auto-rows-fr grid-cols-3 gap-4 justify-center items-center p-4">
+                      {roleTeam.roles.map((role, i) => {
+                        const isChecked = currentGamemode.roles.includes(
+                          role.name
+                        );
+                        return (
+                          <div
+                            key={i}
+                            className={`flex h-full justify-between items-center outline-secondary rounded-lg${
+                              !isChecked
+                                ? " outline outline-1 outline-secondary opacity-15"
+                                : " bg-secondary bg-opacity-15"
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              name="role"
+                              id={role.name}
+                              value={role.name}
+                              defaultChecked={isChecked}
+                              onChange={checkCurrentGamemode}
+                              className="accent-secondary hidden"
+                            />
+                            <label
+                              htmlFor={role.name}
+                              className="flex gap-4 items-center w-full p-2 px-4"
+                            >
+                              <img
+                                src={`/images/roles/${role.img}`}
+                                alt={role.name}
+                                className="aspect-square object-contain w-8"
+                              />
+                              <p className="text-start">{role.name}</p>
+                            </label>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div className="collapse collapse-arrow bg-base-200">
-              <input type="radio" name="roles" />
-              <div className="collapse-title text-xl font-medium">
-                Werewolf Roles
-              </div>
-              <div className="collapse-content">
-                <div className="grid auto-rows-fr grid-cols-3 gap-4 items-center p-4">
-                  {werewolfRoles.map((role, i) => {
-                    const isChecked = currentGamemode.roles.includes(role.name);
-                    return (
-                      <div
-                        key={i}
-                        className={`flex h-full justify-between items-center outline-secondary rounded-lg${
-                          !isChecked
-                            ? " outline outline-1 outline-secondary opacity-15"
-                            : " bg-secondary bg-opacity-15"
-                        }`}
-                      >
-                        <input
-                          type="checkbox"
-                          name="role"
-                          id={role.name}
-                          value={role.name}
-                          defaultChecked={isChecked}
-                          onChange={checkCurrentGamemode}
-                          className="accent-secondary hidden"
-                        />
-                        <label
-                          htmlFor={role.name}
-                          className="flex gap-4 items-center w-full p-2 px-4"
-                        >
-                          <img
-                            src={`/images/roles/${role.img}`}
-                            alt={role.name}
-                            className="aspect-square object-contain w-8"
-                          />
-                          <p className="text-start">{role.name}</p>
-                        </label>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-            <div className="collapse collapse-arrow bg-base-200">
-              <input type="radio" name="roles" />
-              <div className="collapse-title text-xl font-medium">
-                Solo Roles
-              </div>
-              <div className="collapse-content">
-                <div className="grid auto-rows-fr grid-cols-3 gap-4 items-center p-4">
-                  {soloRoles.map((role, i) => {
-                    const isChecked = currentGamemode.roles.includes(role.name);
-                    return (
-                      <div
-                        key={i}
-                        className={`flex h-full justify-between items-center outline-secondary rounded-lg${
-                          !isChecked
-                            ? " outline outline-1 outline-secondary opacity-15"
-                            : " bg-secondary bg-opacity-15"
-                        }`}
-                      >
-                        <input
-                          type="checkbox"
-                          name="role"
-                          id={role.name}
-                          value={role.name}
-                          defaultChecked={isChecked}
-                          onChange={checkCurrentGamemode}
-                          className="accent-secondary hidden"
-                        />
-                        <label
-                          htmlFor={role.name}
-                          className="flex gap-4 items-center w-full p-2 px-4"
-                        >
-                          <img
-                            src={`/images/roles/${role.img}`}
-                            alt={role.name}
-                            className="aspect-square object-contain w-8"
-                          />
-                          <p className="text-start">{role.name}</p>
-                        </label>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
+            );
+          })}
           </div>
 
           <div className="flex flex-col gap-8 w-1/3 px-10 bg-base-200 py-12 rounded-2xl h-fit">
