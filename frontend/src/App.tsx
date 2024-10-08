@@ -7,7 +7,7 @@ import Footer from "./components/Footer";
 
 export default function App() {
   return (
-      <body>
+      <>
         <Navbar />
         <Switch>
           <Route path="/" component={Home} />
@@ -17,6 +17,6 @@ export default function App() {
           <Route>404: No such page!</Route>
         </Switch>
         <Footer />
-      </body>
+      </>
   );
 }
