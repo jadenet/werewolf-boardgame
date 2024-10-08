@@ -50,14 +50,14 @@ const soloRoles = roles
   });
 
 export default function CreateLobby() {
-  const [currentGamemode, setCurrentGamemode]: any = useState(gamemodes[0]);
-  const [currentRoles, setCurrentRoles]: any = useState(gamemodes[0].roles);
-  const [formErrors, setFormErrors]: any = useState([]);
+  const [currentGamemode, setCurrentGamemode] = useState(gamemodes[0]);
+  const [currentRoles, setCurrentRoles] = useState(gamemodes[0].roles);
+  const [formErrors, setFormErrors] = useState([]);
   const [, setLocation] = useLocation();
   const customGamemode = useMemo(() => currentRoles, [currentRoles]);
   gamemodes[1].roles = customGamemode;
 
-  function checkCurrentGamemode(e: any) {
+  function checkCurrentGamemode(e) {
     const newRoles = [...currentRoles];
     if (e.target.checked) {
       newRoles.push(e.target.value);
@@ -76,9 +76,9 @@ export default function CreateLobby() {
 
   return (
     <>
-      {formErrors.map((formError) => {
+      {formErrors.map((formError, i) => {
         return (
-          <div className="toast">
+          <div key={i} className="toast">
             <div className="alert alert-error">
               <span>{formError}</span>
             </div>
@@ -116,10 +116,11 @@ export default function CreateLobby() {
               </div>
               <div className="collapse-content">
                 <div className="grid auto-rows-fr grid-cols-3 gap-4 justify-center items-center p-4">
-                  {villageRoles.map((role) => {
+                  {villageRoles.map((role, i) => {
                     const isChecked = currentGamemode.roles.includes(role.name);
                     return (
                       <div
+                        key={i}
                         className={`flex h-full justify-between items-center outline-secondary rounded-lg${
                           !isChecked
                             ? " outline outline-1 outline-secondary opacity-15"
@@ -159,10 +160,11 @@ export default function CreateLobby() {
               </div>
               <div className="collapse-content">
                 <div className="grid auto-rows-fr grid-cols-3 gap-4 items-center p-4">
-                  {werewolfRoles.map((role) => {
+                  {werewolfRoles.map((role, i) => {
                     const isChecked = currentGamemode.roles.includes(role.name);
                     return (
                       <div
+                        key={i}
                         className={`flex h-full justify-between items-center outline-secondary rounded-lg${
                           !isChecked
                             ? " outline outline-1 outline-secondary opacity-15"
@@ -202,10 +204,11 @@ export default function CreateLobby() {
               </div>
               <div className="collapse-content">
                 <div className="grid auto-rows-fr grid-cols-3 gap-4 items-center p-4">
-                  {soloRoles.map((role) => {
+                  {soloRoles.map((role, i) => {
                     const isChecked = currentGamemode.roles.includes(role.name);
                     return (
                       <div
+                        key={i}
                         className={`flex h-full justify-between items-center outline-secondary rounded-lg${
                           !isChecked
                             ? " outline outline-1 outline-secondary opacity-15"
