@@ -129,12 +129,15 @@ export default function Lobbiesid() {
                         <p
                           key={i}
                           className={
-                            player.status !== "Alive" ? "opacity-15" : ""
+                            player.status == "Alive" || !gameStarted
+                              ? ""
+                              : "opacity-15"
                           }
                         >
-                          {player.name + player.status !== "Alive"
-                            ? "(dead)"
-                            : ""}
+                          {player.name +
+                            (player.status == "Alive" || !gameStarted
+                              ? ""
+                              : "(dead)")}
                         </p>
                       );
                     })}
@@ -154,10 +157,7 @@ export default function Lobbiesid() {
                 <div className="flex flex-col gap-6 mx-2 my-8">
                   <div className="flex flex-col gap-3 p-4 outline outline-base-300 outline-2 rounded-lg">
                     <div className="text-center text-lg">Game Settings</div>
-                    {[
-                      "Gamemode: Classic",
-                      "Chat: Audio",
-                    ].map((text, i) => (
+                    {["Gamemode: Classic", "Chat: Audio"].map((text, i) => (
                       <div key={i}>{text}</div>
                     ))}
                   </div>
