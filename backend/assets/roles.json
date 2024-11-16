@@ -1,24 +1,5 @@
 [
   {
-    "name": "Doctor",
-    "img": "Doctor.png",
-    "description": "The Doctor can choose one player to protect every night. That player cannot be killed that night.",
-    "aura": "Good",
-    "team": ["Village"],
-    "type": ["Protective"],
-    "assignment": "Regular",
-    "abilities": [
-      {
-        "name": "Doctor Protect",
-        "displayName": "Protect",
-        "img": "Doctor_Protect",
-        "description": "Protects one player from being attacked at night.",
-        "conditions": { "phase": "Night" }
-      }
-    ]
-  },
-
-  {
     "name": "Bodyguard",
     "img": "Bodyguard.png",
     "description": "The Bodyguard can choose one player to protect every night. That player cannot be killed that night and instead the Bodyguard will be attacked. They survive the first attack due to their strength, but will die or get inflicted by a status on the second attack. They automatically protect themselves every night before the first attack.",
@@ -37,29 +18,6 @@
     ]
   },
   {
-    "name": "Vigilante",
-    "img": "Vigilante.png",
-    "description": "During the day, the Vigilante can either shoot to kill or reveal to everyone the role of another player. Both actions can only be done once, but not during the same day.",
-    "aura": "Unknown",
-    "team": ["Village"],
-    "type": ["Killing"],
-    "assignment": "Strong",
-    "abilities": [
-      {
-        "name": "Vigilante Reveal",
-        "displayName": "Reveal",
-        "img": "Vigilante_Reveal",
-        "conditions": { "phase": "Day", "useLimit": 1 }
-      },
-      {
-        "name": "Ability Bullet",
-        "displayName": "Shoot",
-        "img": "Ability_Bullet",
-        "conditions": { "phase": "Day", "useLimit": 1 }
-      }
-    ]
-  },
-  {
     "name": "Jailer",
     "img": "Jailer.png",
     "description": "The Jailer can select a player during the day to put in jail the following night. They can talk to the jailed player at night anonymously. Jailed players cannot use any of their abilities or be attacked. They have one bullet to kill a jailed player during the night.",
@@ -73,23 +31,6 @@
         "displayName": "Jail",
         "img": "Jail",
         "conditions": { "phase": "Day" }
-      }
-    ]
-  },
-  {
-    "name": "Seer",
-    "img": "Seer.png",
-    "description": "The Seer can select a player to uncover their role each night.",
-    "aura": "Good",
-    "team": ["Village"],
-    "type": ["Investigative"],
-    "assignment": "Strong",
-    "abilities": [
-      {
-        "name": "Seer Uncover",
-        "displayName": "Uncover",
-        "img": "",
-        "conditions": { "phase": "Night" }
       }
     ]
   },
@@ -136,43 +77,6 @@
     "type": []
   },
   {
-    "name": "Wolf Shaman",
-    "img": "Wolf_Shaman.png",
-    "description": "At night, the Wolf Shaman can talk and vote with the other werewolves. During the day, the Wolf Shaman can enchant another player. This will make that player appear as a Wolf Shaman to the Seer, Aura Seer, Detective, Gambler, Violinist and Analyst for the next night. If the Wolf Shaman chooses someone to enchant and then gets lynched the same day, that player will still appear as Wolf Shaman that night.",
-    "aura": "Evil",
-    "team": ["Werewolves"],
-    "type": ["Investigative", "Supportive"],
-    "abilities": [
-      {
-        "name": "Wolf Shaman Enchant",
-        "displayName": "Enchant",
-        "img": "Wolf_Shaman_Enchant",
-        "conditions": { "phase": "Day" }
-      }
-    ]
-  },
-  {
-    "name": "Wolf Seer",
-    "img": "Wolf_Seer.png",
-    "description": "Each night the Wolf Seer can select a player to uncover their role. They can talk with the other Werewolves and provide any information they found. However, the Wolf Seer cannot vote on a player to kill unless they resign their ability to see roles. If they are the last Werewolf alive, they instantly resign their inform ability.",
-    "aura": "Evil",
-    "team": ["Werewolves"],
-    "type": ["Killing", "Investigative"],
-    "abilities": [
-      { "name": "Uncover", "conditions": { "phase": "Night" } },
-      { "name": "Resign", "conditions": { "phase": "Night" } }
-    ]
-  },
-  {
-    "name": "Alpha Werewolf",
-    "img": "Alpha_Werewolf.png",
-    "description": "The Alpha Werewolf has the same abilities as a regular Werewolf and can vote on one player to kill each night. However, when the Alpha Werewolf votes on a player to kill during the night, their vote counts twice. Additionally, the Alpha Werewolf can send unlimited private messages to the other wolves during the day that only the Werewolf Team can see.",
-    "aura": "Unknown",
-    "team": ["Werewolves"],
-    "type": ["Killing", "Supportive"],
-    "abilities": [{ "name": "Growl", "conditions": { "phase": "Day" }}]
-  },
-  {
     "name": "Fool",
     "img": "Fool.png",
     "description": "The Fool has no special abilities besides talking and voting during the day.",
@@ -180,26 +84,6 @@
     "team": ["Solo"],
     "type": ["Voting"],
     "assignment": "Voting"
-  },
-  {
-    "name": "Headhunter",
-    "img": "Headhunter.png",
-    "description": "The Headhunter is assigned a target at the start of the game. Their goal is to get their target lynched by the village during the day. Their target must be lynched before you die in order to win. If their target dies another way, they will win with the village.",
-    "aura": "Unknown",
-    "team": ["Solo", "Village"],
-    "type": [],
-    "assignment": "Voting",
-    "abilities": [{ "name": "Target", "conditions": { "phase": "Day" }}]
-  },
-  {
-    "name": "Cupid",
-    "img": "Cupid.png",
-    "description": "On the first night, the Cupid selects 2 players to become a Love Couple. These players are now loyal to each other and not their original team (although the players can still win with their original team). If one of these players dies, the other will die as well. Can be chosen as an accomplice by the bandit.",
-    "aura": "Good",
-    "team": ["Village", "Love couple"],
-    "type": ["Converting"],
-    "assignment": "Other",
-    "abilities": [{ "name": "Couple", "conditions": { "phase": "Day", "useLimit": 1 } }]
   },
   {
     "name": "Loudmouth",
@@ -244,15 +128,6 @@
     "abilities": [{ "name": "Check", "conditions": { "phase": "Day" }}]
   },
   {
-    "name": "Cursed",
-    "img": "Cursed.png",
-    "description": "The Cursed begins the game as a villager. If the Cursed is attacked by the werewolves, the player does not die, but instead turns into a Regular Werewolf. The cursed can't be turned to another team by the Sect Leader, Zombie, or Bandit.",
-    "aura": "Good",
-    "team": ["Village"],
-    "type": ["Role Changing"],
-    "assignment": "Other"
-  },
-  {
     "name": "Junior Werewolf",
     "img": "Junior_Werewolf.png",
     "description": "Each night the Junior Werewolf can vote on a player to kill like a regular Werewolf. They can also select one player to die with them. They can select this player during any phase of the game. The Junior's selected player will not die if they flee.",
@@ -260,25 +135,6 @@
     "team": ["Werewolves"],
     "type": ["Killing"],
     "abilities": [{ "name": "Tag", "conditions": { "useLimit": 1 } }]
-  },
-  {
-    "name": "Serial Killer",
-    "img": "Serial_Killer.png",
-    "description": "Each night the Serial Killer can kill one player. They cannot be killed by the Werewolves. However, they are in competition with the Werewolves, as both win if they kill enough people.",
-    "aura": "Unknown",
-    "team": ["Solo"],
-    "type": [],
-    "assignment": "Killing"
-  },
-  {
-    "name": "Corruptor",
-    "img": "Corruptor.png",
-    "description": "Each night the Corruptor can select one player to glitch. That player will not be able to speak, vote, use their role ability or send emojis the following day and will die after the voting. That player's role will not be revealed when they die. Instead, it will be replaced by a question mark. When a person is corrupted, they will receive a message. An icon will also show in the middle of the screen.",
-    "aura": "Unknown",
-    "team": ["Solo"],
-    "type": [],
-    "assignment": "Killing",
-    "abilities": [{ "name": "Corrupt", "conditions": { "phase": "Night" }}]
   },
   {
     "name": "Arsonist",
@@ -292,55 +148,6 @@
       { "name": "Douse", "conditions": { "phase": "Night" }},
       { "name": "Ignite", "conditions": { "phase": "Night" }}
     ]
-  },
-  {
-    "name": "Beast Hunter",
-    "img": "Beast_Hunter.png",
-    "description": "At night, the Beast Hunter can place a trap on a player, which will become active the following night. This player cannot be killed at night. If the player is attacked by werewolves, the weakest werewolf will die. The attack of Solo Killers, will trigger the trap, but not kill them.",
-    "aura": "Unknown",
-    "team": ["Village"],
-    "type": ["Protective"],
-    "assignment": "Regular",
-    "abilities": [{ "name": "Trap", "conditions": { "phase": "Night" } }]
-  },
-  {
-    "name": "Mayor",
-    "img": "Mayor.png",
-    "description": "The Mayor can reveal their role to everyone during the day which will make their vote count double during the rest of the game.",
-    "aura": "Good",
-    "team": ["Village"],
-    "type": ["Vote Manipulative"],
-    "assignment": "Regular",
-    "abilities": [{ "name": "Reveal", "conditions": { "phase": "Day", "useLimit": 1 }}]
-  },
-  {
-    "name": "Sheriff",
-    "img": "Sheriff.png",
-    "description": "The Sheriff can select two players to watch during the night. If either player dies during the night, the Sheriff will uncover two possible suspects who might have killed that player.",
-    "aura": "Good",
-    "team": ["Village"],
-    "type": ["Investigative"],
-    "assignment": "Regular",
-    "abilities": [{ "name": "Watch", "conditions": { "phase": "Night" } }]
-  },
-  {
-    "name": "Flower Child",
-    "img": "Flower_Child.png",
-    "description": "The Flower Child is a villager who can protect a player once from being lynched by the village during the day.",
-    "aura": "Good",
-    "team": ["Village"],
-    "type": ["Vote Manipulative"],
-    "assignment": "Regular",
-    "abilities": [{ "name": "Protect", "conditions": { "phase": "Day" } }]
-  },
-  {
-    "name": "Bandit",
-    "img": "Bandit.png",
-    "description": "At night, the Bandit finds an Accomplice by converting another player. Then each night, the Bandit and the Accomplice can select a player to kill. The chosen target of the Accomplice is prioritized over the Bandit. If they vote different players, then the deciding vote will be the Accomplice's vote. The Bandit cannot be killed by the werewolves. Only villagers and random voting roles can be converted to Accomplice. Trying to convert a werewolf will result in the Bandit killing that werewolf. If the Accomplice dies, the Bandit can select a new Accomplice the next night. If there are several accomplices in the same game, all of them win when the Bandit wins.",
-    "aura": "Unknown",
-    "team": ["Solo"],
-    "type": [],
-    "assignment": "Killing"
   },
   {
     "name": "Red Lady",
@@ -361,24 +168,6 @@
     "type": ["Killing"],
     "assignment": "Regular",
     "abilities": [{ "name": "Throw Holy Water","conditions": { "phase": "Day" , "useLimit": 1} }]
-  },
-  {
-    "name": "Guardian Wolf",
-    "img": "Guardian_Wolf.png",
-    "description": "During the voting period, the Guardian Wolf can save a player from being lynched by the village. Once the Guardian Wolf successfully saves a player, its ability will be consumed.",
-    "aura": "Evil",
-    "team": ["Werewolves"],
-    "type": ["Killing", "Vote Manipulative"],
-    "abilities": [{ "name": "Protect", "conditions": { "phase": "Day", "useLimit": 1 }}]
-  },
-  {
-    "name": "Shadow Wolf",
-    "img": "Shadow_Wolf.png",
-    "description": "The Shadow Wolf has the same abilities as an ordinary werewolf and can vote for a player to kill each night. However, once per game, the Shadow Wolf can double your team's votes during the day, while hiding all votes.",
-    "aura": "Evil",
-    "team": ["Werewolves"],
-    "type": ["Killing", "Crowd Controlling"],
-    "abilities": [{ "name": "Trick Votes", "conditions": { "phase": "Day", "useLimit": 1} }]
   },
   {
     "name": "Nightmare Werewolf",
