@@ -6,8 +6,6 @@ const serverUrl =
     ? "https://werewolf-backend.onrender.com"
     : "http://localhost:10000";
 
-const gamemodes = ["Classic", "Custom"];
-const chats = ["Video", "Audio"];
 const sorts = ["Player count"];
 
 export default function Lobbies() {
@@ -33,9 +31,8 @@ export default function Lobbies() {
           <table className="table table-lg table-zebra">
             <thead>
               <tr>
-                <th>Gamemode</th>
+                <th>Name</th>
                 <th>Players</th>
-                <th>Chat</th>
                 <th></th>
               </tr>
             </thead>
@@ -43,20 +40,9 @@ export default function Lobbies() {
               {lobbies.map((lobby) => {
                 return (
                   <tr className="hover">
-                    <td>{lobby.gamemode}</td>
+                    <td>{lobby.name || "Unnamed"}</td>
                     <td>
                       {lobby.players.length} / {lobby.maxPlayers}
-                    </td>
-                    <td className="max-w-52">
-                      <div className="flex flex-wrap gap-4">
-                        {lobby.chats.map((tag) => {
-                          return (
-                            <div className="badge badge-lg badge-outline">
-                              {tag}
-                            </div>
-                          );
-                        })}
-                      </div>
                     </td>
 
                     <td>
@@ -87,58 +73,6 @@ export default function Lobbies() {
           className="drawer-overlay"
         ></label>
         <div className="menu p-4 w-80 min-h-[80vh] text-base-content">
-          <div className="collapse collapse-arrow bg-base-200">
-            <input type="checkbox" defaultChecked />
-            <div className="collapse-title text-xl">Gamemode</div>
-            <div className="collapse-content">
-              <div className="flex flex-wrap gap-3">
-                {gamemodes.map((gamemode, index) => {
-                  return (
-                    <button className="btn btn-outline btn-xs" key={index}>
-                      {gamemode}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          <div className="collapse collapse-arrow bg-base-200">
-            <input type="checkbox" defaultChecked />
-            <div className="collapse-title text-xl">Max players</div>
-            <div className="collapse-content">
-              <input
-                type="range"
-                min={4}
-                max="16"
-                defaultValue="16"
-                className="range"
-              />
-              <div className="w-full flex justify-between text-xs px-2">
-                <span>4</span>
-                <span>8</span>
-                <span>12</span>
-                <span>16</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="collapse collapse-arrow bg-base-200">
-            <input type="checkbox" defaultChecked />
-            <div className="collapse-title text-xl">Chat</div>
-            <div className="collapse-content">
-              <div className="flex flex-wrap gap-3">
-                {chats.map((chat, index) => {
-                  return (
-                    <button className="btn btn-outline btn-xs" key={index}>
-                      {chat}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
           <div className="collapse collapse-arrow bg-base-200">
             <input type="checkbox" defaultChecked />
             <div className="collapse-title text-xl">Sort</div>
