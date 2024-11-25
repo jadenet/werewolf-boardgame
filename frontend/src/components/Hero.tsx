@@ -1,4 +1,10 @@
-import { Link } from "wouter";
+import { useLocation } from "wouter";
+import { getRoleNames } from "../functions/getRolesFromTeam";
+
+const serverUrl =
+  process.env.NODE_ENV === "production"
+    ? "https://werewolf-backend.onrender.com"
+    : "http://localhost:10000";
 
 const images = [
   {
@@ -16,6 +22,8 @@ const images = [
 ];
 
 export default function Hero() {
+  const [, setLocation] = useLocation();
+
   return (
     <div className="hero h-[90vh] bg-base-200">
       <div className="hero-content text-center">
@@ -33,12 +41,28 @@ export default function Hero() {
             })}
           </div>
           <h1 className="text-4xl font-bold py-12">Whose side are you on?</h1>
-          <Link
+          <button
             className="btn btn-primary px-12 pt-6 pb-10"
-            href="/createlobby"
+            onClick={async (e) => {
+              e.preventDefault();
+              const response = await fetch(serverUrl + "/lobbies", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  roles: getRoleNames(),
+                  gamemode: "Classic",
+                }),
+              });
+
+              const responseJson = await response.json();
+
+              if (responseJson.status === "success") {
+                setLocation(`/lobbies/${responseJson.id}`);
+              }
+            }}
           >
             Create a lobby
-          </Link>
+          </button>
         </div>
       </div>
     </div>
