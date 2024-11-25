@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import { useLocation, useParams } from "wouter";
+import { getRoles } from "../functions/getRolesFromTeam";
 
 export default function useSocketConnect() {
   const socketRef = useRef(null);
   const lobbyId = useRef(useParams()["id"]);
   const [, setLocation] = useLocation();
   const [players, setPlayers] = useState([]);
+  const [roles, setRoles] = useState(getRoles());
   const [currentPhase, setCurrentPhase] = useState(null);
   const [gameStarted, setGameStarted] = useState(false);
   const [winner, setWinner] = useState(null);
@@ -50,12 +52,17 @@ export default function useSocketConnect() {
       setPlayers(newPlayers);
     });
 
+    socket.on("rolesChanged", (newRoles) => {
+      console.log(newRoles)
+      setRoles(newRoles);
+    });
+
     socket.on("phaseChange", (phase) => {
       setCurrentPhase(phase);
     });
 
     socket.on("gameStarted", () => {
-      setGameStarted(true);
+      setGameStarted(!gameStarted);
     });
 
     socket.on("winner", (newWinner) => {
@@ -73,10 +80,11 @@ export default function useSocketConnect() {
     return () => {
       socket.disconnect();
     };
-  }, [setLocation]);
+  }, [gameStarted, setLocation]);
 
   return [
     players,
+    roles,
     currentPlayer,
     currentPhase,
     gameStarted,

@@ -8,6 +8,14 @@ export function getRoleNames() {
   return roleNames;
 }
 
+export function getRoles() {
+  const roleInfo = roles.map((role) => {
+    return { name: role.name, img: role.img };
+  });
+
+  return roleInfo;
+}
+
 export function getRolesFromTeam(teamName: string) {
   const filteredRoles = roles
     .filter((role) => {

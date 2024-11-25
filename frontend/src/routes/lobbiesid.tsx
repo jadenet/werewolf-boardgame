@@ -12,6 +12,7 @@ export default function Lobbiesid() {
 
   const [
     players,
+    roles,
     currentPlayer,
     currentPhase,
     gameStarted,
@@ -107,20 +108,20 @@ export default function Lobbiesid() {
 
               <div role="tabpanel" className="tab-content">
                 <div className="flex flex-col gap-6 mx-2 my-8">
-                  <div className="grid grid-cols-5 items-center p-4 outline outline-2 outline-base-300 h-40 gap-x-4 rounded-lg">
-                    {/* {roles.map((role) => {
-                    return (
-                      <div className="tooltip" data-tip={role.name}>
-                        <img
-                          src={`/images/roles/${role.img}`}
-                          alt={role.name}
-                          className={`w-full aspect-square object-contain ${
-                            role.name === "Aura Seer" && "opacity-20"
-                          }`}
-                        />
-                      </div>
-                    );
-                  })} */}
+                  <div className="grid grid-cols-6 items-center p-4 outline outline-2 outline-base-300 h-40 gap-x-2 rounded-lg">
+                    {roles.map((role) => {
+                      return (
+                        <div className="tooltip" data-tip={role.name}>
+                          <img
+                            src={`/images/roles/${role.img}`}
+                            alt={role.name}
+                            className={`w-full h-7 aspect-square object-contain ${
+                              role.name === "Aura Seer" && "opacity-20"
+                            }`}
+                          />
+                        </div>
+                      );
+                    })}
                   </div>
                   <div className="flex flex-col gap-3 p-4 outline outline-base-300 outline-2 rounded-lg">
                     <p className="text-center text-lg">Players</p>
