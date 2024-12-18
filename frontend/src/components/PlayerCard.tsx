@@ -20,7 +20,11 @@ export default function PlayerCard(props) {
 
   return (
     <div
-      className="relative flex flex-col w-56 aspect-square rounded-2xl"
+      className={
+        isCurrentPlayer
+          ? "relative flex flex-col w-56 aspect-square rounded-2xl border-2 border-base-300 bg-base-300"
+          : "relative flex flex-col w-56 aspect-square rounded-2xl border-2 border-base-300 bg-base-200"
+      }
       onClick={() => emitPlayerClicked(props.player)}
     >
       <p className="btn btn-ghost absolute top-0 right-0 text-lg">
@@ -31,33 +35,15 @@ export default function PlayerCard(props) {
         autoPlay
         playsInline
         controls={false}
-        className="w-full bg-secondary rounded-t-2xl object-fill aspect-video"
+        className="w-full h-4/5 g-secondary rounded-t-2xl object-cover aspect-video"
       />
 
-      <div
-        className={
-          isCurrentPlayer
-            ? "bg-red-500"
-            : "" +
-              "h-10 flex justify-between items-center p-3 bg-opacity-30 w-full text-center bottom-0 rounded-b-2xl"
-        }
-      >
+      <div className="h-10 flex justify-center items-center p-3 bg-opacity-30 w-full text-center bottom-0 rounded-b-2xl">
         <div className="tooltip" data-tip={props.player.name}>
           <p className={isCurrentPlayer ? "text-md" : "text-sm"}>
             {getTrunucatedString(props.player.name, 18)}
           </p>
-          <p>{props.player.status}</p>
-          <p>{props.player.role}</p>
-          {props.currentPhase === "Voting" && (
-            <p>Voting: {playerIsVoting && playerIsVoting.name}</p>
-          )}
         </div>
-        <label className="swap">
-          <input type="checkbox" defaultChecked />
-
-          <div className="swap-on">{"<"}</div>
-          <div className="swap-off">-</div>
-        </label>
       </div>
     </div>
   );
