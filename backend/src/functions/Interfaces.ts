@@ -21,11 +21,7 @@ export type Round = {
   cards: Card[];
   playerRoles: Map<Player, Role[]>;
   playerStatus: Map<Player, "Alive" | "Dead">;
-  options: {
-    discussionDuration: number;
-    votingDuration: number;
-    actionDuration: number;
-  };
+  options: Options;
   status: "Begin" | "Night phase" | "Day phase" | "Voting" | "Completed";
   teamWinner?: ("Villagers" | "Werewolves" | "Tanner")[];
   votes?: Map<Player["id"], Player["id"]>;
@@ -58,7 +54,7 @@ export type Ability = {
     phase?: Round["status"];
     playerStatus?: "Alive" | "Dead";
     queue?: number;
-    other?: "SoleWerewolf"
+    other?: "SoleWerewolf";
   };
 };
 

@@ -1,6 +1,6 @@
 import "dotenv/config";
 import startGame from "../src/functions/startGame";
-import { Lobby, Player, Role, Round } from "../src/functions/Interfaces";
+import { Lobby, Options, Player, Role } from "../src/functions/Interfaces";
 import {
   createLobby,
   addPlayerToLobby,
@@ -43,7 +43,7 @@ io.on("connection", (socket) => {
       io.to(lobbyId).emit("playersChanged", lobby.players);
 
 
-      socket.on("gameStart", (playerClicked: Player["id"], roles: Role[], options: Round["options"]) => {
+      socket.on("gameStart", (playerClicked: Player["id"], roles: Role[], options: Options) => {
         if (
           playerClicked === lobby.hostId &&
           lobby.players.length >= minimumPlayerCount
