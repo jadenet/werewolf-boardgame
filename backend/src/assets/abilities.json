@@ -1,0 +1,161 @@
+[
+  {
+    "id": "seer-ability",
+    "name": "Seer Ability",
+    "description": "",
+    "optional": true,
+    "actions": [
+      [
+        {
+          "name": "ViewRole",
+          "target": "Player",
+          "exclusions": ["NotSelf"]
+        },
+        {
+          "name": "ViewRole",
+          "target": "Center",
+          "exclusions": []
+        }
+      ]
+    ],
+    "conditions": {"phase": "Night", "queue": 8}
+  },
+  {
+    "id": "robber-ability",
+    "name": "Robber Ability",
+    "description": "",
+    "optional": true,
+    "actions": [
+      [
+        {
+          "type": "Switch",
+          "target": "Player-Self",
+          "exclusions": []
+        }
+      ],
+      [{ "type": "ViewRole", "target": "Self", "exclusions": [] }]
+    ],
+    "conditions": {"phase": "Night", "queue": 11}
+  },
+  {
+    "id": "troublemaker-ability",
+    "name": "Troublemaker Ability",
+    "description": "",
+    "optional": true,
+    "actions": [
+      [
+        {
+          "type": "Switch",
+          "target": "Player-Player",
+          "exclusions": ["NotSelf"]
+        }
+      ]
+    ],
+   "conditions": {"phase": "Night", "queue": 13}
+  },
+  {
+    "id": "drunk-ability",
+    "name": "Drunk Ability",
+    "description": "",
+    "optional": false,
+    "actions": [
+      [
+        {
+          "type": "Switch",
+          "target": "Self-Center",
+          "exclusions": []
+        }
+      ]
+    ],
+    "conditions": {"phase": "Night", "queue": 15}
+  },
+  {
+    "id": "insomniac-ability",
+    "name": "Insomniac Ability",
+    "description": "",
+    "optional": false,
+    "actions": [[{ "type": "ViewRole", "target": "Self", "exclusions": [] }]],
+ 
+    "conditions": {"phase": "Night", "queue": 16}
+  },
+  {
+    "id": "minion-ability",
+    "name": "Minion Ability",
+    "description": "",
+    "optional": false,
+    "actions": [
+      [
+        {
+          "type": "ViewTeam",
+          "target": "Werewolves",
+          "exclusions": ["WerewolfOnly"]
+        }
+      ]
+    ],
+   "conditions": {"phase": "Night", "queue": 6}
+  },
+  {
+    "id": "werewolf-ability",
+    "name": "Werewolf Ability",
+    "description": "",
+    "optional": false,
+    "actions": [
+      [
+        {
+          "type": "ViewTeam",
+          "target": "Werewolves",
+          "exclusions": ["WerewolfOnly"]
+        }
+      ]
+    ],
+    "conditions": {"phase": "Night", "queue": 3}
+  },
+  {
+    "id": "lone-wolf-ability",
+    "name": "Lone Wolf Ability",
+    "description": "",
+    "optional": true,
+    "actions": [
+      [
+        {
+          "type": "ViewRole",
+          "target": "Player",
+          "exclusions": ["NotSelf"]
+        }
+      ]
+    ],
+   "conditions": {"phase": "Night", "queue": 3, "other": ["SoleWerewolf"]}
+  },
+  {
+    "id": "hunter-ability",
+    "name": "Hunter Ability",
+    "description": "",
+    "optional": false,
+    "actions": [
+      [
+        {
+          "type": "Kill",
+          "target": "Voting",
+          "exclusions": ["NotSelf"]
+        }
+      ]
+    ],
+   "conditions": {"phase": "Voting", "playerStatus": "Dead"}
+  },
+  {
+    "id": "voting-ability",
+    "name": "Voting Ability",
+    "description": "",
+    "optional": true,
+    "actions": [
+      [
+        {
+          "type": "Vote",
+          "target": "Voting",
+          "exclusions": ["NotSelf"]
+        }
+      ]
+    ],
+   "conditions": {"phase": "Voting"}
+  }
+]

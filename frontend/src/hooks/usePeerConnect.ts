@@ -26,7 +26,15 @@ export default function usePeerConnect(currentPlayer, players) {
           audio: true,
         });
       } catch (error) {
-        /* empty */
+        // TODO  periodically ask for new media if not given initial media and/or allow user to manually get a getusermedia request. give silent audio if no media
+        try {
+          localStream.current = await navigator.mediaDevices.getUserMedia({
+            video: false,
+            audio: true,
+          });
+        } catch (error2) {
+          // a
+        }
       }
 
       const videoElement = document.getElementById(
@@ -38,7 +46,7 @@ export default function usePeerConnect(currentPlayer, players) {
       }
 
       peer.current.on("call", (call) => {
-        call.answer(localStream.current && localStream.current);
+        call.answer(localStream.current);
         call.on("stream", (stream) => {
           const videoElement2 = document.getElementById(
             "video-" + call.peer
@@ -67,4 +75,8 @@ export default function usePeerConnect(currentPlayer, players) {
     }
     connectMedia();
   }, [currentPlayer, players]);
+}
+
+export function callPlayer() {
+  
 }

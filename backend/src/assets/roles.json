@@ -1,0 +1,101 @@
+[
+  {
+    "id": "seer",
+    "name": "Seer",
+    "description": "",
+    "image": "",
+    "team": "Villagers",
+    "member": "Villager",
+    "abilities": ["seer-ability"]
+  },
+  {
+    "id": "robber",
+    "name": "Robber",
+    "description": "",
+    "image": "",
+    "team": "Villagers",
+    "member": "Villager",
+    "abilities": ["robber-ability"]
+  },
+  {
+    "id": "troublemaker",
+    "name": "Troublemaker",
+    "description": "",
+    "image": "",
+    "team": "Villagers",
+    "member": "Villager",
+    "abilities": ["troublemaker-ability"]
+  },
+  {
+    "id": "drunk",
+    "name": "Drunk",
+    "description": "",
+    "image": "",
+    "team": "Villagers",
+    "member": "Villager",
+    "abilities": ["drunk-ability"]
+  },
+  {
+    "id": "hunter",
+    "name": "Hunter",
+    "description": "",
+    "image": "",
+    "team": "Villagers",
+    "member": "Villager",
+    "abilities": ["hunter-ability"]
+  },
+  {
+    "id": "mason",
+    "name": "Mason",
+    "description": "",
+    "image": "",
+    "team": "Villagers",
+    "member": "Villager",
+    "abilities": ["mason-ability"]
+  },
+  {
+    "id": "insomniac",
+    "name": "Insomniac",
+    "description": "",
+    "image": "",
+    "team": "Villagers",
+    "member": "Villager",
+    "abilities": ["insomniac-ability"]
+  },
+  {
+    "id": "minion",
+    "name": "Minion",
+    "description": "",
+    "image": "",
+    "team": "Werewolves",
+    "member": "Villager",
+    "abilities": ["minion-ability"]
+  },
+  {
+    "id": "werewolf",
+    "name": "Werewolf",
+    "description": "",
+    "image": "",
+    "team": "Werewolves",
+    "member": "Werewolf",
+    "abilities": ["werewolf-ability", "lone-wolf-ability"]
+  },
+  {
+    "id": "villager",
+    "name": "Villager",
+    "description": "",
+    "image": "",
+    "team": "Villagers",
+    "member": "Villager",
+    "abilities": []
+  },
+  {
+    "id": "tanner",
+    "name": "Tanner",
+    "description": "",
+    "image": "",
+    "team": "Solo",
+    "member": "Villager",
+    "abilities": []
+  }
+]
