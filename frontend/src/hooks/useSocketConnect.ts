@@ -8,32 +8,14 @@ export default function useSocketConnect() {
   const socketRef = useRef(null);
   const lobbyId = useRef(useParams()["id"]);
   const [, setLocation] = useLocation();
-  const [players, setPlayers]: [
-    Player[],
-    React.Dispatch<React.SetStateAction<Player[]>>
-  ] = useState([]);
+  const [players, setPlayers] = useState<Player[]>([]);
   const [roles, setRoles] = useState(getRoles());
-  const [currentPhase, setCurrentPhase]: [
-    Round["status"],
-    React.Dispatch<React.SetStateAction<Round["status"]>>
-  ] = useState(null);
+  const [currentPhase, setCurrentPhase] = useState<Round["status"]>(null);
   const [gameStarted, setGameStarted] = useState(false);
-  const [winner, setWinner]: [
-    Round["teamWinner"],
-    React.Dispatch<React.SetStateAction<Round["teamWinner"]>>
-  ] = useState(null);
-  const [lynchVotes, setLynchVotes]: [
-    Round["votes"],
-    React.Dispatch<React.SetStateAction<Round["votes"]>>
-  ] = useState(new Map());
-  const [cards, setCards]: [
-    Round["cards"],
-    React.Dispatch<React.SetStateAction<Round["cards"]>>
-  ] = useState([]);
-  const [playerStatus, setPlayerStatus]: [
-    Round["playerStatus"],
-    React.Dispatch<React.SetStateAction<Round["playerStatus"]>>
-  ] = useState(new Map());
+  const [winner, setWinner] = useState<Round["teamWinner"]>(null);
+  const [lynchVotes, setLynchVotes] = useState<Round["votes"]>(new Map());
+  const [cards, setCards] = useState<Round["cards"]>([]);
+  const [playerStatus, setPlayerStatus] = useState<Round["playerStatus"]>(new Map());
   const [currentPlayer, setCurrentPlayer] = useState({
     id: null,
     name: null,
