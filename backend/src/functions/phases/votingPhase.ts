@@ -7,10 +7,9 @@ export default async function votingPhase(
   round: Round
 ) {
   const votes: Map<Player, Player> = new Map();
-  // TODO refactor to using emitwithAck
   await new Promise<void>((resolve) => {
     players.forEach((player) => {
-      player.socket
+      player.socket && player.socket
         .timeout(round.options.votingDuration * 1000)
         .emit("vote", (err: Error, res: Player["id"]) => {
           if (err) {

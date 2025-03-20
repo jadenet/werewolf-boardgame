@@ -2,18 +2,38 @@ import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import { useLocation, useParams } from "wouter";
 import { getRoles } from "../functions/getRolesFromTeam";
+import { Player, Round } from "@/Interfaces";
 
 export default function useSocketConnect() {
   const socketRef = useRef(null);
   const lobbyId = useRef(useParams()["id"]);
   const [, setLocation] = useLocation();
-  const [players, setPlayers] = useState([]);
+  const [players, setPlayers]: [
+    Player[],
+    React.Dispatch<React.SetStateAction<Player[]>>
+  ] = useState([]);
   const [roles, setRoles] = useState(getRoles());
-  const [currentPhase, setCurrentPhase] = useState(null);
+  const [currentPhase, setCurrentPhase]: [
+    Round["status"],
+    React.Dispatch<React.SetStateAction<Round["status"]>>
+  ] = useState(null);
   const [gameStarted, setGameStarted] = useState(false);
-  const [winner, setWinner] = useState(null);
-  const [werewolvesVotes, setWerewolvesVotes] = useState([]);
-  const [lynchVotes, setLynchVotes] = useState([]);
+  const [winner, setWinner]: [
+    Round["teamWinner"],
+    React.Dispatch<React.SetStateAction<Round["teamWinner"]>>
+  ] = useState(null);
+  const [lynchVotes, setLynchVotes]: [
+    Round["votes"],
+    React.Dispatch<React.SetStateAction<Round["votes"]>>
+  ] = useState(new Map());
+  const [cards, setCards]: [
+    Round["cards"],
+    React.Dispatch<React.SetStateAction<Round["cards"]>>
+  ] = useState([]);
+  const [playerStatus, setPlayerStatus]: [
+    Round["playerStatus"],
+    React.Dispatch<React.SetStateAction<Round["playerStatus"]>>
+  ] = useState(new Map());
   const [currentPlayer, setCurrentPlayer] = useState({
     id: null,
     name: null,
@@ -36,29 +56,38 @@ export default function useSocketConnect() {
           _: never,
           res: {
             isValidId: boolean;
-            player: { id: string; name: string; isHost: boolean };
+            player?: { id: string; name: string; isHost: boolean };
           }
         ) => {
-          if (res.isValidId) {
+          if (res && res.isValidId) {
             setCurrentPlayer(res.player);
           } else {
-            setLocation("/lobbies?invalidId=true", { replace: true });
+            setLocation("/?invalidId=true", { replace: true });
+            return;
           }
         }
       );
     });
 
     socket.on("playersChanged", (newPlayers) => {
+      console.log("emitt")
       setPlayers(newPlayers);
     });
 
     socket.on("rolesChanged", (newRoles) => {
-      console.log(newRoles)
       setRoles(newRoles);
     });
 
     socket.on("phaseChange", (phase) => {
       setCurrentPhase(phase);
+    });
+
+    socket.on("cardsChange", (newCards) => {
+      setCards(newCards);
+    });
+
+    socket.on("playerStatusChange", (newPlayerStatus) => {
+      setPlayerStatus(newPlayerStatus);
     });
 
     socket.on("gameStarted", () => {
@@ -67,10 +96,6 @@ export default function useSocketConnect() {
 
     socket.on("winner", (newWinner) => {
       setWinner(newWinner);
-    });
-
-    socket.on("werewolvesVotesChange", (newWerewolvesVotes) => {
-      setWerewolvesVotes(newWerewolvesVotes);
     });
 
     socket.on("lynchVotesChange", (newLynchVotes) => {
@@ -87,9 +112,10 @@ export default function useSocketConnect() {
     roles,
     currentPlayer,
     currentPhase,
+    cards,
+    playerStatus,
     gameStarted,
     winner,
-    werewolvesVotes,
     lynchVotes,
     socketRef,
   ] as const;

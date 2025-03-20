@@ -1,7 +1,6 @@
 import { Lobby, Player } from "./Interfaces";
 
 export function createLobby() {
-  // TODO seems like a lobby should be created with the host inserted in players by default, since lobbies are removed when there are no players
   const lobby: Lobby = {
     id: crypto.randomUUID(),
     createdAt: Date.now(),

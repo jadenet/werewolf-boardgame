@@ -15,9 +15,10 @@ export default function Lobbiesid() {
     roles,
     currentPlayer,
     currentPhase,
+    cards,
+    playerStatus,
     gameStarted,
     winner,
-    werewolvesVotes,
     lynchVotes,
     socketRef,
   ] = useSocketConnect();
@@ -62,8 +63,8 @@ export default function Lobbiesid() {
                   currentPlayer={currentPlayer}
                   currentPhase={currentPhase}
                   socket={socketRef}
-                  werewolvesVotes={werewolvesVotes}
                   lynchVotes={lynchVotes}
+                  stream={new MediaStream()}
                 />
               ))}
             </div>
@@ -109,9 +110,9 @@ export default function Lobbiesid() {
               <div role="tabpanel" className="tab-content">
                 <div className="flex flex-col gap-6 mx-2 my-8">
                   <div className="grid grid-cols-6 items-center p-4 outline outline-2 outline-base-300 h-40 gap-x-2 rounded-lg">
-                    {roles.map((role) => {
+                    {roles.map((role, i) => {
                       return (
-                        <div className="tooltip" data-tip={role.name}>
+                        <div key={i} className="tooltip" data-tip={role.name}>
                           <img
                             src={`/images/roles/${role.img}`}
                             alt={role.name}
@@ -130,13 +131,13 @@ export default function Lobbiesid() {
                         <p
                           key={i}
                           className={
-                            player.status == "Alive" || !gameStarted
+                            playerStatus.get(player) === "Alive" || !gameStarted
                               ? ""
                               : "opacity-15"
                           }
                         >
                           {player.name +
-                            (player.status == "Alive" || !gameStarted
+                            (playerStatus.get(player) == "Alive" || !gameStarted
                               ? ""
                               : "(dead)")}
                         </p>

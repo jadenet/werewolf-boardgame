@@ -14,7 +14,7 @@ export function validateLynchingVote(
   phase: Round["status"]
 ) {
   return (
-    player !== targetPlayer && phase === "Voting" // TODO check for phase naming consistency
+    player !== targetPlayer && phase === "Voting"
   );
 }
 

@@ -124,7 +124,7 @@ export default function CreateLobby() {
                               className="flex gap-4 items-center w-full p-2 px-4"
                             >
                               <img
-                                src={`/images/roles/${role.img}`}
+                                src={`/images/roles/${role.image}`}
                                 alt={role.name}
                                 className="aspect-square object-contain w-8"
                               />

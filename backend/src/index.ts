@@ -23,6 +23,10 @@ const io = new Server(server, {
 let lobbies: Lobby[] = [];
 const minimumPlayerCount = 3;
 
+function toPlayerDTO(player: Player) {
+  return { id: player.id, name: player.name };
+}
+
 io.on("connection", (socket) => {
   socket.on(
     "lobbyjoin",
@@ -40,17 +44,25 @@ io.on("connection", (socket) => {
       };
 
       addPlayerToLobby(lobby, player);
-      io.to(lobbyId).emit("playersChanged", lobby.players);
+      
+      io.to(lobbyId).emit(
+        "playersChanged",
+        lobby.players.map((playerInLobby) => {
+          return toPlayerDTO(playerInLobby);
+        })
+      );
 
-
-      socket.on("gameStart", (playerClicked: Player["id"], roles: Role[], options: Options) => {
-        if (
-          playerClicked === lobby.hostId &&
-          lobby.players.length >= minimumPlayerCount
-        ) {
-          startGame(lobby, roles, io, options);
+      socket.on(
+        "gameStart",
+        (playerClicked: Player["id"], roles: Role[], options: Options) => {
+          if (
+            playerClicked === lobby.hostId &&
+            lobby.players.length >= minimumPlayerCount
+          ) {
+            startGame(lobby, roles, io, options);
+          }
         }
-      });
+      );
 
       // TODO once done with all socket events, search all .emit and .on to check for name consistency
 
@@ -58,12 +70,18 @@ io.on("connection", (socket) => {
         removePlayerFromLobby(lobby, player);
 
         if (lobby.players.length > 0) {
-          io.to(lobbyId).emit("playersChanged", lobby.players);
+          io.to(lobbyId).emit(
+            "playersChanged",
+            lobby.players.map((playerInLobby) => {
+              return toPlayerDTO(playerInLobby);
+            })
+          );
         } else {
           removeLobby(lobbies, lobby.id);
         }
       });
-      callback({ isValidId: true, player: player });
+
+      callback({ isValidId: true, player: toPlayerDTO(player) });
     }
   );
 });
@@ -71,7 +89,6 @@ io.on("connection", (socket) => {
 app.use(bodyParser.json());
 
 app.post("/lobbies", async (req, res) => {
-  // TODO possibly remove or change this
   let formErrors: string[] = [];
   if (req.body.hostPlayerName === "") {
     formErrors.push("Enter a name");
@@ -86,7 +103,7 @@ app.post("/lobbies", async (req, res) => {
       if (lobby.players.length === 0) {
         removeLobby(lobbies, lobby.id);
       }
-    });
+    }, 10 * 1000);
   } else {
     res.send(JSON.stringify({ status: "error", errors: formErrors }));
   }
@@ -94,6 +111,15 @@ app.post("/lobbies", async (req, res) => {
 
 app.get("/lobbies", async (_, res) => {
   res.send(JSON.stringify(lobbies));
+});
+
+app.get("/lobbies/:id", async (req, res) => {
+  const lobby = getLobbyFromId(lobbies, req.params.id);
+  res.send(lobby != undefined)
+});
+
+app.get("/roles", async (_, res) => {
+  res.sendFile("./assets/roles.json", { root: import.meta.dirname });
 });
 
 server.listen(Number(process.env.SERVER_PORT), "0.0.0.0", () => {});

@@ -3,7 +3,7 @@ import { Socket } from "socket.io";
 export type Player = {
   id: string;
   name: string;
-  socket: Socket;
+  socket?: Socket;
 };
 
 export type Lobby = {
@@ -22,7 +22,7 @@ export type Round = {
   playerRoles: Map<Player, Role[]>;
   playerStatus: Map<Player, "Alive" | "Dead">;
   options: Options;
-  status: "Begin" | "Night phase" | "Day phase" | "Voting" | "Completed";
+  status: "Pregame" | "Night" | "Day" | "Voting" | "Results";
   teamWinner?: ("Villagers" | "Werewolves" | "Tanner")[];
   votes?: Map<Player["id"], Player["id"]>;
 };
@@ -84,6 +84,7 @@ export type Options = {
   votingDuration: number;
   actionDuration: number;
   resultsDuration: number;
+  preGameDuration: number;
 };
 
 export type ErrorResponse = {

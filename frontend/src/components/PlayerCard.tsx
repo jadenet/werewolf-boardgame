@@ -1,22 +1,24 @@
+import { Player, Round } from "@/Interfaces";
 import getTrunucatedString from "../functions/getTrunucatedString";
-import getTargetPlayerVoteFromPlayerId from "../functions/getTargetPlayerVoteFromPlayerId.ts";
 import getVotesOnPlayerId from "../functions/getVotesOnPlayerId.ts";
+import { Server } from "http";
+import { Video } from "./Video.tsx";
 
-export default function PlayerCard(props) {
-  function emitPlayerClicked(player) {
+export default function PlayerCard(props: {
+  player: Player;
+  key: Player["id"];
+  currentPlayer: Player;
+  currentPhase: Round["status"];
+  lynchVotes: Round["votes"];
+  socket: React.MutableRefObject<Server>;
+  stream: MediaStream;
+}) {
+  function emitPlayerClicked(player: Player) {
     props.socket.current.emit("playerClicked", props.currentPlayer.id, player);
   }
   const isCurrentPlayer =
     props.currentPlayer.id && props.player.id === props.currentPlayer.id;
-  const votesOnPlayer =
-    props.currentPhase === "Night"
-      ? getVotesOnPlayerId(props.werewolvesVotes, props.player.id)
-      : getVotesOnPlayerId(props.lynchVotes, props.player.id);
-
-  const playerIsVoting =
-    props.currentPhase === "Night"
-      ? getTargetPlayerVoteFromPlayerId(props.werewolvesVotes, props.player.id)
-      : getTargetPlayerVoteFromPlayerId(props.lynchVotes, props.player.id);
+  const votesOnPlayer = getVotesOnPlayerId(props.lynchVotes, props.player.id);
 
   return (
     <div
@@ -30,7 +32,9 @@ export default function PlayerCard(props) {
       <p className="btn btn-ghost absolute top-0 right-0 text-lg">
         {votesOnPlayer > 0 && votesOnPlayer}
       </p>
-      <video
+
+      <Video
+        srcObject={props.stream}
         id={"video-" + props.player.id}
         autoPlay
         playsInline

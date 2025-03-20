@@ -1,3 +1,4 @@
+import { Player } from "@/Interfaces";
 import { useEffect, useRef, useState } from "react";
 
 export default function NameModal(props) {
@@ -9,7 +10,7 @@ export default function NameModal(props) {
 
   const [nameInputValue, setNameInputValue] = useState("");
 
-  function emitNameEnter(name) {
+  function emitNameEnter(name: Player["name"]) {
     props.socket.current.emit("nameEnter", name);
   }
 

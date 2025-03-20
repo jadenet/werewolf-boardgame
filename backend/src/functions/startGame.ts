@@ -13,6 +13,7 @@ const defaultOptions = {
   votingDuration: 3 * 60,
   actionDuration: 5 * 60,
   resultsDuration: 5 * 60,
+  preGameDuration: 5 * 60,
 };
 
 export default async function startGame(
@@ -30,18 +31,18 @@ export default async function startGame(
     playerRoles: playerRoles,
     playerStatus: playerStatus,
     options: options || defaultOptions,
-    status: "Begin",
+    status: "Pregame",
   };
 
   lobby.rounds.push(round);
 
-  io.to(lobby.id).emit("phaseChange", "Start");
-  await preGame();
+  io.to(lobby.id).emit("phaseChange", "PreGame");
+  await preGame(lobby.players, round.playerRoles, round.options.preGameDuration);
 
   // remove all calls
   // music, narrator, etc
-  io.to(lobby.id).emit("phaseChange", "Night");
   const abilities = getAbilitiesFromRoles(playerRoles, roles);
+  io.to(lobby.id).emit("phaseChange", "Night");
   await nightPhase(round, abilities);
 
   // add all calls, day music

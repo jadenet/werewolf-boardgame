@@ -1,16 +1,15 @@
 import { useMemo, useState } from "react";
 import { Link } from "wouter";
 
-const serverUrl =
-  process.env.NODE_ENV === "production"
-    ? "https://werewolf-backend.onrender.com"
-    : "http://localhost:10000";
-
 const sorts = ["Player count"];
 
 export default function Lobbies() {
   const [lobbies, setLobbies] = useState([]);
   const lobbiesMemo = useMemo(async () => {
+    const serverUrl =
+      process.env.NODE_ENV === "production"
+        ? "https://werewolf-backend.onrender.com"
+        : "http://localhost:10000";
     const lobbiesResponse = await fetch(serverUrl + "/lobbies", {
       method: "GET",
       headers: { "Content-Type": "application/json" },

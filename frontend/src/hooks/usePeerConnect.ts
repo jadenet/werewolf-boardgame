@@ -1,7 +1,20 @@
+import { Player } from "@/Interfaces";
 import Peer from "peerjs";
 import { useEffect, useRef } from "react";
 
-export default function usePeerConnect(currentPlayer, players) {
+function displayMedia(playerId: Player["id"], stream: MediaStream) {
+  const videoElement = document.getElementById(
+    "video-" + playerId
+  ) as HTMLVideoElement;
+  if (stream && videoElement) {
+    videoElement.srcObject = stream;
+  }
+}
+
+export default function usePeerConnect(
+  currentPlayer: Player,
+  players: Player[]
+) {
   const peer = useRef<Peer | null>();
   const localStream = useRef<MediaStream>();
 
@@ -10,7 +23,9 @@ export default function usePeerConnect(currentPlayer, players) {
 
     function removeMedia() {
       if (localStream.current) {
-        navigator.mediaDevices.getUserMedia({ audio: false, video: false });
+        localStream.current.getTracks().forEach((track) => {
+          track.stop();
+        });
       }
       peer.current.destroy();
     }
@@ -19,64 +34,63 @@ export default function usePeerConnect(currentPlayer, players) {
   }, [currentPlayer.id]);
 
   useEffect(() => {
-    async function connectMedia() {
-      try {
-        localStream.current = await navigator.mediaDevices.getUserMedia({
-          video: true,
-          audio: true,
-        });
-      } catch (error) {
-        // TODO  periodically ask for new media if not given initial media and/or allow user to manually get a getusermedia request. give silent audio if no media
+    async function getMediaDevices() {
+      let mediaDevices = null;
+      for (let i = 0; i < 5; i++) {
         try {
-          localStream.current = await navigator.mediaDevices.getUserMedia({
-            video: false,
+          mediaDevices = await navigator.mediaDevices.getUserMedia({
+            video: true,
             audio: true,
           });
-        } catch (error2) {
-          // a
+          break;
+        } catch (error) {
+          await new Promise<void>((resolve) => {
+            setTimeout(() => {
+              resolve();
+            }, 3000);
+          });
         }
       }
-
-      const videoElement = document.getElementById(
-        "video-" + currentPlayer.id
-      ) as HTMLVideoElement;
-
-      if (localStream && videoElement) {
-        videoElement.srcObject = localStream.current;
+      if (!mediaDevices) {
+        const mediaStream = new MediaStream();
+        mediaStream.addTrack(new MediaStreamTrack());
+        mediaDevices = mediaStream;
       }
 
+      return mediaDevices;
+    }
+
+    function waitForCalls() {
       peer.current.on("call", (call) => {
         call.answer(localStream.current);
         call.on("stream", (stream) => {
-          const videoElement2 = document.getElementById(
-            "video-" + call.peer
-          ) as HTMLVideoElement;
-          videoElement2.srcObject = stream;
+          displayMedia(call.peer, stream);
         });
       });
+    }
 
+    getMediaDevices()
+    displayMedia(currentPlayer.id, localStream.current);
+    waitForCalls()
+
+
+    function callEachPlayer() {
       players.forEach((player) => {
         if (
           player.id !== currentPlayer.id &&
           currentPlayer.id &&
           players.length > 1 &&
-          localStream
+          localStream.current
         ) {
           const call = peer.current.call(player.id, localStream.current);
-
           call.on("stream", (stream) => {
-            const videoElement = document.getElementById(
-              "video-" + player.id
-            ) as HTMLVideoElement;
-            videoElement.srcObject = stream;
+            displayMedia(player.id, stream);
           });
         }
       });
     }
-    connectMedia();
-  }, [currentPlayer, players]);
+    callEachPlayer()
+  }, [currentPlayer.id, players]);
 }
 
-export function callPlayer() {
-  
-}
+export function callPlayer() {}
