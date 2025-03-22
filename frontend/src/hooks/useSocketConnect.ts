@@ -9,7 +9,7 @@ export default function useSocketConnect() {
   const lobbyId = useRef(useParams()["id"]);
   const [, setLocation] = useLocation();
   const [players, setPlayers] = useState<Player[]>([]);
-  const [roles, setRoles] = useState<{ name: string; img: string }[]>();
+  const [roles, setRoles] = useState<{ name: string; img: string }[]>(getRoles());
   const [currentPhase, setCurrentPhase] = useState<Round["status"]>(null);
   const [gameStarted, setGameStarted] = useState(false);
   const [winner, setWinner] = useState<Round["teamWinner"]>(null);
@@ -25,12 +25,6 @@ export default function useSocketConnect() {
   });
 
   useEffect(() => {
-    async function grabRoles() {
-      const roles = await getRoles();
-      setRoles(roles);
-    }
-
-    grabRoles();
     const socketUrl = import.meta.env.PROD
       ? "https://werewolf-backend.onrender.com"
       : "http://localhost:10000";
