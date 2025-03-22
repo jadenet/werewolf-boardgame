@@ -1,6 +1,6 @@
-import { Player } from "@/Interfaces";
 import Peer from "peerjs";
 import { useEffect, useRef } from "react";
+import { Player } from "@/Interfaces";
 
 function displayMedia(playerId: Player["id"], stream: MediaStream) {
   const videoElement = document.getElementById(
@@ -8,6 +8,7 @@ function displayMedia(playerId: Player["id"], stream: MediaStream) {
   ) as HTMLVideoElement;
   if (stream && videoElement) {
     videoElement.srcObject = stream;
+    console.log("yes", videoElement.srcObject)
   }
 }
 
@@ -57,7 +58,7 @@ export default function usePeerConnect(
         mediaDevices = mediaStream;
       }
 
-      return mediaDevices;
+      displayMedia(currentPlayer.id, mediaDevices);
     }
 
     function waitForCalls() {
@@ -70,9 +71,7 @@ export default function usePeerConnect(
     }
 
     getMediaDevices()
-    displayMedia(currentPlayer.id, localStream.current);
     waitForCalls()
-
 
     function callEachPlayer() {
       players.forEach((player) => {
@@ -91,6 +90,7 @@ export default function usePeerConnect(
     }
     callEachPlayer()
   }, [currentPlayer.id, players]);
+
 }
 
-export function callPlayer() {}
+// export function callPlayer() {}

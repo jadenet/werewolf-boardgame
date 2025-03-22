@@ -37,6 +37,8 @@ io.on("connection", (socket) => {
         return;
       }
 
+      socket.join(lobbyId)
+
       const player: Player = {
         id: crypto.randomUUID(),
         name: playerName,
@@ -44,7 +46,7 @@ io.on("connection", (socket) => {
       };
 
       addPlayerToLobby(lobby, player);
-      
+
       io.to(lobbyId).emit(
         "playersChanged",
         lobby.players.map((playerInLobby) => {
