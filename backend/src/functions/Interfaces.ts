@@ -1,9 +1,7 @@
-import { Socket } from "socket.io";
-
 export type Player = {
   id: string;
   name: string;
-  socket?: Socket;
+  socket?: any;
 };
 
 export type Lobby = {
