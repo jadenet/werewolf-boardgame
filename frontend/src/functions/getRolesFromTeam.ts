@@ -6,13 +6,12 @@ const serverUrl =
   process.env.NODE_ENV === "production"
     ? "https://werewolf-backend.onrender.com"
     : "http://localhost:10000";
-
-const rolesResponse = await fetch(serverUrl + "/roles", {
-  method: "GET",
-  headers: { "Content-Type": "application/json" },
-});
-
+ 
 async function getAllRoles() {
+  const rolesResponse = await fetch(serverUrl + "/roles", {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
   roles = await rolesResponse.json()
 }
 
