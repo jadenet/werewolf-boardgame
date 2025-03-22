@@ -15,6 +15,7 @@ export default function Lobbiesid() {
     roles,
     currentPlayer,
     currentPhase,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     cards,
     playerStatus,
     gameStarted,
@@ -24,7 +25,6 @@ export default function Lobbiesid() {
   ] = useSocketConnect();
 
   usePeerConnect(currentPlayer, players);
-  console.log(cards)
 
   return (
     <>

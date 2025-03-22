@@ -54,7 +54,6 @@ export default function useSocketConnect() {
     });
 
     socket.on("playersChanged", (newPlayers) => {
-      console.log("emitt");
       setPlayers(newPlayers);
     });
 
