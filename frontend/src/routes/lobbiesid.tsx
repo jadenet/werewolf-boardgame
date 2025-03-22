@@ -24,6 +24,7 @@ export default function Lobbiesid() {
   ] = useSocketConnect();
 
   usePeerConnect(currentPlayer, players);
+  console.log(cards)
 
   return (
     <>
