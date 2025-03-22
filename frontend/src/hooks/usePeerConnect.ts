@@ -8,7 +8,6 @@ function displayMedia(playerId: Player["id"], stream: MediaStream) {
   ) as HTMLVideoElement;
   if (stream && videoElement) {
     videoElement.srcObject = stream;
-    console.log("yes", videoElement.srcObject)
   }
 }
 
@@ -58,7 +57,10 @@ export default function usePeerConnect(
         mediaDevices = mediaStream;
       }
 
+      localStream.current = mediaDevices
       displayMedia(currentPlayer.id, mediaDevices);
+      waitForCalls()
+      callEachPlayer()
     }
 
     function waitForCalls() {
@@ -69,9 +71,6 @@ export default function usePeerConnect(
         });
       });
     }
-
-    getMediaDevices()
-    waitForCalls()
 
     function callEachPlayer() {
       players.forEach((player) => {
@@ -88,7 +87,8 @@ export default function usePeerConnect(
         }
       });
     }
-    callEachPlayer()
+
+    getMediaDevices()
   }, [currentPlayer.id, players]);
 
 }
