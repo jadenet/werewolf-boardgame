@@ -9,13 +9,15 @@ export default function useSocketConnect() {
   const lobbyId = useRef(useParams()["id"]);
   const [, setLocation] = useLocation();
   const [players, setPlayers] = useState<Player[]>([]);
-  const [roles, setRoles] = useState(getRoles());
+  const [roles, setRoles] = useState<{ name: string; img: string }[]>();
   const [currentPhase, setCurrentPhase] = useState<Round["status"]>(null);
   const [gameStarted, setGameStarted] = useState(false);
   const [winner, setWinner] = useState<Round["teamWinner"]>(null);
   const [lynchVotes, setLynchVotes] = useState<Round["votes"]>(new Map());
   const [cards, setCards] = useState<Round["cards"]>([]);
-  const [playerStatus, setPlayerStatus] = useState<Round["playerStatus"]>(new Map());
+  const [playerStatus, setPlayerStatus] = useState<Round["playerStatus"]>(
+    new Map()
+  );
   const [currentPlayer, setCurrentPlayer] = useState({
     id: null,
     name: null,
@@ -23,6 +25,12 @@ export default function useSocketConnect() {
   });
 
   useEffect(() => {
+    async function grabRoles() {
+      const roles = await getRoles();
+      setRoles(roles);
+    }
+
+    grabRoles();
     const socketUrl = import.meta.env.PROD
       ? "https://werewolf-backend.onrender.com"
       : "http://localhost:10000";
@@ -52,7 +60,7 @@ export default function useSocketConnect() {
     });
 
     socket.on("playersChanged", (newPlayers) => {
-      console.log("emitt")
+      console.log("emitt");
       setPlayers(newPlayers);
     });
 

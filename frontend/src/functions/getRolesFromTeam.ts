@@ -1,17 +1,23 @@
 import { Role } from "@/Interfaces";
 
-const serverUrl =
-  process.env.NODE_ENV === "production"
-    ? "https://werewolf-backend.onrender.com"
-    : "http://localhost:10000";
+async function getAllRoles() {
+  const serverUrl =
+    process.env.NODE_ENV === "production"
+      ? "https://werewolf-backend.onrender.com"
+      : "http://localhost:10000";
 
-const rolesResponse = await fetch(serverUrl + "/roles", {
-  method: "GET",
-  headers: { "Content-Type": "application/json" },
-});
-const roles: Role[] = await rolesResponse.json();
+  const rolesResponse = await fetch(serverUrl + "/roles", {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
 
-export function getRoleNames() {
+  const roles: Role[] = await rolesResponse.json()
+  return roles;
+}
+
+export async function getRoleNames() {
+  const roles = await getAllRoles()
+  
   const roleNames = roles.map((role) => {
     return role.name;
   });
@@ -19,7 +25,9 @@ export function getRoleNames() {
   return roleNames;
 }
 
-export function getRoles() {
+export async function getRoles() {
+  const roles = await getAllRoles()
+
   const roleInfo = roles.map((role) => {
     return { name: role.name, img: role.image };
   });
@@ -27,7 +35,9 @@ export function getRoles() {
   return roleInfo;
 }
 
-export function getRolesFromTeam(teamName: string) {
+export async function getRolesFromTeam(teamName: string) {
+  const roles = await getAllRoles()
+
   const filteredRoles = roles
     .filter((role) => {
       return role.team[0] === teamName;

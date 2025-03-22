@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { getRoleNames, getRolesFromTeam } from "../functions/getRolesFromTeam";
+import { Role } from "@/Interfaces";
 
 const chats = ["Audio", "Video"];
 const serverUrl =
@@ -10,32 +11,47 @@ const serverUrl =
     ? "https://werewolf-backend.onrender.com"
     : "http://localhost:10000";
 
-const gamemodes = [
-  {
-    name: "Classic",
-    role_percentages: { werewolves: 5, solos: 5, villagers: 90 },
-    roles: getRoleNames(),
-  },
-  {
-    name: "Custom",
-    role_percentages: { werewolves: 5, solos: 5, villagers: 90 },
-    roles: [],
-  },
-];
-
-const roleTeams = [
-  { name: "Village", roles: getRolesFromTeam("Village") },
-  { name: "Werewolf", roles: getRolesFromTeam("Werewolves") },
-  { name: "Solo", roles: getRolesFromTeam("Solo") },
-]
-
 export default function CreateLobby() {
-  const [currentGamemode, setCurrentGamemode] = useState(gamemodes[0]);
-  const [currentRoles, setCurrentRoles] = useState(gamemodes[0].roles);
+  const gamemodes = useRef<{
+    name: string;
+    role_percentages: {
+      werewolves: number;
+      solos: number;
+      villagers: number;
+    };
+    roles: string[];
+  }[]>();
+  const roleTeams = useRef<{name: string, roles: Role[]}[]>()
+
+  async function getInfo() {
+    gamemodes.current = [
+      {
+        name: "Classic",
+        role_percentages: { werewolves: 5, solos: 5, villagers: 90 },
+        roles: await getRoleNames(),
+      },
+      {
+        name: "Custom",
+        role_percentages: { werewolves: 5, solos: 5, villagers: 90 },
+        roles: [],
+      },
+    ];
+
+    roleTeams.current = [
+      { name: "Village", roles: await getRolesFromTeam("Village") },
+      { name: "Werewolf", roles: await getRolesFromTeam("Werewolves") },
+      { name: "Solo", roles: await getRolesFromTeam("Solo") },
+    ];
+  }
+
+  getInfo()
+
+  const [currentGamemode, setCurrentGamemode] = useState(gamemodes.current[0]);
+  const [currentRoles, setCurrentRoles] = useState(gamemodes.current[0].roles);
   const [formErrors, setFormErrors] = useState([]);
   const [, setLocation] = useLocation();
   const customGamemode = useMemo(() => currentRoles, [currentRoles]);
-  gamemodes[1].roles = customGamemode;
+  gamemodes.current[1].roles = customGamemode;
 
   function checkCurrentGamemode(e) {
     const newRoles = [...currentRoles];
@@ -46,10 +62,10 @@ export default function CreateLobby() {
     }
     setCurrentRoles(newRoles);
 
-    if (gamemodes[0].roles.sort().join() === newRoles.sort().join()) {
-      setCurrentGamemode(gamemodes[0]);
+    if (gamemodes.current[0].roles.sort().join() === newRoles.sort().join()) {
+      setCurrentGamemode(gamemodes.current[0]);
     } else {
-      setCurrentGamemode(gamemodes[1]);
+      setCurrentGamemode(gamemodes.current[1]);
     }
   }
 
@@ -88,10 +104,14 @@ export default function CreateLobby() {
       >
         <div className="max-h-xl flex justify-center gap-4 p-8 w-full max-w-7xl min-h-screen rounded-lg">
           <div className="flex flex-col gap-4 items-center max-w-3xl">
-          {roleTeams.map((roleTeam) => {
-            return (
+            {roleTeams.current.map((roleTeam) => {
+              return (
                 <div className="collapse collapse-arrow bg-base-200">
-                  <input type="radio" name="roles" defaultChecked={roleTeam.name == "Village"} />
+                  <input
+                    type="radio"
+                    name="roles"
+                    defaultChecked={roleTeam.name == "Village"}
+                  />
                   <div className="collapse-title text-xl font-medium">
                     {roleTeam.name} Roles
                   </div>
@@ -136,15 +156,15 @@ export default function CreateLobby() {
                     </div>
                   </div>
                 </div>
-            );
-          })}
+              );
+            })}
           </div>
 
           <div className="flex flex-col gap-8 w-1/3 px-10 bg-base-200 py-12 rounded-2xl h-fit">
             <div className="flex flex-col gap-4">
               <div className="w-full text-lg">Gamemode</div>
               <div className="flex flex-wrap gap-3">
-                {gamemodes.map((gamemode, index) => {
+                {gamemodes.current.map((gamemode, index) => {
                   function handleGamemodeChange() {
                     setCurrentGamemode(gamemode);
                   }
