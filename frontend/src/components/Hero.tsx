@@ -1,5 +1,6 @@
 import { useLocation } from "wouter";
 import { getRoleNames } from "../functions/getRolesFromTeam";
+import { useState } from "react";
 
 const serverUrl =
   process.env.NODE_ENV === "production"
@@ -23,6 +24,7 @@ const images = [
 
 export default function Hero() {
   const [, setLocation] = useLocation();
+  const [isLoading, setIsLoading] = useState(false);
 
   return (
     <div className="hero h-[90vh] bg-base-200">
@@ -41,28 +43,39 @@ export default function Hero() {
             })}
           </div>
           <h1 className="text-4xl font-bold py-12">Whose side are you on?</h1>
-          <button
-            className="btn btn-primary px-12 pt-6 pb-10"
-            onClick={async (e) => {
-              e.preventDefault();
-              const response = await fetch(serverUrl + "/lobbies", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  roles: getRoleNames(),
-                  gamemode: "Classic",
-                }),
-              });
+          {isLoading ? (
+            <div className="text-lg font-semibold">Creating lobby...</div>
+          ) : (
+            <button
+              className="btn btn-primary px-12 pt-6 pb-10"
+              onClick={async (e) => {
+                e.preventDefault();
+                setIsLoading(true);
+                try {
+                  const response = await fetch(serverUrl + "/lobbies", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      roles: getRoleNames(),
+                      gamemode: "Classic",
+                    }),
+                  });
 
-              const responseJson = await response.json();
+                  const responseJson = await response.json();
 
-              if (responseJson.status === "success") {
-                setLocation(`/lobbies/${responseJson.id}`);
-              }
-            }}
-          >
-            Create a lobby
-          </button>
+                  if (responseJson.status === "success") {
+                    setLocation(`/lobbies/${responseJson.id}`);
+                  }
+                } catch (error) {
+                  console.error("Error creating lobby:", error);
+                } finally {
+                  setIsLoading(false);
+                }
+              }}
+            >
+              Create a lobby
+            </button>
+          )}
         </div>
       </div>
     </div>
