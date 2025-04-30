@@ -6,7 +6,7 @@ export default function Navbar() {
       <div className="navbar-start">
       </div>
       <div className="navbar-center">
-        <Link className="btn btn-ghost text-xl font-bold" href="/">WEREWOLF</Link>
+        <Link className="btn btn-ghost text-xl font-bold" href="/">ONE NIGHT WEREWOLF</Link>
       </div>
       <div className="navbar-end">
       </div>
