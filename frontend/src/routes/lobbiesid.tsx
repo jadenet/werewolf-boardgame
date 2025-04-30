@@ -187,7 +187,7 @@ export default function Lobbiesid() {
                           value={option.value}
                           className="btn btn-outline theme-controller"
                           defaultChecked={themePreference === option.name}
-                          onClick={() => setThemePreference(option.name)}
+                          onClick={() => setThemePreference(option.name)}  // TODO: changing mode removes video element
                           aria-label={option.name}
                         />
                       ))}

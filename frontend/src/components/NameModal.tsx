@@ -1,7 +1,7 @@
 import { Player } from "@/Interfaces";
 import { useEffect, useRef, useState } from "react";
 
-export default function NameModal(props) {
+export default function NameModal(props) { //TODO: this doesn't currently work
   const nameModal = useRef<HTMLDialogElement | null>(null);
 
   useEffect(() => {
