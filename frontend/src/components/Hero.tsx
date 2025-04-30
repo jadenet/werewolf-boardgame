@@ -42,7 +42,7 @@ export default function Hero() {
               );
             })}
           </div>
-          <h1 className="text-4xl font-bold py-12">Whose side are you on?</h1>
+          <h1 className="text-4xl font-bold py-12">One Night Werewolf Online</h1>
           {!isLoading ? (
             <div className="text-lg font-semibold">Creating lobby... (May take up to 30 seconds)</div>
           ) : (
