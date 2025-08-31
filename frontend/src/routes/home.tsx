@@ -16,10 +16,6 @@ const images = [
     src: "/images/roles/Werewolf.png",
     alt: "Werewolf avatar",
   },
-  {
-    src: "/images/roles/Serial_Killer.png",
-    alt: "Serial Killer avatar",
-  },
 ];
 
 export default function Home() {
