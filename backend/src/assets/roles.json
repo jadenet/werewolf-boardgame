@@ -97,5 +97,14 @@
     "team": "Solo",
     "member": "Villager",
     "abilities": []
+  },
+  {
+    "id": "doppelganger",
+    "name": "Doppelganger",
+    "description": "",
+    "image": "",
+    "team": "Solo",
+    "member": "Villager",
+    "abilities": []
   }
 ]
