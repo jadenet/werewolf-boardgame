@@ -16,6 +16,10 @@ const images = [
     src: "/images/roles/Werewolf.png",
     alt: "Werewolf avatar",
   },
+  {
+    src: "/images/roles/Doppelganger.png",
+    alt: "Doppelganger avatar",
+  },
 ];
 
 export default function Home() {
