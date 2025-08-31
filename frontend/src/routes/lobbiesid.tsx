@@ -24,7 +24,8 @@ export default function Lobbiesid() {
   ] = useSocketConnect();
 
   usePeerConnect(currentPlayer, players);
-  console.log(cards)
+  console.log(cards);
+  // TODO: opening/closing drawer removes video element
 
   return (
     <>
@@ -112,6 +113,7 @@ export default function Lobbiesid() {
                 <div className="flex flex-col gap-6 mx-2 my-8">
                   <div className="grid grid-cols-6 items-center p-4 outline outline-2 outline-base-300 h-40 gap-x-2 rounded-lg">
                     {roles.map((role, i) => {
+                      // role images not showing up
                       return (
                         <div key={i} className="tooltip" data-tip={role.name}>
                           <img
@@ -125,9 +127,11 @@ export default function Lobbiesid() {
                       );
                     })}
                   </div>
+
                   <div className="flex flex-col gap-3 p-4 outline outline-base-300 outline-2 rounded-lg">
                     <p className="text-center text-lg">Players</p>
                     {players.map((player, i) => {
+                      // fix player list not showing up
                       return (
                         <p
                           key={i}
@@ -187,7 +191,7 @@ export default function Lobbiesid() {
                           value={option.value}
                           className="btn btn-outline theme-controller"
                           defaultChecked={themePreference === option.name}
-                          onClick={() => setThemePreference(option.name)}  // TODO: changing mode removes video element
+                          onClick={() => setThemePreference(option.name)} // TODO: changing mode removes video element
                           aria-label={option.name}
                         />
                       ))}

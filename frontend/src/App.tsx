@@ -50,7 +50,8 @@ export default function App() {
         <aside>
           <p>Jaden Edwards © 2024</p>
         </aside>
-      </footer>
+      </footer> 
     </>
+    // TODO: fix overflow scrolling
   );
 }
