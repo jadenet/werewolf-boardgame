@@ -111,7 +111,7 @@ export default function Lobbiesid() {
 
               <div role="tabpanel" className="tab-content">
                 <div className="flex flex-col gap-6 mx-2 my-8">
-                  <div className="grid grid-cols-4 items-center py-4 px-2 outline outline-2 gap-y-2 outline-base-300 rounded-lg">
+                  <div className="grid grid-cols-4 items-center p-4 outline outline-2 gap-2 outline-base-300 rounded-lg">
                     {roles.map((role, i) => {
                       // role images not showing up
                       return (
@@ -119,8 +119,8 @@ export default function Lobbiesid() {
                           <img
                             src={`/images/roles/${role.name}.png`}
                             alt={role.name}
-                            className={`w-full h-full aspect-square object-contain ${
-                              role.name === "Aura Seer" && "opacity-20"
+                            className={`w-full h-full rounded-lg ${
+                              ["Seer", "Mason", "Tanner"].includes(role.name) && "opacity-20"
                             }`}
                           />
                         </div>
