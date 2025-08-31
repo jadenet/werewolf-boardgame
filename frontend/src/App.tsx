@@ -2,8 +2,7 @@ import { Redirect, Route, Switch, useParams } from "wouter";
 import Home from "./routes/home";
 import CreateLobby from "./routes/createlobby";
 import LobbiesId from "./routes/lobbiesid";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
+import { Link } from "wouter";
 import { useEffect, useState } from "react";
 
 export default function App() {
@@ -31,7 +30,15 @@ export default function App() {
   }
   return (
     <>
-      <Navbar />
+      <div className="navbar h-[8vh] bg-base-100">
+        <div className="navbar-start"></div>
+        <div className="navbar-center">
+          <Link className="btn btn-ghost text-xl font-bold" href="/">
+            ONE NIGHT WEREWOLF
+          </Link>
+        </div>
+        <div className="navbar-end"></div>
+      </div>
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/createlobby" component={CreateLobby} />
@@ -39,7 +46,11 @@ export default function App() {
 
         <Route>404: No such page!</Route>
       </Switch>
-      <Footer />
+      <footer className="footer footer-center p-4 h-[8vh] bg-base-300 text-base-content">
+        <aside>
+          <p>Jaden Edwards © 2024</p>
+        </aside>
+      </footer>
     </>
   );
 }

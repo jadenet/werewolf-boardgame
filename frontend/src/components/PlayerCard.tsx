@@ -2,7 +2,7 @@ import { Player, Round } from "@/Interfaces";
 import getTrunucatedString from "../functions/getTrunucatedString";
 import getVotesOnPlayerId from "../functions/getVotesOnPlayerId.ts";
 import { Server } from "http";
-import { Video } from "./Video.tsx";
+import { useEffect, useRef } from "react";
 
 export default function PlayerCard(props: {
   player: Player;
@@ -20,6 +20,16 @@ export default function PlayerCard(props: {
     props.currentPlayer.id && props.player.id === props.currentPlayer.id;
   const votesOnPlayer = getVotesOnPlayerId(props.lynchVotes, props.player.id);
 
+  const videoRef = useRef<HTMLVideoElement>();
+
+  useEffect(() => {
+    if (!videoRef.current || videoRef.current.srcObject === props.stream) {
+      return;
+    }
+
+    videoRef.current.srcObject = props.stream;
+  }, [props.stream]);
+
   return (
     <div
       className={
@@ -32,9 +42,8 @@ export default function PlayerCard(props: {
       <p className="btn btn-ghost absolute top-0 right-0 text-lg">
         {votesOnPlayer > 0 && votesOnPlayer}
       </p>
-
-      <Video
-        srcObject={props.stream}
+      <video
+        ref={videoRef}
         id={"video-" + props.player.id}
         autoPlay
         playsInline
