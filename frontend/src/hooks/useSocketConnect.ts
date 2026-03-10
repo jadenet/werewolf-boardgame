@@ -28,7 +28,7 @@ export default function useSocketConnect() {
     const socketUrl = import.meta.env.PROD
       ? "https://werewolf-backend.onrender.com"
       : "http://localhost:10000";
-    const socket = io(socketUrl, { port: 10000 });
+    const socket = io(socketUrl);
     socketRef.current = socket;
 
     socket.on("connect", () => {
@@ -51,6 +51,11 @@ export default function useSocketConnect() {
           }
         }
       );
+    });
+
+    socket.on("connect_error", (error) => {
+      console.error("Failed to connect to server:", error);
+      setLocation("/?connectionError=true", { replace: true });
     });
 
     socket.on("playersChanged", (newPlayers) => {
