@@ -23,19 +23,15 @@ export default function useSocketConnect() {
     name: null,
     isHost: false,
   });
+  const [socketConnected, setSocketConnected] = useState(false);
 
-  useEffect(() => {
-    const socketUrl = import.meta.env.PROD
-      ? "https://werewolf-backend.onrender.com"
-      : "http://localhost:10000";
-    const socket = io(socketUrl);
-    socketRef.current = socket;
-
-    socket.on("connect", () => {
-      socket.timeout(5000).emit(
+  const joinLobby = (playerName: string) => {
+    console.log("joinLobby called with:", playerName, "socketConnected:", socketConnected);
+    if (socketConnected && playerName.trim()) {
+      socketRef.current.timeout(5000).emit(
         "lobbyjoin",
         lobbyId.current,
-        "",
+        playerName.trim(),
         (
           _: never,
           res: {
@@ -43,22 +39,49 @@ export default function useSocketConnect() {
             player?: { id: string; name: string; isHost: boolean };
           }
         ) => {
+          console.log("joinLobby callback received:", res);
           if (res && res.isValidId) {
             setCurrentPlayer(res.player);
           } else {
             setLocation("/?invalidId=true", { replace: true });
-            return;
           }
         }
       );
+    } else if (!socketConnected) {
+      console.error("Socket not connected, cannot join lobby");
+    }
+  };
+
+  useEffect(() => {
+    const socketUrl = import.meta.env.PROD
+      ? "https://werewolf-backend.onrender.com"
+      : "http://localhost:10000";
+    const socket = io(socketUrl, {
+      transports: ['websocket', 'polling'],
+      timeout: 5000,
+      forceNew: true,
     });
+    socketRef.current = socket;
 
     socket.on("connect_error", (error) => {
-      console.error("Failed to connect to server:", error);
+      console.error("Socket connect error:", error);
+      console.error("Socket URL:", socketUrl);
+      console.error("Error message:", error.message);
       setLocation("/?connectionError=true", { replace: true });
     });
 
+    socket.on("connect", () => {
+      console.log("Socket connected successfully to:", socketUrl);
+      setSocketConnected(true);
+    });
+
+    socket.on("disconnect", (reason) => {
+      console.log("Socket disconnected:", reason);
+      setSocketConnected(false);
+    });
+
     socket.on("playersChanged", (newPlayers) => {
+      console.log("Received playersChanged:", newPlayers);
       setPlayers(newPlayers);
     });
 
@@ -86,14 +109,38 @@ export default function useSocketConnect() {
       setWinner(newWinner);
     });
 
+    socket.on("shareRole", (role) => {
+      console.log("Received role:", role);
+      // Store the role for the current player
+      // You might want to add a state for currentPlayerRole
+    });
+
+    socket.on("startNight", (duration) => {
+      console.log("Night started, duration:", duration);
+    });
+
+    socket.on("startDiscussion", (duration) => {
+      console.log("Discussion started, duration:", duration);
+    });
+
+    socket.on("startVoting", (duration) => {
+      console.log("Voting started, duration:", duration);
+    });
+
     socket.on("lynchVotesChange", (newLynchVotes) => {
-      setLynchVotes(newLynchVotes);
+      // Convert array of [targetId, voterId] to Map
+      const votesMap = new Map();
+      newLynchVotes.forEach(([targetId, voterId]: [string, string]) => {
+        // For now, just store the target ID - we can enhance this later
+        votesMap.set(targetId, voterId);
+      });
+      setLynchVotes(votesMap);
     });
 
     return () => {
       socket.disconnect();
     };
-  }, [gameStarted, setLocation]);
+  }, [setLocation]);
 
   return [
     players,
@@ -106,5 +153,7 @@ export default function useSocketConnect() {
     winner,
     lynchVotes,
     socketRef,
+    joinLobby,
+    socketConnected,
   ] as const;
 }

@@ -7,6 +7,7 @@ import {
   getLobbyFromId,
   removePlayerFromLobby,
   removeLobby,
+  findPlayerFromId,
 } from "../src/functions/lobby";
 import express from "express";
 import cors from "cors";
@@ -14,10 +15,18 @@ import bodyParser from "body-parser";
 import { createServer } from "node:http";
 import { Server } from "socket.io";
 const app = express();
-app.use(cors({ origin: "https://werewolf-peom.onrender.com" }));
+app.use(cors({
+  origin: process.env.NODE_ENV === "production"
+    ? "https://werewolf-peom.onrender.com"
+    : ["http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173", "http://127.0.0.1:3000"]
+}));
 const server = createServer(app);
 const io = new Server(server, {
-  cors: { origin: "https://werewolf-peom.onrender.com" },
+  cors: {
+    origin: process.env.NODE_ENV === "production"
+      ? "https://werewolf-peom.onrender.com"
+      : ["http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173", "http://127.0.0.1:3000"]
+  }
 });
 
 let lobbies: Lobby[] = [];
@@ -31,13 +40,16 @@ io.on("connection", (socket) => {
   socket.on(
     "lobbyjoin",
     (lobbyId: Lobby["id"], playerName: Player["name"], callback: Function) => {
+      console.log("Player joining lobby:", lobbyId, playerName);
       let lobby = getLobbyFromId(lobbies, lobbyId);
       if (!lobby) {
+        console.log("Lobby not found:", lobbyId);
         callback({ isValidId: false });
         return;
       }
 
       socket.join(lobbyId)
+      console.log("Socket joined room:", lobbyId);
 
       const player: Player = {
         id: crypto.randomUUID(),
@@ -46,6 +58,7 @@ io.on("connection", (socket) => {
       };
 
       addPlayerToLobby(lobby, player);
+      console.log("Player added to lobby. Total players:", lobby.players.length);
 
       io.to(lobbyId).emit(
         "playersChanged",
@@ -54,19 +67,47 @@ io.on("connection", (socket) => {
         })
       );
 
+      callback({
+        isValidId: true,
+        player: { id: player.id, name: player.name, isHost: player.id === lobby.hostId }
+      });
+      console.log("Join callback sent");
+
       socket.on(
         "gameStart",
-        (playerClicked: Player["id"], roles: Role[], options: Options) => {
+        (playerClicked: Player["id"], roles: Role[], options: Options, callback?: Function) => {
           if (
             playerClicked === lobby.hostId &&
             lobby.players.length >= minimumPlayerCount
           ) {
-            startGame(lobby, roles, io, options);
+            // Acknowledge immediately, then start the game
+            if (callback) callback({ success: true });
+
+            // Start game asynchronously without awaiting
+            startGame(lobby, roles, io, options).catch(error => {
+              console.error("Error during game:", error);
+              // Could emit an error event to all players if needed
+            });
+          } else {
+            if (callback) callback({ success: false, error: "Not authorized or insufficient players" });
           }
         }
       );
 
-      // TODO once done with all socket events, search all .emit and .on to check for name consistency
+      socket.on("playerClicked", (currentPlayerId: string, targetPlayerId: string) => {
+        // Handle player selection for voting or abilities
+        const currentPlayer = findPlayerFromId(lobby.players, currentPlayerId);
+        const targetPlayer = findPlayerFromId(lobby.players, targetPlayerId);
+
+        if (currentPlayer && targetPlayer && lobby.rounds.length > 0) {
+          const currentRound = lobby.rounds[lobby.rounds.length - 1];
+
+          if (currentRound.status === "Voting") {
+            // Handle voting
+            socket.emit("vote", currentPlayerId, targetPlayerId);
+          }
+        }
+      });
 
       socket.on("disconnect", () => {
         removePlayerFromLobby(lobby, player);
@@ -90,25 +131,17 @@ io.on("connection", (socket) => {
 
 app.use(bodyParser.json());
 
-app.post("/lobbies", async (req, res) => {
-  let formErrors: string[] = [];
-  if (req.body.hostPlayerName === "") {
-    formErrors.push("Enter a name");
-  }
+app.post("/lobbies", async (_req, res) => {
+  // Lobby creation doesn't require a name - name is provided when joining
+  const lobby = createLobby();
+  lobbies.push(lobby);
+  res.send(JSON.stringify({ status: "success", id: lobby.id }));
 
-  if (formErrors.length === 0) {
-    const lobby = createLobby();
-    lobbies.push(lobby);
-    res.send(JSON.stringify({ status: "success", id: lobby.id }));
-
-    setTimeout(() => {
-      if (lobby.players.length === 0) {
-        removeLobby(lobbies, lobby.id);
-      }
-    }, 10 * 1000);
-  } else {
-    res.send(JSON.stringify({ status: "error", errors: formErrors }));
-  }
+  setTimeout(() => {
+    if (lobby.players.length === 0) {
+      removeLobby(lobbies, lobby.id);
+    }
+  }, 10 * 1000);
 });
 
 app.get("/lobbies", async (_, res) => {

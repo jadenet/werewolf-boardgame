@@ -3,7 +3,7 @@ import { Role } from "@/Interfaces";
 let roles: Role[] = []
 
 const serverUrl =
-  process.env.NODE_ENV === "production"
+  import.meta.env.PROD
     ? "https://werewolf-backend.onrender.com"
     : "http://localhost:10000";
  

@@ -20,8 +20,8 @@ export default function CreateLobby() {
       villagers: number;
     };
     roles: string[];
-  }[]>();
-  const roleTeams = useRef<{name: string, roles: Role[]}[]>()
+  }[]>([]);
+  const roleTeams = useRef<{name: string, roles: Role[]}[]>([])
 
   async function getInfo() {
     gamemodes.current = [
@@ -47,13 +47,13 @@ export default function CreateLobby() {
   getInfo()
 
   const [currentGamemode, setCurrentGamemode] = useState(gamemodes.current[0]);
-  const [currentRoles, setCurrentRoles] = useState(gamemodes.current[0].roles);
-  const [formErrors, setFormErrors] = useState([]);
+  const [currentRoles, setCurrentRoles] = useState(gamemodes.current[0]?.roles || []);
+  const [formErrors, setFormErrors] = useState<string[]>([]);
   const [, setLocation] = useLocation();
   const customGamemode = useMemo(() => currentRoles, [currentRoles]);
   gamemodes.current[1].roles = customGamemode;
 
-  function checkCurrentGamemode(e) {
+  function checkCurrentGamemode(e: React.ChangeEvent<HTMLInputElement>) {
     const newRoles = [...currentRoles];
     if (e.target.checked) {
       newRoles.push(e.target.value);
@@ -62,7 +62,7 @@ export default function CreateLobby() {
     }
     setCurrentRoles(newRoles);
 
-    if (gamemodes.current[0].roles.sort().join() === newRoles.sort().join()) {
+    if (gamemodes.current[0]?.roles.sort().join() === newRoles.sort().join()) {
       setCurrentGamemode(gamemodes.current[0]);
     } else {
       setCurrentGamemode(gamemodes.current[1]);
@@ -70,11 +70,11 @@ export default function CreateLobby() {
   }
 
   return (
-    <>
+    <div className="min-h-[84vh] p-4">
       {formErrors.map((formError, i) => {
         return (
-          <div key={i} className="toast">
-            <div className="alert alert-error">
+          <div key={i} className="toast toast-top toast-center">
+            <div className="alert alert-error shadow-lg">
               <span>{formError}</span>
             </div>
           </div>
@@ -83,6 +83,7 @@ export default function CreateLobby() {
       <form
         onSubmit={async (e) => {
           e.preventDefault();
+          setFormErrors([]);
           const response = await fetch(serverUrl + "/lobbies", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -97,16 +98,26 @@ export default function CreateLobby() {
           if (responseJson.status === "success") {
             setLocation(`/lobbies/${responseJson.id}`);
           } else {
-            setFormErrors(responseJson.errors);
+            setFormErrors(responseJson.errors || ["An error occurred"]);
           }
         }}
-        className="flex flex-col gap-8 items-center py-4 mb-20 w-full"
+        className="max-w-7xl mx-auto space-y-8"
       >
-        <div className="max-h-xl flex justify-center gap-4 p-8 w-full max-w-7xl min-h-screen rounded-lg">
-          <div className="flex flex-col gap-4 items-center max-w-3xl">
+        <div className="text-center space-y-4">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            Create Your Lobby
+          </h1>
+          <p className="text-lg text-base-content/70">
+            Customize your game settings and select the roles for an unforgettable experience
+          </p>
+        </div>
+
+        <div className="flex flex-col lg:flex-row gap-8">
+          <div className="flex-1 space-y-6">
+            <h2 className="text-2xl font-semibold text-center">Select Roles</h2>
             {roleTeams.current.map((roleTeam) => {
               return (
-                <div className="collapse collapse-arrow bg-base-200">
+                <div key={roleTeam.name} className="collapse collapse-arrow bg-base-200/50 backdrop-blur-sm border border-base-300 rounded-xl shadow-lg">
                   <input
                     type="radio"
                     name="roles"
@@ -116,7 +127,7 @@ export default function CreateLobby() {
                     {roleTeam.name} Roles
                   </div>
                   <div className="collapse-content">
-                    <div className="grid auto-rows-fr grid-cols-3 gap-4 justify-center items-center p-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 justify-center items-center p-4">
                       {roleTeam.roles.map((role, i) => {
                         const isChecked = currentGamemode.roles.includes(
                           role.name
@@ -124,11 +135,11 @@ export default function CreateLobby() {
                         return (
                           <div
                             key={i}
-                            className={`flex h-full justify-between items-center outline-secondary rounded-lg${
+                            className={`card bg-base-100 shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 ${
                               !isChecked
-                                ? " outline outline-1 outline-secondary opacity-15"
-                                : " bg-secondary bg-opacity-15"
-                            }`}
+                                ? "outline outline-1 outline-base-300 opacity-60 hover:opacity-80"
+                                : "outline outline-2 outline-primary bg-primary/5 shadow-primary/20"
+                            } rounded-lg`}
                           >
                             <input
                               type="checkbox"
@@ -137,18 +148,21 @@ export default function CreateLobby() {
                               value={role.name}
                               defaultChecked={isChecked}
                               onChange={checkCurrentGamemode}
-                              className="accent-secondary hidden"
+                              className="hidden"
                             />
                             <label
                               htmlFor={role.name}
-                              className="flex gap-4 items-center w-full p-2 px-4"
+                              className="flex gap-3 items-center w-full p-3 cursor-pointer"
                             >
                               <img
                                 src={`/images/roles/${role.image}`}
                                 alt={role.name}
-                                className="aspect-square object-contain w-8"
+                                className="aspect-square object-contain w-10 h-10 rounded"
                               />
-                              <p className="text-start">{role.name}</p>
+                              <div className="flex-1">
+                                <p className="font-medium text-sm">{role.name}</p>
+                                <p className="text-xs text-base-content/60 line-clamp-2">{role.description}</p>
+                              </div>
                             </label>
                           </div>
                         );
@@ -160,53 +174,81 @@ export default function CreateLobby() {
             })}
           </div>
 
-          <div className="flex flex-col gap-8 w-1/3 px-10 bg-base-200 py-12 rounded-2xl h-fit">
-            <div className="flex flex-col gap-4">
-              <div className="w-full text-lg">Gamemode</div>
-              <div className="flex flex-wrap gap-3">
-                {gamemodes.current.map((gamemode, index) => {
-                  function handleGamemodeChange() {
-                    setCurrentGamemode(gamemode);
-                  }
+          <div className="lg:w-80 space-y-6">
+            <div className="bg-base-200/50 backdrop-blur-sm border border-base-300 rounded-xl p-6 shadow-lg">
+              <h3 className="text-xl font-semibold mb-4 text-center">Game Settings</h3>
 
-                  return (
-                    <input
-                      type="radio"
-                      aria-label={gamemode.name}
-                      name="gamemode"
-                      value={gamemode.name}
-                      className="btn btn-outline btn-sm"
-                      key={index}
-                      checked={currentGamemode.name === gamemode.name}
-                      onChange={handleGamemodeChange}
-                    />
-                  );
-                })}
+              <div className="space-y-4">
+                <div>
+                  <label className="label">
+                    <span className="label-text font-medium">Gamemode</span>
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {gamemodes.current.map((gamemode, index) => {
+                      function handleGamemodeChange() {
+                        setCurrentGamemode(gamemode);
+                        setCurrentRoles(gamemode.roles);
+                      }
+
+                      return (
+                        <input
+                          type="radio"
+                          aria-label={gamemode.name}
+                          name="gamemode"
+                          value={gamemode.name}
+                          className="btn btn-outline btn-sm flex-1"
+                          key={index}
+                          checked={currentGamemode?.name === gamemode.name}
+                          onChange={handleGamemodeChange}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="label">
+                    <span className="label-text font-medium">Chat Options</span>
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {chats.map((chat, index) => {
+                      return (
+                        <input
+                          type="checkbox"
+                          aria-label={chat}
+                          name="chat"
+                          className="btn btn-outline btn-sm flex-1"
+                          key={index}
+                          value={chat}
+                          defaultChecked={chat === "Audio"}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="pt-4">
+                  <button className="btn btn-primary w-full btn-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
+                    🎮 Create Lobby
+                  </button>
+                </div>
               </div>
             </div>
-            <div className="flex flex-col gap-4">
-              <div className="w-full text-lg">Chat</div>
-              <div className="flex flex-wrap gap-3 w-full">
-                {chats.map((chat, index) => {
-                  return (
-                    <input
-                      type="checkbox"
-                      aria-label={chat}
-                      name="chat"
-                      className="btn btn-outline btn-sm"
-                      key={index}
-                      value={chat}
-                      defaultChecked={chat === "Audio"}
-                    />
-                  );
-                })}
+
+            <div className="bg-base-200/50 backdrop-blur-sm border border-base-300 rounded-xl p-6 shadow-lg">
+              <h4 className="font-semibold mb-3">Selected Roles ({currentRoles.length})</h4>
+              <div className="max-h-32 overflow-y-auto space-y-1">
+                {currentRoles.map((role, index) => (
+                  <div key={index} className="text-sm text-base-content/70 flex items-center gap-2">
+                    <div className="w-2 h-2 bg-primary rounded-full"></div>
+                    {role}
+                  </div>
+                ))}
               </div>
             </div>
-
-            <button className="btn btn-primary w-full">Submit</button>
           </div>
         </div>
       </form>
-    </>
+    </div>
   );
 }

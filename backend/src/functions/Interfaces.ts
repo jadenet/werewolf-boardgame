@@ -20,7 +20,7 @@ export type Round = {
   playerRoles: Map<Player, Role[]>;
   playerStatus: Map<Player, "Alive" | "Dead">;
   options: Options;
-  status: "Pregame" | "Night" | "Day" | "Voting" | "Results";
+  status: "PreGame" | "Night" | "Discussion" | "Voting" | "End";
   teamWinner?: ("Villagers" | "Werewolves" | "Tanner")[];
   votes?: Map<Player["id"], Player["id"]>;
 };

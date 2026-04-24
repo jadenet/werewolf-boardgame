@@ -31,13 +31,16 @@ export default async function startGame(
     playerRoles: playerRoles,
     playerStatus: playerStatus,
     options: options || defaultOptions,
-    status: "Pregame",
+    status: "PreGame",
   };
 
   lobby.rounds.push(round);
 
   io.to(lobby.id).emit("phaseChange", "PreGame");
   await preGame(lobby.players, round.playerRoles, round.options.preGameDuration);
+
+  // Start the game
+  io.to(lobby.id).emit("gameStarted");
 
   // remove all calls
   // music, narrator, etc
@@ -46,7 +49,7 @@ export default async function startGame(
   await nightPhase(round, abilities);
 
   // add all calls, day music
-  io.to(lobby.id).emit("phaseChange", "Day");
+  io.to(lobby.id).emit("phaseChange", "Discussion");
   await discussionPhase(lobby.players, round.options.discussionDuration);
 
   io.to(lobby.id).emit("phaseChange", "Voting");

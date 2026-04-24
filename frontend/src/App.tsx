@@ -21,7 +21,11 @@ export default function App() {
       });
     }, [params.id]);
     if (isValidId === null) {
-      return <></>;
+      return (
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="loading loading-spinner loading-lg text-primary"></div>
+        </div>
+      );
     } else if (isValidId) {
       return <LobbiesId />;
     } else {
@@ -29,12 +33,12 @@ export default function App() {
     }
   }
   return (
-    <>
-      <div className="navbar h-[8vh] bg-base-100">
+    <div className="min-h-screen bg-gradient-to-br from-base-100 to-base-200">
+      <div className="navbar h-[8vh] bg-base-100/80 backdrop-blur-md border-b border-base-300 shadow-lg">
         <div className="navbar-start"></div>
         <div className="navbar-center">
-          <Link className="btn btn-ghost text-xl font-bold" href="/">
-            ONE NIGHT WEREWOLF
+          <Link className="btn btn-ghost text-xl font-bold hover:bg-primary/10 transition-colors" href="/">
+            🌙 ONE NIGHT WEREWOLF
           </Link>
         </div>
         <div className="navbar-end"></div>
@@ -43,15 +47,21 @@ export default function App() {
         <Route path="/" component={Home} />
         <Route path="/createlobby" component={CreateLobby} />
         <Route path="/lobbies/:id" component={ValidateLobby} />
-
-        <Route>404: No such page!</Route>
+        <Route>
+          <div className="flex flex-col items-center justify-center min-h-[84vh] text-center">
+            <h1 className="text-6xl font-bold text-error mb-4">404</h1>
+            <p className="text-xl text-base-content/70 mb-8">Page not found</p>
+            <Link href="/" className="btn btn-primary btn-lg">
+              Return Home
+            </Link>
+          </div>
+        </Route>
       </Switch>
-      <footer className="footer footer-center p-4 h-[8vh] bg-base-300 text-base-content">
+      <footer className="footer footer-center p-4 h-[8vh] bg-base-300/50 backdrop-blur-sm text-base-content/70 border-t border-base-300">
         <aside>
-          <p>Jaden Edwards © 2024</p>
+          <p className="text-sm">© 2024 Jaden Edwards • Built with React & TypeScript</p>
         </aside>
-      </footer> 
-    </>
-    // TODO: fix overflow scrolling
+      </footer>
+    </div>
   );
 }
