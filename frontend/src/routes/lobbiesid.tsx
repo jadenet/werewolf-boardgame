@@ -20,7 +20,6 @@ export default function Lobbiesid() {
     roles,
     currentPlayer,
     currentPhase,
-    cards,
     playerStatus,
     gameStarted,
     winner,
@@ -245,7 +244,7 @@ export default function Lobbiesid() {
 
             <div className="flex items-center gap-4">
               <div className="text-sm text-base-content/70">
-                Abilities: {cards?.length > 0 ? "Available" : "None"}
+                Abilities: None
               </div>
               {winner && (
                 <div className="badge badge-success badge-lg">

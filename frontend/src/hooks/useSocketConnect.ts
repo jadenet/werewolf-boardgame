@@ -14,7 +14,6 @@ export default function useSocketConnect() {
   const [gameStarted, setGameStarted] = useState(false);
   const [winner, setWinner] = useState<Round["teamWinner"]>(null);
   const [lynchVotes, setLynchVotes] = useState<Round["votes"]>(new Map());
-  const [cards, setCards] = useState<Round["cards"]>([]);
   const [playerStatus, setPlayerStatus] = useState<Round["playerStatus"]>(
     new Map()
   );
@@ -85,20 +84,8 @@ export default function useSocketConnect() {
       setPlayers(newPlayers);
     });
 
-    socket.on("rolesChanged", (newRoles) => {
-      setRoles(newRoles);
-    });
-
     socket.on("phaseChange", (phase) => {
       setCurrentPhase(phase);
-    });
-
-    socket.on("cardsChange", (newCards) => {
-      setCards(newCards);
-    });
-
-    socket.on("playerStatusChange", (newPlayerStatus) => {
-      setPlayerStatus(newPlayerStatus);
     });
 
     socket.on("gameStarted", () => {
@@ -147,7 +134,6 @@ export default function useSocketConnect() {
     roles,
     currentPlayer,
     currentPhase,
-    cards,
     playerStatus,
     gameStarted,
     winner,
