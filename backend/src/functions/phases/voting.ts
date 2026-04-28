@@ -1,16 +1,17 @@
-import { Lobby, Round, Player } from "../Interfaces";
-import { findPlayerFromId } from "../lobby";
+import { Lobby, Round, Player } from "../types";
+import { getPlayerFromId } from "../helpers/lobby";
 import { validateLynchingVote } from "../validator";
 
 export default async function votingPhase(
   players: Lobby["players"],
   round: Round
 ) {
-  const votes: Map<Player, Player> = new Map();
+  const votes: Map<Player["id"], Player["id"]> = new Map();
 
   // Emit voting start to all players
-  players.forEach((player) => {
-    if (player.socket) {
+  players.forEach((playerId) => {
+    const player = getPlayerFromId(playerId);
+    if (player && player.socket) {
       player.socket.emit("startVoting", round.options.votingDuration);
     }
   });
@@ -21,17 +22,18 @@ export default async function votingPhase(
     const totalPlayers = players.length;
 
     const voteHandler = (voterId: string, targetId: string) => {
-      const voter = findPlayerFromId(players, voterId);
-      const target = findPlayerFromId(players, targetId);
+      const voter = getPlayerFromId(voterId);
+      const target = getPlayerFromId(targetId);
 
       if (voter && target) {
-        const voteSuccess = validateLynchingVote(voter, target, round.status);
+        const voteSuccess = validateLynchingVote(voter.id, target.id, round.status);
         if (voteSuccess) {
-          votes.set(target, voter);
+          votes.set(target.id, voter.id);
           // Emit vote update to all players
-          players.forEach((player) => {
-            if (player.socket) {
-              player.socket.emit("lynchVotesChange", Array.from(votes.entries()).map(([target, voter]) => [target.id, voter.id]));
+          players.forEach((playerId) => {
+            const player = getPlayerFromId(playerId);
+            if (player && player.socket) {
+              player.socket.emit("lynchVotesChange", Array.from(votes.entries()).map(([target, voter]) => [target, voter]));
             }
           });
         }
@@ -44,8 +46,9 @@ export default async function votingPhase(
     };
 
     // Set up vote listeners
-    players.forEach((player) => {
-      if (player.socket) {
+    players.forEach((playerId) => {
+      const player = getPlayerFromId(playerId);
+      if (player && player.socket) {
         player.socket.once("vote", (targetId: string) => {
           voteHandler(player.id, targetId);
         });

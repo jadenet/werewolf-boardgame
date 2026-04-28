@@ -1,14 +1,14 @@
 import "dotenv/config";
-import startGame from "../src/functions/startGame";
-import { Lobby, Options, Player, Role } from "../src/functions/Interfaces";
+import startGame from "./functions/playGame";
+import { Lobby, Options, Player, Role } from "./functions/types";
 import {
   createLobby,
   addPlayerToLobby,
   getLobbyFromId,
   removePlayerFromLobby,
   removeLobby,
-  findPlayerFromId,
-} from "../src/functions/lobby";
+  getPlayerFromId,
+} from "./functions/helpers/lobby";
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
@@ -32,7 +32,9 @@ const io = new Server(server, {
 let lobbies: Lobby[] = [];
 const minimumPlayerCount = 3;
 
-function toPlayerDTO(player: Player) {
+function toPlayerDTO(playerId: Player["id"]) {
+  const player = getPlayerFromId(playerId);
+  if (!player) return { id: playerId, name: "Unknown" };
   return { id: player.id, name: player.name };
 }
 
@@ -41,7 +43,7 @@ io.on("connection", (socket) => {
     "lobbyjoin",
     (lobbyId: Lobby["id"], playerName: Player["name"], callback: Function) => {
       console.log("Player joining lobby:", lobbyId, playerName);
-      let lobby = getLobbyFromId(lobbies, lobbyId);
+      let lobby = getLobbyFromId(lobbyId);
       if (!lobby) {
         console.log("Lobby not found:", lobbyId);
         callback({ isValidId: false });
@@ -57,7 +59,7 @@ io.on("connection", (socket) => {
         socket: socket,
       };
 
-      addPlayerToLobby(lobby, player);
+      addPlayerToLobby(lobby, player.id);
       console.log("Player added to lobby. Total players:", lobby.players.length);
 
       io.to(lobbyId).emit(
@@ -96,8 +98,8 @@ io.on("connection", (socket) => {
 
       socket.on("playerClicked", (currentPlayerId: string, targetPlayerId: string) => {
         // Handle player selection for voting or abilities
-        const currentPlayer = findPlayerFromId(lobby.players, currentPlayerId);
-        const targetPlayer = findPlayerFromId(lobby.players, targetPlayerId);
+        const currentPlayer = getPlayerFromId(currentPlayerId);
+        const targetPlayer = getPlayerFromId(targetPlayerId);
 
         if (currentPlayer && targetPlayer && lobby.rounds.length > 0) {
           const currentRound = lobby.rounds[lobby.rounds.length - 1];
@@ -110,21 +112,21 @@ io.on("connection", (socket) => {
       });
 
       socket.on("disconnect", () => {
-        removePlayerFromLobby(lobby, player);
+        removePlayerFromLobby(lobby, player.id);
 
         if (lobby.players.length > 0) {
           io.to(lobbyId).emit(
             "playersChanged",
-            lobby.players.map((playerInLobby) => {
-              return toPlayerDTO(playerInLobby);
+            lobby.players.map((playerId) => {
+              return toPlayerDTO(playerId);
             })
           );
         } else {
-          removeLobby(lobbies, lobby.id);
+          removeLobby(lobby.id);
         }
       });
 
-      callback({ isValidId: true, player: toPlayerDTO(player) });
+      callback({ isValidId: true, player: toPlayerDTO(player.id) });
     }
   );
 });
@@ -139,7 +141,7 @@ app.post("/lobbies", async (_req, res) => {
 
   setTimeout(() => {
     if (lobby.players.length === 0) {
-      removeLobby(lobbies, lobby.id);
+      removeLobby(lobby.id);
     }
   }, 10 * 1000);
 });
@@ -149,7 +151,7 @@ app.get("/lobbies", async (_, res) => {
 });
 
 app.get("/lobbies/:id", async (req, res) => {
-  const lobby = getLobbyFromId(lobbies, req.params.id);
+  const lobby = getLobbyFromId(req.params.id);
   res.send(lobby != undefined)
 });
 

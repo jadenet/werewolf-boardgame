@@ -1,12 +1,18 @@
-import { Lobby, Options, Role, Round } from "./Interfaces";
-import { assignRoles } from "./roles";
-import nightPhase from "./phases/nightPhase";
-import discussionPhase from "./phases/discussionPhase";
-import votingPhase from "./phases/votingPhase";
-import preGame from "./phases/preGame";
+import {
+  Lobby,
+  Options,
+  Player,
+  PlayerStatus,
+  Role,
+  Round,
+} from "./types";
+import { assignRoles } from "./helpers/role";
 import { Server } from "socket.io";
-import { getAbilitiesFromRoles } from "./actions";
-import checkGameConditions from "./checkgameconditions";
+import preGame from "./phases/preGame";
+import nightPhase from "./phases/night";
+import discussionPhase from "./phases/discussion";
+import votingPhase from "./phases/voting";
+import getTeamWinners from "./helpers/getTeamWinners";
 
 const defaultOptions = {
   discussionDuration: 5 * 60,
@@ -16,18 +22,22 @@ const defaultOptions = {
   preGameDuration: 5 * 60,
 };
 
-export default async function startGame(
+export default async function playGame(
   lobby: Lobby,
   roles: Role[],
   io: Server,
-  options?: Options
+  options?: Options,
 ) {
-  const [cards, playerRoles, playerStatus] = assignRoles(lobby.players, roles);
+  const playerRoles = assignRoles(lobby.players, roles);
+
+  const playerStatus = new Map<Player["id"], PlayerStatus>();
+  lobby.players.forEach((playerId) => {
+    playerStatus.set(playerId, "Alive");
+  });
 
   const round: Round = {
     id: crypto.randomUUID(),
     createdAt: Date.now(),
-    cards: cards,
     playerRoles: playerRoles,
     playerStatus: playerStatus,
     options: options || defaultOptions,
@@ -37,24 +47,27 @@ export default async function startGame(
   lobby.rounds.push(round);
 
   io.to(lobby.id).emit("phaseChange", "PreGame");
-  await preGame(lobby.players, round.playerRoles, round.options.preGameDuration);
+  await preGame(
+    lobby.players,
+    round.playerRoles,
+    round.options.preGameDuration,
+  );
 
-  // Start the game
+  // Start game
   io.to(lobby.id).emit("gameStarted");
 
-  // remove all calls
-  // music, narrator, etc
-  const abilities = getAbilitiesFromRoles(playerRoles, roles);
+  // Remove all calls
   io.to(lobby.id).emit("phaseChange", "Night");
-  await nightPhase(round, abilities);
+  await nightPhase(round);
 
-  // add all calls, day music
+  // Add all calls, day music
   io.to(lobby.id).emit("phaseChange", "Discussion");
   await discussionPhase(lobby.players, round.options.discussionDuration);
 
+  // Voting music
   io.to(lobby.id).emit("phaseChange", "Voting");
   const votes = await votingPhase(lobby.players, round);
-  const winner = checkGameConditions(votes, round.playerRoles, playerStatus);
+  const winner = getTeamWinners(votes, round.playerRoles, playerStatus);
 
   io.to(lobby.id).emit("winner", winner);
   io.to(lobby.id).emit("phaseChange", "End");

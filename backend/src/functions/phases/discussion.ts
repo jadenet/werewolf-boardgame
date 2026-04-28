@@ -1,15 +1,17 @@
-import { Player } from "../Interfaces";
+import { getPlayerFromId } from "../helpers/lobby";
+import { Player } from "../types";
 import { validateDiscussionSkip } from "../validator";
 
 export default async function discussionPhase(
-  players: Player[],
+  players: Player["id"][],
   discussionDuration: number
 ) {
-  let discussionSkips: Player[] = [];
+  let discussionSkips: Player["id"][] = [];
 
   // Emit discussion start to all players
-  players.forEach((player) => {
-    if (player.socket) {
+  players.forEach((playerId) => {
+    const player = getPlayerFromId(playerId);
+    if (player && player.socket) {
       player.socket.emit("startDiscussion", discussionDuration);
     }
   });
@@ -17,9 +19,8 @@ export default async function discussionPhase(
   // Wait for discussion duration or majority skip
   await new Promise<void>((resolve) => {
     const skipHandler = (playerId: string) => {
-      const player = players.find(p => p.id === playerId);
-      if (player && validateDiscussionSkip(discussionSkips, player)) {
-        discussionSkips.push(player);
+      if (validateDiscussionSkip(discussionSkips, playerId)) {
+        discussionSkips.push(playerId);
         if (discussionSkips.length > players.length / 2) {
           resolve();
         }
@@ -27,8 +28,9 @@ export default async function discussionPhase(
     };
 
     // Set up skip listeners
-    players.forEach((player) => {
-      if (player.socket) {
+    players.forEach((playerId) => {
+      const player = getPlayerFromId(playerId);
+      if (player && player.socket) {
         player.socket.once("discussionSkip", () => {
           skipHandler(player.id);
         });

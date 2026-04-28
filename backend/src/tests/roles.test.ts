@@ -3,8 +3,8 @@ import assert from "node:assert";
 import { faker } from "@faker-js/faker";
 import { Socket } from "socket.io";
 import roles from "../assets/roles.json";
-import { assignRoles } from "../functions/roles";
-import { Player, Role } from "../functions/Interfaces";
+import { assignRoles } from "../functions/helpers/role";
+import { Player, Role } from "../functions/types";
 
 describe("assignRoles function", () => {
   const players: Player[] = [];

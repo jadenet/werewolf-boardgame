@@ -1,3 +1,9 @@
+export type PlayerStatus = "Alive" | "Dead";
+
+export type RoundStatus = "PreGame" | "Night" | "Discussion" | "Voting" | "End";
+
+export type Team = "Villagers" | "Werewolves" | "Solo";
+
 export type Player = {
   id: string;
   name: string;
@@ -7,7 +13,7 @@ export type Player = {
 export type Lobby = {
   id: string;
   createdAt?: number;
-  players: Player[];
+  players: Player["id"][];
   hostId?: Player["id"];
   gameStarted: boolean;
   rounds: Round[];
@@ -16,12 +22,11 @@ export type Lobby = {
 export type Round = {
   id: string;
   createdAt: number;
-  cards: Card[];
-  playerRoles: Map<Player, Role[]>;
-  playerStatus: Map<Player, "Alive" | "Dead">;
+  playerRoles: Map<Player["id"], Role["id"][]>;
+  playerStatus: Map<Player["id"], PlayerStatus>;
   options: Options;
-  status: "PreGame" | "Night" | "Discussion" | "Voting" | "End";
-  teamWinner?: ("Villagers" | "Werewolves" | "Tanner")[];
+  status: RoundStatus;
+  teamWinner?: Team[];
   votes?: Map<Player["id"], Player["id"]>;
 };
 
@@ -30,16 +35,9 @@ export type Role = {
   name: string;
   description: string;
   image: string;
-  team: "Villagers" | "Werewolves" | "Solo";
+  team: Team;
   member: "Villager" | "Werewolf";
   abilities: Ability["name"][];
-};
-
-export type Card = {
-  id: string;
-  role: Role;
-  centerIndex?: number;
-  belongsTo?: Player;
 };
 
 export type Ability = {
@@ -57,7 +55,7 @@ export type Ability = {
 };
 
 export type Action = {
-  name: "ViewRole" | "ViewTeam" | "ViewAllOfRole" | "Switch" | "Kill";
+  type: "ViewRole" | "ViewTeam" | "ViewAllOfRole" | "SwitchRoles" | "Kill";
   target:
     | "Center"
     | "Player"

@@ -1,25 +1,25 @@
-import { Ability, ErrorResponse, Player, Round } from "./Interfaces";
-import { findPlayersWithRole } from "./roles";
+import { Ability, ErrorResponse, Player, Round } from "./types";
+import { getPlayersByRole, getRoleById } from "./helpers/role";
 
 export function validateDiscussionSkip(
-  discussionSkips: Player[],
-  player: Player
+  discussionSkips: Player["id"][],
+  playerId: Player["id"]
 ) {
-  return !discussionSkips.includes(player);
+  return !discussionSkips.includes(playerId);
 }
 
 export function validateLynchingVote(
-  player: Player,
-  targetPlayer: Player,
+  playerId: Player["id"],
+  targetPlayerId: Player["id"],
   phase: Round["status"]
 ) {
   return (
-    player !== targetPlayer && phase === "Voting"
+    playerId !== targetPlayerId && phase === "Voting"
   );
 }
 
 export function validateAbility(
-  player: Player,
+  playerId: Player["id"],
   playerRoles: Round["playerRoles"],
   playerStatus: Round["playerStatus"],
   ability: Ability,
@@ -32,9 +32,9 @@ export function validateAbility(
     timestamp: Date.now(),
   };
 
-  const roles = playerRoles.get(player);
+  const roles = playerRoles.get(playerId);
 
-  if (!roles || !roles[0].abilities.includes(ability.name)) {
+  if (!roles || !getRoleById(roles[0]) || !getRoleById(roles[0])!.abilities.includes(ability.name)) {
     valid.message = "You do not have access to this ability!";
     return valid;
   }
@@ -45,15 +45,15 @@ export function validateAbility(
     const statusCondition = ability.conditions.playerStatus;
     const otherCondition = ability.conditions.other;
 
-    const status = playerStatus.get(player);
+    const status = playerStatus.get(playerId);
     let otherConditionValid = true;
 
     if (otherCondition) {
       switch (otherCondition) {
         case "SoleWerewolf":
-          const werewolfPlayers = findPlayersWithRole(playerRoles, "Werewolf");
+          const werewolfPlayers = getPlayersByRole(playerRoles, "Werewolf");
 
-          if (werewolfPlayers.length != 1 || werewolfPlayers[0] != player) {
+          if (werewolfPlayers.length != 1 || werewolfPlayers[0] != playerId) {
             otherConditionValid = false;
           }
           break;

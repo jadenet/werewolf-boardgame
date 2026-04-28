@@ -7,18 +7,18 @@
     "actions": [
       [
         {
-          "name": "ViewRole",
+          "type": "ViewRole",
           "target": "Player",
-          "exclusions": ["NotSelf"]
-        },
-        {
-          "name": "ViewRole",
-          "target": "Center",
-          "exclusions": []
+          "exclusions": [
+            "NotSelf"
+          ]
         }
       ]
     ],
-    "conditions": {"phase": "Night", "queue": 8}
+    "conditions": {
+      "phase": "Night",
+      "queue": 8
+    }
   },
   {
     "id": "robber-ability",
@@ -28,14 +28,23 @@
     "actions": [
       [
         {
-          "type": "Switch",
+          "type": "SwitchRoles",
           "target": "Player-Self",
           "exclusions": []
         }
       ],
-      [{ "type": "ViewRole", "target": "Self", "exclusions": [] }]
+      [
+        {
+          "type": "ViewRole",
+          "target": "Self",
+          "exclusions": []
+        }
+      ]
     ],
-    "conditions": {"phase": "Night", "queue": 11}
+    "conditions": {
+      "phase": "Night",
+      "queue": 11
+    }
   },
   {
     "id": "troublemaker-ability",
@@ -45,38 +54,56 @@
     "actions": [
       [
         {
-          "type": "Switch",
+          "type": "SwitchRoles",
           "target": "Player-Player",
-          "exclusions": ["NotSelf"]
+          "exclusions": [
+            "NotSelf"
+          ]
         }
       ]
     ],
-   "conditions": {"phase": "Night", "queue": 13}
+    "conditions": {
+      "phase": "Night",
+      "queue": 13
+    }
   },
   {
-    "id": "drunk-ability",
-    "name": "Drunk Ability",
+    "id": "mason-ability",
+    "name": "Mason Ability",
     "description": "",
     "optional": false,
     "actions": [
       [
         {
-          "type": "Switch",
-          "target": "Self-Center",
+          "type": "ViewAllOfRole",
+          "target": "Mason",
           "exclusions": []
         }
       ]
     ],
-    "conditions": {"phase": "Night", "queue": 15}
+    "conditions": {
+      "phase": "Night",
+      "queue": 10
+    }
   },
   {
     "id": "insomniac-ability",
     "name": "Insomniac Ability",
     "description": "",
     "optional": false,
-    "actions": [[{ "type": "ViewRole", "target": "Self", "exclusions": [] }]],
- 
-    "conditions": {"phase": "Night", "queue": 16}
+    "actions": [
+      [
+        {
+          "type": "ViewRole",
+          "target": "Self",
+          "exclusions": []
+        }
+      ]
+    ],
+    "conditions": {
+      "phase": "Night",
+      "queue": 16
+    }
   },
   {
     "id": "minion-ability",
@@ -86,13 +113,16 @@
     "actions": [
       [
         {
-          "type": "ViewTeam",
-          "target": "Werewolves",
-          "exclusions": ["WerewolfOnly"]
+          "type": "ViewAllOfRole",
+          "target": "Werewolf",
+          "exclusions": []
         }
       ]
     ],
-   "conditions": {"phase": "Night", "queue": 6}
+    "conditions": {
+      "phase": "Night",
+      "queue": 6
+    }
   },
   {
     "id": "werewolf-ability",
@@ -102,13 +132,16 @@
     "actions": [
       [
         {
-          "type": "ViewTeam",
-          "target": "Werewolves",
-          "exclusions": ["WerewolfOnly"]
+          "type": "ViewAllOfRole",
+          "target": "Werewolf",
+          "exclusions": []
         }
       ]
     ],
-    "conditions": {"phase": "Night", "queue": 3}
+    "conditions": {
+      "phase": "Night",
+      "queue": 3
+    }
   },
   {
     "id": "lone-wolf-ability",
@@ -120,27 +153,19 @@
         {
           "type": "ViewRole",
           "target": "Player",
-          "exclusions": ["NotSelf"]
+          "exclusions": [
+            "NotSelf"
+          ]
         }
       ]
     ],
-   "conditions": {"phase": "Night", "queue": 3, "other": ["SoleWerewolf"]}
-  },
-  {
-    "id": "hunter-ability",
-    "name": "Hunter Ability",
-    "description": "",
-    "optional": false,
-    "actions": [
-      [
-        {
-          "type": "Kill",
-          "target": "Voting",
-          "exclusions": ["NotSelf"]
-        }
+    "conditions": {
+      "phase": "Night",
+      "queue": 3,
+      "other": [
+        "SoleWerewolf"
       ]
-    ],
-   "conditions": {"phase": "Voting", "playerStatus": "Dead"}
+    }
   },
   {
     "id": "voting-ability",
@@ -151,11 +176,15 @@
       [
         {
           "type": "Vote",
-          "target": "Voting",
-          "exclusions": ["NotSelf"]
+          "target": "Player",
+          "exclusions": [
+            "NotSelf"
+          ]
         }
       ]
     ],
-   "conditions": {"phase": "Voting"}
+    "conditions": {
+      "phase": "Voting"
+    }
   }
 ]
