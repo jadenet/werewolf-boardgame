@@ -8,6 +8,7 @@ import {
   removePlayerFromLobby,
   removeLobby,
   getPlayerFromId,
+  getLobbies,
 } from "./functions/helpers/lobby";
 import express from "express";
 import cors from "cors";
@@ -28,8 +29,6 @@ const io = new Server(server, {
       : ["http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173", "http://127.0.0.1:3000"]
   }
 });
-
-let lobbies: Lobby[] = [];
 const minimumPlayerCount = 3;
 
 function toPlayerDTO(playerId: Player["id"]) {
@@ -126,7 +125,7 @@ io.on("connection", (socket) => {
         }
       });
 
-      callback({ isValidId: true, player: toPlayerDTO(player.id) });
+      //callback({ isValidId: true, player: toPlayerDTO(player.id) });
     }
   );
 });
@@ -136,7 +135,6 @@ app.use(bodyParser.json());
 app.post("/lobbies", async (_req, res) => {
   // Lobby creation doesn't require a name - name is provided when joining
   const lobby = createLobby();
-  lobbies.push(lobby);
   res.send(JSON.stringify({ status: "success", id: lobby.id }));
 
   setTimeout(() => {
@@ -147,7 +145,7 @@ app.post("/lobbies", async (_req, res) => {
 });
 
 app.get("/lobbies", async (_, res) => {
-  res.send(JSON.stringify(lobbies));
+  res.send(JSON.stringify(getLobbies()));
 });
 
 app.get("/lobbies/:id", async (req, res) => {

@@ -11,7 +11,13 @@ export function createLobby() {
     gameStarted: false,
     rounds: [],
   };
+
+  lobbies.push(lobby);
+  
   return lobby;
+}
+export function getLobbies() {
+  return lobbies;
 }
 
 export function addPlayerToLobby(lobby: Lobby, playerId: Player["id"]) {
