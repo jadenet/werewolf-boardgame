@@ -7,6 +7,7 @@ import LobbyStatusBar from "../components/LobbyStatusBar.tsx";
 import usePeerConnect from "../hooks/usePeerConnect.ts";
 import useSocketConnect from "../hooks/useSocketConnect.ts";
 import SideDrawer from "../components/SideDrawer.tsx";
+import { getPhaseDisplay, setBrowserTabIcon } from "../functions/getPhaseDisplay";
 
 type LobbyFeedMessage = {
   id: string;
@@ -121,6 +122,16 @@ export default function Lobbiesid() {
     }
 
     appendSystemMessage(getPhaseAnnouncement(currentPhase));
+  }, [currentPhase]);
+
+  useEffect(() => {
+    const phaseInfo = getPhaseDisplay(currentPhase);
+    setBrowserTabIcon(phaseInfo.icon);
+    document.title = `Werewolf`;
+
+    return () => {
+      document.title = "Werewolf";
+    };
   }, [currentPhase]);
 
   useEffect(() => {
