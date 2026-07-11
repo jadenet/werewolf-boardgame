@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import useThemePreference from "../hooks/useThemePreference.ts";
 import NameModal from "../components/NameModal.tsx";
 import PlayerCard from "../components/PlayerCard.tsx";
-import PhaseStatusBanner from "../components/PhaseStatusBanner.tsx";
 import AbilityPromptBanner from "../components/AbilityPromptBanner.tsx";
 import LobbyChatSection from "../components/LobbyChatSection.tsx";
 import LobbyStatusBar from "../components/LobbyStatusBar.tsx";

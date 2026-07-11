@@ -1,7 +1,7 @@
 import LobbyRolesTab from "./LobbyRolesTab";
 import LobbySettingsTab from "./LobbySettingsTab";
 import LobbyHowToPlayTab from "./LobbyHowToPlayTab";
-import { PlayerStatus, Role, RoundStatus } from "../../../backend/src/functions/types";
+import { PlayerStatus, RoundStatus } from "../../../backend/src/functions/types";
 
 export default function SideDrawer(props: {
   roles: {name: string, img: string}[];

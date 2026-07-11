@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import { useLocation, useParams } from "wouter";
 import { getRoles } from "../functions/getRolesFromTeam";
-import { AbilityPrompt, AbilityPromptResponse, AbilityResult, Player, Role, Round } from "../Interfaces";
+import { AbilityPrompt, AbilityPromptResponse, AbilityResult, Player, Round } from "../Interfaces";
 import { SERVER_URL } from "../config/server";
 
 export default function useSocketConnect() {
