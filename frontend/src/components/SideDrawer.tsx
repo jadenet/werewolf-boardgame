@@ -58,7 +58,7 @@ export default function SideDrawer(props: {
           />
 
           <div role="tabpanel" className="tab-content">
-            <LobbyRulesTab roles={props.roles} />
+            <LobbyRulesTab />
           </div>
 
           <input
