@@ -25,7 +25,10 @@ export type Round = {
   playerRoles: Map<Player["id"], Role["id"][]>;
   playerStatus: Map<Player["id"], PlayerStatus>;
   status: RoundStatus;
+  options: Options;
+  phaseDeadlineAt?: number;
   teamWinner?: Team[];
+  // Key is voter player id, value is target player id.
   votes?: Map<Player["id"], Player["id"]>;
 };
 

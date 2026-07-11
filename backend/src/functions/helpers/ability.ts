@@ -106,6 +106,12 @@ export async function requestAbilityPrompt(
   const requiredSelections = getRequiredSelections(action.target);
   const validTargetIds = getValidTargetIds(round, playerId, action.target, action.exclusions);
 
+  const configuredTimeoutMs = round.options?.actionDuration && round.options.actionDuration > 0
+    ? round.options.actionDuration * 1000
+    : 60_000;
+  const remainingNightMs = round.phaseDeadlineAt ? round.phaseDeadlineAt - Date.now() : configuredTimeoutMs;
+  const promptTimeoutMs = Math.max(1, Math.min(configuredTimeoutMs, remainingNightMs));
+
   if (requiredSelections === 0) {
     emitAbilityResult(playerId, {
       abilityId: ability.id,
@@ -129,7 +135,7 @@ export async function requestAbilityPrompt(
 
   return new Promise<Player["id"][] | null>((resolve) => {
     player.socket
-      .timeout(round.options.actionDuration * 1000)
+      .timeout(promptTimeoutMs)
       .emit("abilityPrompt", prompt, (err: Error | null, response?: AbilityPromptResponse) => {
         if (err || !response) {
           emitAbilityResult(playerId, {

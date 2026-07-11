@@ -163,6 +163,9 @@ export default function useSocketConnect() {
 
     socket.on("phaseChange", (phase) => {
       setCurrentPhase(phase);
+      if (phase !== "Voting") {
+        setLynchVotes(new Map());
+      }
       if (phase === "End") {
         setPhaseDeadline(null);
       }
@@ -250,11 +253,10 @@ export default function useSocketConnect() {
     });
 
     socket.on("lynchVotesChange", (newLynchVotes) => {
-      // Convert array of [targetId, voterId] to Map
+      // Convert array of [voterId, targetId] to Map
       const votesMap = new Map();
-      newLynchVotes.forEach(([targetId, voterId]: [string, string]) => {
-        // For now, just store the target ID - we can enhance this later
-        votesMap.set(targetId, voterId);
+      newLynchVotes.forEach(([voterId, targetId]: [string, string]) => {
+        votesMap.set(voterId, targetId);
       });
       setLynchVotes(votesMap);
     });

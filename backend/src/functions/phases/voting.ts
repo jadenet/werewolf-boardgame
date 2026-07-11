@@ -6,6 +6,7 @@ export default async function votingPhase(
   players: Lobby["players"],
   round: Round
 ) {
+  // Key is voter player id, value is target player id.
   const votes: Map<Player["id"], Player["id"]> = new Map();
 
   // Emit voting start to all players
@@ -28,12 +29,12 @@ export default async function votingPhase(
       if (voter && target) {
         const voteSuccess = validateLynchingVote(voter.id, target.id, round.status);
         if (voteSuccess) {
-          votes.set(target.id, voter.id);
+          votes.set(voter.id, target.id);
           // Emit vote update to all players
           players.forEach((playerId) => {
             const player = getPlayerFromId(playerId);
             if (player && player.socket) {
-              player.socket.emit("lynchVotesChange", Array.from(votes.entries()).map(([target, voter]) => [target, voter]));
+              player.socket.emit("lynchVotesChange", Array.from(votes.entries()).map(([voter, target]) => [voter, target]));
             }
           });
         }

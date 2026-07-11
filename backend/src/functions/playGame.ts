@@ -39,6 +39,7 @@ export default async function playGame(
     playerRoles: playerRoles,
     playerStatus: playerStatus,
     status: "PreGame",
+    options: defaultOptions,
   };
 
   lobby.rounds.push(round);
@@ -90,6 +91,7 @@ export default async function playGame(
   round.status = "Voting";
   io.to(lobby.id).emit("phaseChange", "Voting");
   const votes = await votingPhase(lobby.players, round);
+  round.votes = votes;
   const winner = getTeamWinners(votes, round.playerRoles, playerStatus);
 
   // Emit updated playerStatus after elimination
