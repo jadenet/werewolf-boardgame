@@ -10,6 +10,9 @@ export default function PlayerCard(props: {
   currentPhase: Round["status"];
   lynchVotes: Round["votes"];
   socket: React.MutableRefObject<any>;
+  isTalking?: boolean;
+  isMuted?: boolean;
+  onToggleMute?: (playerId: Player["id"]) => void;
   abilityTargetSelectable?: boolean;
   abilityTargetSelected?: boolean;
   onAbilityTargetSelect?: (playerId: Player["id"]) => void;
@@ -26,10 +29,11 @@ export default function PlayerCard(props: {
   const isCurrentPlayer = props.currentPlayer.id && props.player.id === props.currentPlayer.id;
   const votesOnPlayer = getVotesOnPlayerId(props.lynchVotes, props.player.id);
   const avatarUrl = getAvatarUrl(props.player.id || props.player.name || "player");
+  const showIndicator = Boolean(props.isMuted || props.isTalking);
 
   return (
     <div
-      className={`relative flex flex-col w-56 aspect-square rounded-2xl border-2 transition-all duration-300 transform hover:scale-105 cursor-pointer ${
+      className={`group relative flex flex-col w-56 aspect-square rounded-2xl border-2 transition-all duration-300 transform hover:scale-105 cursor-pointer ${
         props.abilityTargetSelected
           ? "border-secondary bg-secondary/10 shadow-lg shadow-secondary/20"
           : props.abilityTargetSelectable
@@ -59,12 +63,26 @@ export default function PlayerCard(props: {
         />
         <audio id={"audio-" + props.player.id} autoPlay className="hidden" />
 
-        {/* Overlay for current player indicator */}
-        {isCurrentPlayer && (
-          <div className="absolute top-2 left-2">
-            <div className="badge badge-secondary badge-sm">You</div>
-          </div>
-        )}
+        {/* Overlay for talking/mute indicator */}
+        <div className={`absolute top-2 left-2 z-10 transition-opacity duration-200 ${showIndicator ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
+          <button
+            className={`btn btn-xs btn-circle shadow-md ${
+              props.isMuted
+                ? "btn-error"
+                : props.isTalking
+                  ? "btn-secondary animate-pulse"
+                  : "btn-ghost bg-base-100/80"
+            }`}
+            onClick={(event) => {
+              event.stopPropagation();
+              props.onToggleMute?.(props.player.id);
+            }}
+            aria-label={props.isMuted ? `Unmute ${props.player.name}` : `Mute ${props.player.name}`}
+            title={props.isMuted ? `Unmute ${props.player.name}` : `Mute ${props.player.name}`}
+          >
+            {props.isMuted ? "🔇" : props.isTalking ? "🗣️" : "🎤"}
+          </button>
+        </div>
 
         {props.abilityTargetSelectable && (
           <div className="absolute top-2 right-2">

@@ -3,29 +3,45 @@ import useThemePreference from "../hooks/useThemePreference.ts";
 import NameModal from "../components/NameModal.tsx";
 import PlayerCard from "../components/PlayerCard.tsx";
 import AbilityPromptBanner from "../components/AbilityPromptBanner.tsx";
-import LobbyChatSection from "../components/LobbyChatSection.tsx";
 import LobbyStatusBar from "../components/LobbyStatusBar.tsx";
 import usePeerConnect from "../hooks/usePeerConnect.ts";
 import useSocketConnect from "../hooks/useSocketConnect.ts";
 import SideDrawer from "../components/SideDrawer.tsx";
 
+type LobbyFeedMessage = {
+  id: string;
+  kind: "player" | "system";
+  playerName: string;
+  message: string;
+  timestamp: number;
+};
+
+function getPhaseAnnouncement(currentPhase: "PreGame" | "Discussion" | "Voting" | "Night" | "End") {
+  switch (currentPhase) {
+    case "PreGame":
+      return "The lobby is ready and waiting for players.";
+    case "Discussion":
+      return "Discussion phase has started. Chat is open.";
+    case "Voting":
+      return "Voting phase has started.";
+    case "Night":
+      return "Night has fallen. Chat is disabled until morning.";
+    case "End":
+      return "The game has ended.";
+  }
+}
+
 export default function Lobbiesid() {
   const [openedDrawer, setOpenedDrawer] = useState(true);
+  const [talkingPlayerIds, setTalkingPlayerIds] = useState<Record<string, boolean>>({});
+  const [mutedPlayerIds, setMutedPlayerIds] = useState<Record<string, boolean>>({});
   const [themePreference, setThemePreference] = useThemePreference();
   const [uiAlert, setUiAlert] = useState<{
     tone: "info" | "success" | "warning" | "error";
     title: string;
     message?: string;
   } | null>(null);
-  const [chatMessages, setChatMessages] = useState<
-    Array<{
-      id: string;
-      playerId: string;
-      playerName: string;
-      message: string;
-      timestamp: number;
-    }>
-  >([]);
+  const [chatMessages, setChatMessages] = useState<LobbyFeedMessage[]>([]);
   const [chatInput, setChatInput] = useState("");
 
   const [
@@ -49,28 +65,47 @@ export default function Lobbiesid() {
     dismissAbilityResult,
   ] = useSocketConnect();
 
-  usePeerConnect(currentPlayer, players);
+  const { isMicMuted, toggleMicMute } = usePeerConnect(currentPlayer, players, (playerId, isTalking) => {
+    setTalkingPlayerIds((previous) => {
+      if (previous[playerId] === isTalking) {
+        return previous;
+      }
+
+      return {
+        ...previous,
+        [playerId]: isTalking,
+      };
+    });
+  });
+
+  const appendSystemMessage = (message: string) => {
+    setChatMessages((prev) => [
+      ...prev,
+      {
+        id: `system-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        kind: "system",
+        playerName: "Lobby",
+        message,
+        timestamp: Date.now(),
+      },
+    ]);
+  };
 
   useEffect(() => {
     if (!socketRef.current) return;
 
     const handleMessageReceived = (
       data: {
-        playerId: string;
         playerName: string;
         message: string;
         timestamp: number;
       }
     ) => {
-      const messageId = `${data.playerId}-${data.timestamp}`;
-      setChatMessages((prev) => [...prev, { id: messageId, ...data }]);
-
-      // Auto-dismiss message after 4 seconds
-      const timer = setTimeout(() => {
-        setChatMessages((prev) => prev.filter((msg) => msg.id !== messageId));
-      }, 4000);
-
-      return () => clearTimeout(timer);
+      const messageId = `${data.playerName}-${data.timestamp}`;
+      setChatMessages((prev) => [
+        ...prev,
+        { id: messageId, kind: "player", ...data },
+      ]);
     };
 
     socketRef.current.on("messageReceived", handleMessageReceived);
@@ -80,8 +115,30 @@ export default function Lobbiesid() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!currentPhase) {
+      return;
+    }
+
+    appendSystemMessage(getPhaseAnnouncement(currentPhase));
+  }, [currentPhase]);
+
+  useEffect(() => {
+    if (gameStarted) {
+      appendSystemMessage("The game has started.");
+    }
+  }, [gameStarted]);
+
+  useEffect(() => {
+    if (!uiAlert) {
+      return;
+    }
+
+    appendSystemMessage(uiAlert.message ? `${uiAlert.title}: ${uiAlert.message}` : uiAlert.title);
+  }, [uiAlert]);
+
   const handleSendMessage = () => {
-    if (chatInput.trim() && currentPlayer.id && currentPhase === "Discussion") {
+    if (chatInput.trim() && currentPlayer.id && currentPhase !== "Night") {
       socketRef.current.emit("sendMessage", currentPlayer.id, chatInput.trim());
       setChatInput("");
     }
@@ -137,6 +194,36 @@ export default function Lobbiesid() {
   const handleSkipDiscussion = () => {
     socketRef.current.emit("discussionSkip");
   };
+
+  const handleTogglePlayerMute = (playerId: string) => {
+    if (playerId === currentPlayer.id) {
+      toggleMicMute();
+      return;
+    }
+
+    setMutedPlayerIds((previous) => {
+      const nextMuted = !Boolean(previous[playerId]);
+
+      const audioElement = document.getElementById(`audio-${playerId}`) as HTMLAudioElement | null;
+      if (audioElement) {
+        audioElement.muted = nextMuted;
+      }
+
+      return {
+        ...previous,
+        [playerId]: nextMuted,
+      };
+    });
+  };
+
+  useEffect(() => {
+    Object.entries(mutedPlayerIds).forEach(([playerId, isMuted]) => {
+      const audioElement = document.getElementById(`audio-${playerId}`) as HTMLAudioElement | null;
+      if (audioElement) {
+        audioElement.muted = isMuted;
+      }
+    });
+  }, [mutedPlayerIds, players]);
 
   useEffect(() => {
     if (!currentPlayer.id) {
@@ -265,6 +352,9 @@ export default function Lobbiesid() {
                   currentPhase={currentPhase}
                   socket={socketRef}
                   lynchVotes={lynchVotes}
+                  isTalking={Boolean(talkingPlayerIds[player.id])}
+                  isMuted={player.id === currentPlayer.id ? isMicMuted : Boolean(mutedPlayerIds[player.id])}
+                  onToggleMute={handleTogglePlayerMute}
                   abilityTargetSelectable={activeAbilityPrompt?.validTargetIds.includes(player.id)}
                   abilityTargetSelected={selectedAbilityTargets.includes(player.id)}
                   onAbilityTargetSelect={
@@ -275,20 +365,7 @@ export default function Lobbiesid() {
                 />
               ))}
             </div>
-
-            {/* Game status messages */}
-            <div className="toast toast-center toast-middle">
-              {/* Game event notifications would go here */}
-            </div>
           </div>
-
-          <LobbyChatSection
-            chatMessages={chatMessages}
-            currentPhase={currentPhase}
-            chatInput={chatInput}
-            onChatInputChange={setChatInput}
-            onSendMessage={handleSendMessage}
-          />
 
           <LobbyStatusBar
             playersCount={players.length}
@@ -310,6 +387,10 @@ export default function Lobbiesid() {
           playerStatus={playerStatus}
           gameStarted={gameStarted}
           currentPhase={currentPhase}
+          chatMessages={chatMessages}
+          chatInput={chatInput}
+          onChatInputChange={setChatInput}
+          onSendMessage={handleSendMessage}
           themePreference={themePreference}
           setThemePreference={setThemePreference}
           currentPlayer={currentPlayer}

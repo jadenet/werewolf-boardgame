@@ -47,6 +47,7 @@ export default function LobbyStatusBar(props: {
               </button>
             </div>
           )}
+
       </div>
 
       <div className="flex items-center gap-4">

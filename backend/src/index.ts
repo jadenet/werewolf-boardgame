@@ -1,6 +1,6 @@
 import "dotenv/config";
 import startGame from "./functions/playGame";
-import { Lobby, Options, Player, Role } from "./functions/types";
+import { Lobby, Player } from "./functions/types";
 import {
   createLobby,
   addPlayerToLobby,
@@ -117,7 +117,7 @@ io.on("connection", (socket) => {
         const sender = getPlayerFromId(playerId);
         if (sender && lobby.rounds.length > 0) {
           const currentRound = lobby.rounds[lobby.rounds.length - 1];
-          if (currentRound.status === "Discussion") {
+          if (currentRound.status !== "Night") {
             io.to(lobbyId).emit("messageReceived", {
               playerId: playerId,
               playerName: sender.name,
@@ -125,6 +125,13 @@ io.on("connection", (socket) => {
               timestamp: Date.now(),
             });
           }
+        } else if (sender) {
+          io.to(lobbyId).emit("messageReceived", {
+            playerId: playerId,
+            playerName: sender.name,
+            message: message,
+            timestamp: Date.now(),
+          });
         }
       });
 
