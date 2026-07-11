@@ -1,14 +1,10 @@
-import { Role } from "@/Interfaces";
+import { Role } from "../Interfaces";
+import { buildServerUrl } from "../config/server";
 
 let roles: Role[] = []
 
-const serverUrl =
-  import.meta.env.PROD
-    ? "https://werewolf-backend.onrender.com"
-    : "http://localhost:10000";
- 
 async function getAllRoles() {
-  const rolesResponse = await fetch(serverUrl + "/roles", {
+  const rolesResponse = await fetch(buildServerUrl("/roles"), {
     method: "GET",
     headers: { "Content-Type": "application/json" },
   });

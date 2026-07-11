@@ -1,4 +1,4 @@
-import { Player } from "@/Interfaces";
+import { Player } from "../Interfaces";
 import { useEffect, useRef, useState } from "react";
 
 export default function NameModal(props: { socket: React.MutableRefObject<any>, onNameEnter: (name: string) => void, socketConnected: boolean }) {

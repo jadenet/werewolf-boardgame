@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@dicebear/collection": "^9.4.2",
+    "@dicebear/core": "^9.4.2",
     "@faker-js/faker": "^8.4.1",
     "peerjs": "^1.5.4",
     "react": "^18.2.0",

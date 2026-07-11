@@ -34,7 +34,7 @@ export function validateAbility(
 
   const roles = playerRoles.get(playerId);
 
-  if (!roles || !getRoleById(roles[0]) || !getRoleById(roles[0])!.abilities.includes(ability.name)) {
+  if (!roles || !getRoleById(roles[0]) || !getRoleById(roles[0])!.abilities.includes(ability.id)) {
     valid.message = "You do not have access to this ability!";
     return valid;
   }
@@ -43,20 +43,25 @@ export function validateAbility(
     const phaseCondition = ability.conditions.phase;
     const queueCondition = ability.conditions.queue;
     const statusCondition = ability.conditions.playerStatus;
-    const otherCondition = ability.conditions.other;
+    const otherConditions = Array.isArray(ability.conditions.other)
+      ? ability.conditions.other
+      : ability.conditions.other
+        ? [ability.conditions.other]
+        : [];
 
     const status = playerStatus.get(playerId);
     let otherConditionValid = true;
 
-    if (otherCondition) {
+    for (const otherCondition of otherConditions) {
       switch (otherCondition) {
-        case "SoleWerewolf":
+        case "SoleWerewolf": {
           const werewolfPlayers = getPlayersByRole(playerRoles, "Werewolf");
 
           if (werewolfPlayers.length != 1 || werewolfPlayers[0] != playerId) {
             otherConditionValid = false;
           }
           break;
+        }
         default:
           break;
       }

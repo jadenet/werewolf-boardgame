@@ -1,28 +1,38 @@
-import { getPlayerFromId } from "../helpers/lobby";
-import { Round, Player, Action, Role } from "../types";
+import { requestAbilityPrompt, emitAbilityResult } from "../helpers/ability";
+import { getRoleById } from "../helpers/role";
+import { Round, Player, Ability, Action } from "../types";
 
 export default async function viewRole(
   round: Round,
   playerId: Player["id"],
-  target: Action["target"],
-  exclusions: Action["exclusions"],
+  ability: Ability,
+  action: Action,
 ) {
-  const player = getPlayerFromId(playerId);
-  if (player && player.socket) {
-    player.socket
-      .timeout(round.options.actionDuration * 1000)
-      .emit(
-        "viewRoleAction",
-        target,
-        exclusions,
-        (err: Error, res: { playerRole: Role["id"] }) => {
-          if (!err) {
-            player.socket.emit("viewRoleResponse", res.playerRole);
-          }
-        },
-      );
-    setTimeout(() => {
-      player.socket.emit("viewRoleActionEnd");
-    }, round.options.actionDuration * 1000);
+  const selectedPlayerIds = await requestAbilityPrompt(round, playerId, ability, action);
+  if (selectedPlayerIds === null) {
+    return;
   }
+
+  const targetPlayerId = action.target === "Self" ? playerId : selectedPlayerIds[0] ?? playerId;
+  const roleId = round.playerRoles.get(targetPlayerId)?.[0];
+  const role = getRoleById(roleId);
+
+  if (!role) {
+    emitAbilityResult(playerId, {
+      abilityId: ability.id,
+      title: ability.name,
+      message: "No role information was found.",
+      tone: "warning",
+    });
+    return;
+  }
+
+  emitAbilityResult(playerId, {
+    abilityId: ability.id,
+    title: ability.name,
+    message: targetPlayerId === playerId
+      ? `Your role is ${role.name}.`
+      : `That player's role is ${role.name}.`,
+    tone: "success",
+  });
 }

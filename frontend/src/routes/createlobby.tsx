@@ -3,13 +3,10 @@
 import { useMemo, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { getRoleNames, getRolesFromTeam } from "../functions/getRolesFromTeam";
-import { Role } from "@/Interfaces";
+import { Role } from "../Interfaces";
+import { buildServerUrl } from "../config/server";
 
 const chats = ["Audio", "Video"];
-const serverUrl =
-  process.env.NODE_ENV === "production"
-    ? "https://werewolf-backend.onrender.com"
-    : "http://localhost:10000";
 
 export default function CreateLobby() {
   const gamemodes = useRef<{
@@ -84,7 +81,7 @@ export default function CreateLobby() {
         onSubmit={async (e) => {
           e.preventDefault();
           setFormErrors([]);
-          const response = await fetch(serverUrl + "/lobbies", {
+          const response = await fetch(buildServerUrl("/lobbies"), {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

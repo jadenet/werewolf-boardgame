@@ -27,6 +27,13 @@ export function addPlayerToLobby(lobby: Lobby, playerId: Player["id"]) {
   lobby.players.push(playerId);
 }
 
+export function addPlayer(player: Player) {
+  const existingPlayer = players.find((p) => p.id === player.id);
+  if (!existingPlayer) {
+    players.push(player);
+  }
+}
+
 export function removePlayerFromLobby(lobby: Lobby, playerId: Player["id"]) {
   const playerIndex = lobby.players.findIndex((id) => id === playerId);
   playerIndex !== -1 && lobby.players.splice(playerIndex, 1);
@@ -37,6 +44,13 @@ export function getPlayerFromId(playerId: Player["id"]) {
     return player.id === playerId;
   });
   return player;
+}
+
+export function removePlayer(playerId: Player["id"]) {
+  const playerIndex = players.findIndex((player) => player.id === playerId);
+  if (playerIndex !== -1) {
+    players.splice(playerIndex, 1);
+  }
 }
 
 export function getLobbyFromId(lobbyId: Lobby["id"]) {

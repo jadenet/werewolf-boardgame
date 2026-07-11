@@ -9,51 +9,6 @@
     "abilities": ["seer-ability"]
   },
   {
-    "id": "robber",
-    "name": "Robber",
-    "description": "",
-    "image": "",
-    "team": "Villagers",
-    "member": "Villager",
-    "abilities": ["robber-ability"]
-  },
-  {
-    "id": "troublemaker",
-    "name": "Troublemaker",
-    "description": "",
-    "image": "",
-    "team": "Villagers",
-    "member": "Villager",
-    "abilities": ["troublemaker-ability"]
-  },
-  {
-    "id": "mason",
-    "name": "Mason",
-    "description": "",
-    "image": "",
-    "team": "Villagers",
-    "member": "Villager",
-    "abilities": ["mason-ability"]
-  },
-  {
-    "id": "insomniac",
-    "name": "Insomniac",
-    "description": "",
-    "image": "",
-    "team": "Villagers",
-    "member": "Villager",
-    "abilities": ["insomniac-ability"]
-  },
-  {
-    "id": "minion",
-    "name": "Minion",
-    "description": "",
-    "image": "",
-    "team": "Werewolves",
-    "member": "Villager",
-    "abilities": ["minion-ability"]
-  },
-  {
     "id": "werewolf",
     "name": "Werewolf",
     "description": "",
@@ -68,15 +23,6 @@
     "description": "",
     "image": "",
     "team": "Villagers",
-    "member": "Villager",
-    "abilities": []
-  },
-  {
-    "id": "tanner",
-    "name": "Tanner",
-    "description": "",
-    "image": "",
-    "team": "Solo",
     "member": "Villager",
     "abilities": []
   }

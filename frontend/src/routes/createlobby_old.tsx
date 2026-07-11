@@ -3,7 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { getRoleNames, getRolesFromTeam } from "../functions/getRolesFromTeam";
-import { Role } from "@/Interfaces";
+import { Role } from "../Interfaces";
 
 const chats = ["Audio", "Video"];
 const serverUrl =

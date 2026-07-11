@@ -31,7 +31,7 @@ export default async function nightPhase(round: Round) {
           for (const action of actionGroup) {
             const actionFunc = getActionFunctionByName(action.type);
             if (actionFunc) {
-              await actionFunc(round, playerId, action.target, action.exclusions);
+              await actionFunc(round, playerId, ability, action);
             }
           }
         }
@@ -40,7 +40,7 @@ export default async function nightPhase(round: Round) {
         for (const action of ability.actions[0]) {
           const actionFunc = getActionFunctionByName(action.type);
           if (actionFunc) {
-            await actionFunc(round, playerId, action.target, action.exclusions);
+            await actionFunc(round, playerId, ability, action);
           }
         }
       }

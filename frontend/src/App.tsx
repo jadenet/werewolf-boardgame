@@ -4,6 +4,7 @@ import CreateLobby from "./routes/createlobby";
 import LobbiesId from "./routes/lobbiesid";
 import { Link } from "wouter";
 import { useEffect, useState } from "react";
+import { buildServerUrl } from "./config/server";
 
 export default function App() {
   function ValidateLobby() {
@@ -11,11 +12,7 @@ export default function App() {
     const params = useParams<{ id?: string }>();
 
     useEffect(() => {
-      const serverUrl =
-        process.env.NODE_ENV === "production"
-          ? "https://werewolf-backend.onrender.com"
-          : "http://localhost:10000";
-      fetch(serverUrl + "/lobbies/" + params.id).then(async (result) => {
+      fetch(buildServerUrl(`/lobbies/${params.id}`)).then(async (result) => {
         const text = await result.text();
         setIsValidId(text === "true");
       });

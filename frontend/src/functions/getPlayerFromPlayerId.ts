@@ -1,4 +1,4 @@
-import { Player } from "@/Interfaces";
+import { Player } from "../Interfaces";
 
 export default function getPlayerFromPlayerId(
   players: Player[],

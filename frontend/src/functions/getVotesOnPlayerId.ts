@@ -1,4 +1,4 @@
-import { Player, Round } from "@/Interfaces";
+import { Player, Round } from "../Interfaces";
 
 export default function getVotesOnPlayerId(
   votes: Round["votes"],

@@ -1,11 +1,7 @@
 import { useLocation } from "wouter";
 import { getRoleNames } from "../functions/getRolesFromTeam";
 import { useState } from "react";
-
-const serverUrl =
-  import.meta.env.PROD
-    ? "https://werewolf-backend.onrender.com"
-    : "http://localhost:10000";
+import { buildServerUrl } from "../config/server";
 
 const images = [
   {
@@ -77,7 +73,7 @@ export default function Home() {
                       e.preventDefault();
                       setIsLoading(true);
                       try {
-                        const response = await fetch(serverUrl + "/lobbies", {
+                        const response = await fetch(buildServerUrl("/lobbies"), {
                           method: "POST",
                           headers: { "Content-Type": "application/json" },
                           body: JSON.stringify({

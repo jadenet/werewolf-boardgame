@@ -4,8 +4,10 @@ import { Lobby, Options, Player, Role } from "./functions/types";
 import {
   createLobby,
   addPlayerToLobby,
+  addPlayer,
   getLobbyFromId,
   removePlayerFromLobby,
+  removePlayer,
   removeLobby,
   getPlayerFromId,
   getLobbies,
@@ -29,7 +31,7 @@ const io = new Server(server, {
       : ["http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173", "http://127.0.0.1:3000"]
   }
 });
-const minimumPlayerCount = 3;
+const minimumPlayerCount = 4;
 
 function toPlayerDTO(playerId: Player["id"]) {
   const player = getPlayerFromId(playerId);
@@ -58,6 +60,7 @@ io.on("connection", (socket) => {
         socket: socket,
       };
 
+      addPlayer(player);
       addPlayerToLobby(lobby, player.id);
       console.log("Player added to lobby. Total players:", lobby.players.length);
 
@@ -76,7 +79,7 @@ io.on("connection", (socket) => {
 
       socket.on(
         "gameStart",
-        (playerClicked: Player["id"], roles: Role[], options: Options, callback?: Function) => {
+        (playerClicked: Player["id"], callback?: Function) => {
           if (
             playerClicked === lobby.hostId &&
             lobby.players.length >= minimumPlayerCount
@@ -85,7 +88,7 @@ io.on("connection", (socket) => {
             if (callback) callback({ success: true });
 
             // Start game asynchronously without awaiting
-            startGame(lobby, roles, io, options).catch(error => {
+            startGame(lobby, io).catch(error => {
               console.error("Error during game:", error);
               // Could emit an error event to all players if needed
             });
@@ -110,8 +113,24 @@ io.on("connection", (socket) => {
         }
       });
 
+      socket.on("sendMessage", (playerId: string, message: string) => {
+        const sender = getPlayerFromId(playerId);
+        if (sender && lobby.rounds.length > 0) {
+          const currentRound = lobby.rounds[lobby.rounds.length - 1];
+          if (currentRound.status === "Discussion") {
+            io.to(lobbyId).emit("messageReceived", {
+              playerId: playerId,
+              playerName: sender.name,
+              message: message,
+              timestamp: Date.now(),
+            });
+          }
+        }
+      });
+
       socket.on("disconnect", () => {
         removePlayerFromLobby(lobby, player.id);
+        removePlayer(player.id);
 
         if (lobby.players.length > 0) {
           io.to(lobbyId).emit(

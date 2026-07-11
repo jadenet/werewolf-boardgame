@@ -24,7 +24,6 @@ export type Round = {
   createdAt: number;
   playerRoles: Map<Player["id"], Role["id"][]>;
   playerStatus: Map<Player["id"], PlayerStatus>;
-  options: Options;
   status: RoundStatus;
   teamWinner?: Team[];
   votes?: Map<Player["id"], Player["id"]>;
@@ -37,7 +36,7 @@ export type Role = {
   image: string;
   team: Team;
   member: "Villager" | "Werewolf";
-  abilities: Ability["name"][];
+  abilities: Ability["id"][];
 };
 
 export type Ability = {
@@ -50,7 +49,7 @@ export type Ability = {
     phase?: Round["status"];
     playerStatus?: "Alive" | "Dead";
     queue?: number;
-    other?: "SoleWerewolf";
+    other?: "SoleWerewolf" | "SoleWerewolf"[];
   };
 };
 
@@ -63,11 +62,35 @@ export type Action = {
     | "NotWerewolves"
     | "Any"
     | "Voting"
+    | "Self"
     | "Player-Player"
     | "Player-Self"
     | "Player-Center"
-    | "Self-Center";
+    | "Self-Center"
+    | Role["name"];
   exclusions: ("NotSelf" | "SelfOnly" | "NotWerewolf" | "WerewolfOnly")[];
+};
+
+export type AbilityPrompt = {
+  abilityId: Ability["id"];
+  abilityName: Ability["name"];
+  message: string;
+  target: Action["target"];
+  exclusions: Action["exclusions"];
+  queue: number;
+  requiredSelections: number;
+  validTargetIds: Player["id"][];
+};
+
+export type AbilityPromptResponse = {
+  selectedPlayerIds: Player["id"][];
+};
+
+export type AbilityResult = {
+  abilityId: Ability["id"];
+  title: string;
+  message: string;
+  tone: "info" | "success" | "warning";
 };
 
 export type Gamemode = {

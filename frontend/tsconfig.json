@@ -9,8 +9,7 @@
     "baseUrl": ".",
 
     "paths": {
-      "@/*": ["./src/*"],
-      "@/Interfaces": ["../backend/src/functions/Interfaces.ts"]
+      "@/*": ["./src/*"]
     },
 
     /* Bundler mode */
@@ -27,6 +26,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "../backend/src/functions/Interfaces.ts"],
+  "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

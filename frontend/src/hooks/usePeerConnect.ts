@@ -1,13 +1,17 @@
 import Peer from "peerjs";
 import { useEffect, useRef } from "react";
-import { Player } from "@/Interfaces";
+import { Player } from "../Interfaces";
 
-function displayMedia(playerId: Player["id"], stream: MediaStream) {
-  const videoElement = document.getElementById(
-    "video-" + playerId
-  ) as HTMLVideoElement;
-  if (stream && videoElement) {
-    videoElement.srcObject = stream;
+function attachAudioStream(playerId: Player["id"], stream: MediaStream) {
+  const audioElement = document.getElementById(
+    "audio-" + playerId
+  ) as HTMLAudioElement | null;
+
+  if (stream && audioElement && audioElement.srcObject !== stream) {
+    audioElement.srcObject = stream;
+    void audioElement.play().catch(() => {
+      // Autoplay may be blocked until the user interacts with the page.
+    });
   }
 }
 
@@ -27,7 +31,7 @@ export default function usePeerConnect(
           track.stop();
         });
       }
-      peer.current.destroy();
+      peer.current?.destroy();
     }
 
     return removeMedia;
@@ -39,8 +43,8 @@ export default function usePeerConnect(
       for (let i = 0; i < 5; i++) {
         try {
           mediaDevices = await navigator.mediaDevices.getUserMedia({
-            video: true,
             audio: true,
+            video: false,
           });
           break;
         } catch (error) {
@@ -52,43 +56,47 @@ export default function usePeerConnect(
         }
       }
       if (!mediaDevices) {
-        const mediaStream = new MediaStream();
-        mediaStream.addTrack(new MediaStreamTrack());
-        mediaDevices = mediaStream;
+        mediaDevices = new MediaStream();
       }
 
-      localStream.current = mediaDevices
-      displayMedia(currentPlayer.id, mediaDevices);
-      waitForCalls()
-      callEachPlayer()
+      localStream.current = mediaDevices;
+      waitForCalls();
+      callEachPlayer();
     }
 
     function waitForCalls() {
+      if (!peer.current) {
+        return;
+      }
+
       peer.current.on("call", (call) => {
-        call.answer(localStream.current);
+        call.answer(localStream.current ?? new MediaStream());
         call.on("stream", (stream) => {
-          displayMedia(call.peer, stream);
+          attachAudioStream(call.peer, stream);
         });
       });
     }
 
     function callEachPlayer() {
+      if (!peer.current || !localStream.current) {
+        return;
+      }
+
       players.forEach((player) => {
         if (
           player.id !== currentPlayer.id &&
           currentPlayer.id &&
-          players.length > 1 &&
-          localStream.current
+          players.length > 1
         ) {
           const call = peer.current.call(player.id, localStream.current);
           call.on("stream", (stream) => {
-            displayMedia(player.id, stream);
+            attachAudioStream(player.id, stream);
           });
         }
       });
     }
 
-    getMediaDevices()
+    getMediaDevices();
   }, [currentPlayer.id, players]);
 
 }
