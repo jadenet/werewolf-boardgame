@@ -1,6 +1,4 @@
-const SPECIAL_ROLES = new Set(["Seer", "Mason", "Tanner"]);
-
-export default function LobbyRulesTab(props: { roles: { name: string; img: string }[] }) {
+export default function LobbyRulesTab() {
   return (
     <div className="mx-2 my-6 space-y-4 pb-4">
       <section className="rounded-2xl border border-base-300 bg-base-100/70 p-4 shadow-md backdrop-blur-sm">
