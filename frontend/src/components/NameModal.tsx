@@ -1,7 +1,7 @@
 import { Player } from "../Interfaces";
 import { useEffect, useRef, useState } from "react";
 
-export default function NameModal(props: { socket: React.MutableRefObject<any>, onNameEnter: (name: string) => void, socketConnected: boolean }) {
+export default function NameModal(props: { socket: React.MutableRefObject<any>, onNameEnter: (name: string) => Promise<boolean> | boolean, socketConnected: boolean }) {
   const nameModal = useRef<HTMLDialogElement | null>(null);
   const [nameInputValue, setNameInputValue] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -10,11 +10,16 @@ export default function NameModal(props: { socket: React.MutableRefObject<any>, 
     nameModal.current?.showModal();
   }, []);
 
-  function handleNameEnter(name: Player["name"]) {
+  async function handleNameEnter(name: Player["name"]) {
     if (name.trim()) {
       setIsSubmitting(true);
-      props.onNameEnter(name.trim());
-      nameModal.current?.close();
+      const didJoinLobby = await props.onNameEnter(name.trim());
+      if (didJoinLobby) {
+        nameModal.current?.close();
+        return;
+      }
+
+      setIsSubmitting(false);
     }
   }
 

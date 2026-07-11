@@ -33,30 +33,46 @@ export default function useSocketConnect() {
   const pendingAbilityPromptAckRef = useRef<((response: AbilityPromptResponse) => void) | null>(null);
 
   const joinLobby = (playerName: string) => {
-    console.log("joinLobby called with:", playerName, "socketConnected:", socketConnected);
-    if (socketConnected && playerName.trim()) {
-      socketRef.current.timeout(5000).emit(
+    const trimmedPlayerName = playerName.trim();
+    if (!trimmedPlayerName || !socketRef.current || !socketConnected) {
+      return Promise.resolve(false);
+    }
+
+    return new Promise<boolean>((resolve) => {
+      socketRef.current.timeout(10000).emit(
         "lobbyjoin",
         lobbyId.current,
-        playerName.trim(),
+        trimmedPlayerName,
         (
-          _: never,
+          err: Error | null,
           res: {
             isValidId: boolean;
             player?: { id: string; name: string; isHost: boolean };
           }
         ) => {
-          console.log("joinLobby callback received:", res);
-          if (res && res.isValidId) {
-            setCurrentPlayer(res.player);
-          } else {
-            setLocation("/?invalidId=true", { replace: true });
+          if (err) {
+            console.error("Timed out while joining lobby:", err.message);
+            resolve(false);
+            return;
           }
+
+          if (res?.isValidId) {
+            setCurrentPlayer(res.player);
+            resolve(true);
+            return;
+          }
+
+          // Only treat explicit invalid-id responses as invalid lobby kicks.
+          if (res?.isValidId === false) {
+            setLocation("/?invalidId=true", { replace: true });
+            resolve(false);
+            return;
+          }
+
+          resolve(false);
         }
       );
-    } else if (!socketConnected) {
-      console.error("Socket not connected, cannot join lobby");
-    }
+    });
   };
 
   const submitAbilityTarget = (playerId: Player["id"]) => {
@@ -124,7 +140,6 @@ export default function useSocketConnect() {
       console.error("Socket URL:", SERVER_URL);
       console.error("Error message:", error.message);
       setSocketConnected(false);
-      setLocation("/?connectionError=true", { replace: true });
     });
 
     socket.on("connect", () => {
