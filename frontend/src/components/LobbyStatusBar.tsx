@@ -27,6 +27,12 @@ export default function LobbyStatusBar(props: {
           <div className="stat-title">Role</div>
           <div className="stat-value text-secondary">{props.currentRoleName || "None"}</div>
         </div>
+        {props.winner && (
+          <div className="stat">
+            <div className="stat-title">Winner</div>
+            <div className="stat-value text-secondary">{props.winner.join(", ")}</div>
+          </div>
+        )}
         {props.formattedPhaseCountdown && (
             <div className="rounded-xl border border-base-300 bg-base-200/80 px-3 py-2 text-right shadow-sm">
               <div className="text-xs uppercase tracking-wide text-base-content/60">Time Left</div>
@@ -47,18 +53,6 @@ export default function LobbyStatusBar(props: {
               </button>
             </div>
           )}
-
-      </div>
-
-      <div className="flex items-center gap-4">
-        <div className="text-sm text-base-content/70">
-          Abilities: {props.activeAbilityName || "Waiting"}
-        </div>
-        {props.winner && (
-          <div className="badge badge-success badge-lg">
-            🏆 {props.winner}
-          </div>
-        )}
       </div>
     </div>
   );
