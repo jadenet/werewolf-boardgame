@@ -1,20 +1,20 @@
 import { useLocation } from "wouter";
 import { getRoleNames } from "../functions/getRolesFromTeam";
 import { useState } from "react";
-import { buildServerUrl } from "../config/server";
+import { buildServerUrl, wakeBackend } from "../config/server";
 
 const images = [
   {
-    src: "/images/roles/Villager.png",
+    src: "https://static.wikia.nocookie.net/werewolf-online/images/5/58/Villager.png",
     alt: "Villager avatar",
   },
   {
-    src: "/images/roles/Werewolf.png",
+    src: "https://static.wikia.nocookie.net/werewolf-online/images/3/3c/Regular_Werewolf.png",
     alt: "Werewolf avatar",
   },
   {
-    src: "/images/roles/Doppelganger.png",
-    alt: "Doppelganger avatar",
+    src: "https://static.wikia.nocookie.net/werewolf-online/images/e/ee/Seer.png",
+    alt: "Seer avatar",
   },
 ];
 
@@ -22,36 +22,25 @@ export default function Home() {
   const [, setLocation] = useLocation();
   const [isLoading, setIsLoading] = useState(false);
   return (
-    <main className="min-h-[84vh] flex items-center justify-center p-4">
-      <div className="hero min-h-[80vh] bg-gradient-to-br from-primary/10 to-secondary/10 rounded-3xl shadow-2xl backdrop-blur-sm border border-base-300/50">
+    <main className="flex items-center justify-center">
+      <div className="hero py-10 rounded-3xl bg-base-100">
         <div className="hero-content text-center max-w-4xl">
           <div className="space-y-8">
-            <div className="flex gap-8 justify-center animate-bounce">
-              {images.map((image, index) => {
+            <div className="flex gap-12 justify-center items-center">
+              {images.map((image) => {
                 return (
-                  <div
-                    key={image.alt}
-                    className="avatar"
-                    style={{ animationDelay: `${index * 0.2}s` }}
-                  >
-                    <div className="w-32 h-32 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2 shadow-lg hover:scale-110 transition-transform duration-300">
-                      <img
-                        src={image.src}
-                        alt={image.alt}
-                        className="object-contain p-2"
-                      />
-                    </div>
-                  </div>
+                    <img src={image.src} alt={image.alt} className="w-34 h-34 md:w-36 md:h-36 object-contain" />
+                
                 );
               })}
             </div>
             <div className="space-y-4">
-              <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              <h1 className="text-5xl md:text-6xl font-bold text-primary">
                 One Night Werewolf
               </h1>
               <p className="text-xl text-base-content/70 max-w-2xl mx-auto">
-                Experience the thrilling social deduction game where villagers and werewolves battle under the cover of night.
-                Trust no one, suspect everyone!
+                A social deduction game full of bluffing, accusations, and never
+                truly knowing whose on your side until it's too late!
               </p>
             </div>
             <div className="space-y-4">
@@ -68,19 +57,23 @@ export default function Home() {
               ) : (
                 <div className="space-y-4">
                   <button
-                    className="btn btn-primary btn-lg px-12 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                    className="btn btn-primary btn-lg px-12 py-4 text-lg font-semibold"
                     onClick={async (e) => {
                       e.preventDefault();
                       setIsLoading(true);
                       try {
-                        const response = await fetch(buildServerUrl("/lobbies"), {
-                          method: "POST",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({
-                            roles: getRoleNames(),
-                            gamemode: "Classic",
-                          }),
-                        });
+                        await wakeBackend();
+                        const response = await fetch(
+                          buildServerUrl("/lobbies"),
+                          {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                              roles: getRoleNames(),
+                              gamemode: "Classic",
+                            }),
+                          },
+                        );
 
                         const responseJson = await response.json();
 
@@ -93,11 +86,8 @@ export default function Home() {
                       }
                     }}
                   >
-                    🏰 Create Lobby
+                    Create Lobby
                   </button>
-                  <p className="text-sm text-base-content/50">
-                    Or join an existing game with a lobby code
-                  </p>
                 </div>
               )}
             </div>

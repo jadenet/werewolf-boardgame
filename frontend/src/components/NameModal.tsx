@@ -31,10 +31,10 @@ export default function NameModal(props: { socket: React.MutableRefObject<any>, 
 
   return (
     <dialog className="modal modal-bottom sm:modal-middle" ref={nameModal}>
-      <div className="modal-box bg-gradient-to-br from-base-100 to-base-200 border border-base-300 shadow-2xl">
+      <div className="modal-box bg-base-100 border border-base-300">
         <div className="text-center space-y-4">
           <div className="text-6xl">🎭</div>
-          <h3 className="font-bold text-2xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+          <h3 className="font-bold text-2xl text-primary">
             Welcome to One Night Werewolf
           </h3>
           <p className="text-base-content/70">
@@ -49,7 +49,7 @@ export default function NameModal(props: { socket: React.MutableRefObject<any>, 
           <input
             type="text"
             placeholder="Enter your mystical name..."
-            className="input input-bordered input-primary w-full focus:input-secondary transition-colors"
+            className="input input-bordered input-primary w-full focus:input-secondary"
             onChange={(e) => setNameInputValue(e.target.value)}
             onKeyPress={handleKeyPress}
             disabled={isSubmitting || !props.socketConnected}

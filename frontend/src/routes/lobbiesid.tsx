@@ -299,7 +299,7 @@ export default function Lobbiesid() {
     <>
       {uiAlert && (
         <div className="toast toast-top toast-center z-50 mt-16">
-          <div className={`alert ${alertToneClasses[uiAlert.tone]} w-[min(92vw,32rem)] shadow-xl`}>
+          <div className={`alert ${alertToneClasses[uiAlert.tone]} w-[min(92vw,32rem)]`}>
             <div className="flex w-full items-start justify-between gap-3">
               <div className="flex items-start gap-3">
                 <span className="text-lg leading-none">{alertToneIcons[uiAlert.tone]}</span>
@@ -334,7 +334,7 @@ export default function Lobbiesid() {
             setOpenedDrawer(!openedDrawer);
           }}
         />
-        <div className="drawer-content flex flex-col justify-between">
+        <div className="drawer-content flex flex-col h-full overflow-hidden">
           {activeAbilityPrompt && (
             <AbilityPromptBanner
               activeAbilityPrompt={activeAbilityPrompt}
@@ -344,7 +344,7 @@ export default function Lobbiesid() {
 
           <label
             htmlFor="my-drawer-2"
-            className={`drawer-button btn btn-circle btn-primary shadow-lg hover:shadow-xl transition-all duration-300 ${
+            className={`drawer-button btn btn-circle btn-primary ${
               openedDrawer && "btn-outline bg-base-200"
             } absolute ${
               openedDrawer ? "right-[23rem]" : "right-10"
@@ -353,7 +353,7 @@ export default function Lobbiesid() {
             {openedDrawer ? "❌" : "📋"}
           </label>
 
-          <div className="flex flex-col items-center justify-center overflow-y-auto p-4">
+          <div className="flex flex-1 min-h-0 flex-col items-center overflow-y-auto p-4">
             <div className="flex flex-wrap items-center justify-center gap-6 p-8 mx-8">
               {players.map((player) => (
                 <PlayerCard

@@ -71,7 +71,7 @@ export default function CreateLobby() {
       {formErrors.map((formError, i) => {
         return (
           <div key={i} className="toast toast-top toast-center">
-            <div className="alert alert-error shadow-lg">
+            <div className="alert alert-error">
               <span>{formError}</span>
             </div>
           </div>
@@ -101,7 +101,7 @@ export default function CreateLobby() {
         className="max-w-7xl mx-auto space-y-8"
       >
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold text-primary">
             Create Your Lobby
           </h1>
           <p className="text-lg text-base-content/70">
@@ -114,7 +114,7 @@ export default function CreateLobby() {
             <h2 className="text-2xl font-semibold text-center">Select Roles</h2>
             {roleTeams.current.map((roleTeam) => {
               return (
-                <div key={roleTeam.name} className="collapse collapse-arrow bg-base-200/50 backdrop-blur-sm border border-base-300 rounded-xl shadow-lg">
+                <div key={roleTeam.name} className="collapse collapse-arrow bg-base-200 border border-base-300 rounded-xl">
                   <input
                     type="radio"
                     name="roles"
@@ -132,10 +132,10 @@ export default function CreateLobby() {
                         return (
                           <div
                             key={i}
-                            className={`card bg-base-100 shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 ${
+                            className={`card bg-base-100 ${
                               !isChecked
-                                ? "outline outline-1 outline-base-300 opacity-60 hover:opacity-80"
-                                : "outline outline-2 outline-primary bg-primary/5 shadow-primary/20"
+                                ? "outline outline-1 outline-base-300 opacity-60"
+                                : "outline outline-2 outline-primary bg-primary/5"
                             } rounded-lg`}
                           >
                             <input
@@ -172,7 +172,7 @@ export default function CreateLobby() {
           </div>
 
           <div className="lg:w-80 space-y-6">
-            <div className="bg-base-200/50 backdrop-blur-sm border border-base-300 rounded-xl p-6 shadow-lg">
+            <div className="bg-base-200 border border-base-300 rounded-xl p-6">
               <h3 className="text-xl font-semibold mb-4 text-center">Game Settings</h3>
 
               <div className="space-y-4">
@@ -225,14 +225,14 @@ export default function CreateLobby() {
                 </div>
 
                 <div className="pt-4">
-                  <button className="btn btn-primary w-full btn-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
+                  <button className="btn btn-primary w-full btn-lg font-semibold">
                     🎮 Create Lobby
                   </button>
                 </div>
               </div>
             </div>
 
-            <div className="bg-base-200/50 backdrop-blur-sm border border-base-300 rounded-xl p-6 shadow-lg">
+            <div className="bg-base-200 border border-base-300 rounded-xl p-6">
               <h4 className="font-semibold mb-3">Selected Roles ({currentRoles.length})</h4>
               <div className="max-h-32 overflow-y-auto space-y-1">
                 {currentRoles.map((role, index) => (

@@ -3,11 +3,12 @@ import { io } from "socket.io-client";
 import { useLocation, useParams } from "wouter";
 import { getRoles } from "../functions/getRolesFromTeam";
 import { AbilityPrompt, AbilityPromptResponse, AbilityResult, Player, Round } from "../Interfaces";
-import { SERVER_URL } from "../config/server";
+import { SERVER_URL, buildServerUrl } from "../config/server";
 
 export default function useSocketConnect() {
   const socketRef = useRef(null);
-  const lobbyId = useRef(useParams()["id"]);
+  const params = useParams<{ id?: string }>();
+  const lobbyId = params.id;
   const [, setLocation] = useLocation();
   const [players, setPlayers] = useState<Player[]>([]);
   const [roles] = useState(() => getRoles());
@@ -34,16 +35,16 @@ export default function useSocketConnect() {
 
   const joinLobby = (playerName: string) => {
     const trimmedPlayerName = playerName.trim();
-    if (!trimmedPlayerName || !socketRef.current || !socketConnected) {
+    if (!trimmedPlayerName || !socketRef.current || !socketConnected || !lobbyId) {
       return Promise.resolve(false);
     }
 
     return new Promise<boolean>((resolve) => {
       socketRef.current.timeout(10000).emit(
         "lobbyjoin",
-        lobbyId.current,
+        lobbyId,
         trimmedPlayerName,
-        (
+        async (
           err: Error | null,
           res: {
             isValidId: boolean;
@@ -62,9 +63,19 @@ export default function useSocketConnect() {
             return;
           }
 
-          // Only treat explicit invalid-id responses as invalid lobby kicks.
+          // Double-check lobby existence before redirecting to avoid false invalid redirects on transient errors.
           if (res?.isValidId === false) {
-            setLocation("/?invalidId=true", { replace: true });
+            const lobbyExists = await fetch(buildServerUrl(`/lobbies/${lobbyId}`))
+              .then(async (result) => {
+                const text = await result.text();
+                return text === "true";
+              })
+              .catch(() => false);
+
+            if (!lobbyExists) {
+              setLocation("/?invalidId=true", { replace: true });
+            }
+
             resolve(false);
             return;
           }

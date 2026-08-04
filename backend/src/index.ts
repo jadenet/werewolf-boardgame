@@ -167,7 +167,7 @@ app.post("/lobbies", async (_req, res) => {
     if (lobby.players.length === 0) {
       removeLobby(lobby.id);
     }
-  }, 10 * 1000);
+  }, 60 * 1000);
 });
 
 app.get("/lobbies", async (_, res) => {
