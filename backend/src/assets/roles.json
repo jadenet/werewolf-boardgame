@@ -1,29 +1,102 @@
 [
   {
-    "id": "seer",
-    "name": "Seer",
-    "description": "",
+    "id": "villager",
+    "name": "Villager",
+    "description": "No special ability. Use your voice and your vote.",
     "image": "",
     "team": "Villagers",
     "member": "Villager",
-    "abilities": ["seer-ability"]
+    "abilities": []
   },
   {
     "id": "werewolf",
     "name": "Werewolf",
-    "description": "",
+    "description": "Wake with the other werewolves and learn who they are. If you're the only werewolf, you may look at one center card.",
     "image": "",
     "team": "Werewolves",
     "member": "Werewolf",
     "abilities": ["werewolf-ability", "lone-wolf-ability"]
   },
   {
-    "id": "villager",
-    "name": "Villager",
-    "description": "",
+    "id": "minion",
+    "name": "Minion",
+    "description": "Learn who the werewolves are (they don't know you). Win with the werewolves even if you're voted out.",
+    "image": "",
+    "team": "Werewolves",
+    "member": "Villager",
+    "abilities": ["minion-ability"]
+  },
+  {
+    "id": "mason",
+    "name": "Mason",
+    "description": "Wake and see the other Mason, if there is one.",
+    "image": "",
+    "team": "Villagers",
+    "member": "Villager",
+    "abilities": ["mason-ability"]
+  },
+  {
+    "id": "seer",
+    "name": "Seer",
+    "description": "Look at another player's card, or two of the three center cards.",
+    "image": "",
+    "team": "Villagers",
+    "member": "Villager",
+    "abilities": ["seer-ability", "seer-center-ability"]
+  },
+  {
+    "id": "robber",
+    "name": "Robber",
+    "description": "You may swap your card with another player's card, then look at your new card.",
+    "image": "",
+    "team": "Villagers",
+    "member": "Villager",
+    "abilities": ["robber-ability"]
+  },
+  {
+    "id": "troublemaker",
+    "name": "Troublemaker",
+    "description": "You may swap cards between two other players, without looking at them.",
+    "image": "",
+    "team": "Villagers",
+    "member": "Villager",
+    "abilities": ["troublemaker-ability"]
+  },
+  {
+    "id": "drunk",
+    "name": "Drunk",
+    "description": "Swap your card with one from the center, without looking at either.",
+    "image": "",
+    "team": "Villagers",
+    "member": "Villager",
+    "abilities": ["drunk-ability"]
+  },
+  {
+    "id": "insomniac",
+    "name": "Insomniac",
+    "description": "At the end of the night, look at your own card to see if it changed.",
+    "image": "",
+    "team": "Villagers",
+    "member": "Villager",
+    "abilities": ["insomniac-ability"]
+  },
+  {
+    "id": "tanner",
+    "name": "Tanner",
+    "description": "You want to die. If you're voted out, you win alone and everyone else loses.",
+    "image": "",
+    "team": "Solo",
+    "member": "Villager",
+    "abilities": []
+  },
+  {
+    "id": "hunter",
+    "name": "Hunter",
+    "description": "If you're voted out, whoever you voted for dies too.",
     "image": "",
     "team": "Villagers",
     "member": "Villager",
     "abilities": []
   }
 ]
+

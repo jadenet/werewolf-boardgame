@@ -1,7 +1,7 @@
 import { useLocation } from "wouter";
-import { getRoleNames } from "../functions/getRolesFromTeam";
+import { getRoleNames } from "../lobby/helpers/getRolesFromTeam";
 import { useState } from "react";
-import { buildServerUrl, wakeBackend } from "../config/server";
+import { buildServerUrl, wakeBackend } from "../app/config/server";
 
 const images = [
   {
@@ -48,10 +48,7 @@ export default function Home() {
                 <div className="flex flex-col items-center space-y-4">
                   <div className="loading loading-spinner loading-lg text-primary"></div>
                   <p className="text-lg font-semibold text-base-content/80">
-                    Creating your mystical lobby...
-                  </p>
-                  <p className="text-sm text-base-content/60">
-                    This may take up to 30 seconds
+                    Setting up your lobby...
                   </p>
                 </div>
               ) : (

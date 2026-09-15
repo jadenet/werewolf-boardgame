@@ -14,4 +14,5 @@ export type {
   Round,
   RoundStatus,
   Team,
-} from "../../backend/src/functions/types";
+  VoteStatus,
+} from "../../backend/src/game/types";

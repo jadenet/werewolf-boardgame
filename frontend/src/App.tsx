@@ -1,40 +1,18 @@
-import { Redirect, Route, Switch, useParams } from "wouter";
+import { Link, Route, Switch } from "wouter";
 import Home from "./routes/home";
-import CreateLobby from "./routes/createlobby";
-import LobbiesId from "./routes/lobbiesid";
-import { Link } from "wouter";
-import { useEffect, useState } from "react";
-import { buildServerUrl } from "./config/server";
+import PageNotFound from "./routes/pagenotfound";
+import ValidateLobby from "./routes/validatelobby";
 
 export default function App() {
-  function ValidateLobby() {
-    const [isValidId, setIsValidId] = useState(null);
-    const params = useParams<{ id?: string }>();
-
-    useEffect(() => {
-      fetch(buildServerUrl(`/lobbies/${params.id}`)).then(async (result) => {
-        const text = await result.text();
-        setIsValidId(text === "true");
-      });
-    }, [params.id]);
-    if (isValidId === null) {
-      return (
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="loading loading-spinner loading-lg text-primary"></div>
-        </div>
-      );
-    } else if (isValidId) {
-      return <LobbiesId />;
-    } else {
-      return <Redirect to="/?invalidId=true" replace />;
-    }
-  }
   return (
-    <div className="min-h-screen bg-base-100 flex flex-col justify-between">
+    <div className="min-h-screen md:max-h-screen bg-base-100 flex flex-col justify-between">
       <div className="navbar bg-base-100 border-b border-base-300">
         <div className="navbar-start"></div>
         <div className="navbar-center">
-          <Link className="text-xl font-bold tracking-wide hover:bg-transparent focus:bg-transparent" href="/">
+          <Link
+            className="text-xl font-bold tracking-wide hover:bg-transparent focus:bg-transparent"
+            href="/"
+          >
             ONE NIGHT WEREWOLF
           </Link>
         </div>
@@ -42,21 +20,14 @@ export default function App() {
       </div>
       <Switch>
         <Route path="/" component={Home} />
-        <Route path="/createlobby" component={CreateLobby} />
         <Route path="/lobbies/:id" component={ValidateLobby} />
-        <Route>
-          <div className="flex flex-col items-center justify-center text-center">
-            <h1 className="text-6xl font-bold text-error mb-4">404</h1>
-            <p className="text-xl text-base-content/70 mb-8">Page not found</p>
-            <Link href="/" className="btn btn-primary btn-lg">
-              Return Home
-            </Link>
-          </div>
-        </Route>
+        <Route component={PageNotFound} />
       </Switch>
       <footer className="footer footer-center p-4 bg-base-200 text-base-content/70 border-t border-base-300">
         <aside>
-          <p className="text-sm">© 2024 Jaden Edwards · Built with React, TypeScript, and Node.js.</p>
+          <p className="text-sm">
+            © 2024 Jaden Edwards · Built with React, TypeScript, and Node.js.
+          </p>
         </aside>
       </footer>
     </div>

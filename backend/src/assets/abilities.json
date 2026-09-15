@@ -21,6 +21,45 @@
     }
   },
   {
+    "id": "seer-center-ability",
+    "name": "Seer Ability (Center)",
+    "description": "",
+    "optional": true,
+    "actions": [
+      [
+        {
+          "type": "ViewRole",
+          "target": "Center",
+          "exclusions": [],
+          "count": 2
+        }
+      ]
+    ],
+    "conditions": {
+      "phase": "Night",
+      "queue": 8
+    }
+  },
+  {
+    "id": "drunk-ability",
+    "name": "Drunk Ability",
+    "description": "",
+    "optional": false,
+    "actions": [
+      [
+        {
+          "type": "SwitchRoles",
+          "target": "Self-Center",
+          "exclusions": []
+        }
+      ]
+    ],
+    "conditions": {
+      "phase": "Night",
+      "queue": 14
+    }
+  },
+  {
     "id": "robber-ability",
     "name": "Robber Ability",
     "description": "",
@@ -152,10 +191,8 @@
       [
         {
           "type": "ViewRole",
-          "target": "Player",
-          "exclusions": [
-            "NotSelf"
-          ]
+          "target": "Center",
+          "exclusions": []
         }
       ]
     ],
