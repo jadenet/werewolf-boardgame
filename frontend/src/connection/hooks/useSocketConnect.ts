@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import { useLocation, useParams } from "wouter";
-import { getRoles } from "../../lobby/helpers/getRolesFromTeam";
 import {
   AbilityPrompt,
   AbilityPromptResponse,
@@ -26,7 +25,7 @@ export default function useSocketConnect() {
   const lobbyId = params.id;
   const [, setLocation] = useLocation();
   const [players, setPlayers] = useState<Player[]>([]);
-  const [roles] = useState(() => getRoles());
+  const [roles] = useState<{ name: string; img: string }[]>([]);
   const [currentPhase, setCurrentPhase] = useState<Round["status"]>(null);
   const [gameStarted, setGameStarted] = useState(false);
   const [winner, setWinner] = useState<Round["teamWinner"]>(null);
@@ -35,7 +34,7 @@ export default function useSocketConnect() {
   const [playAgainStatus, setPlayAgainStatus] = useState<VoteStatus | null>(
     null,
   );
-  const [knownWerewolfIds, setKnownWerewolfIds] = useState<Player["id"][]>([]);
+  const [revealedPlayerRoleIds, setRevealedPlayerRoleIds] = useState<Record<string, Role["id"]>>({});
   const [revealedCenterRoles, setRevealedCenterRoles] = useState<Role[] | null>(
     null,
   );
@@ -49,6 +48,8 @@ export default function useSocketConnect() {
     name: null,
     isHost: false,
   });
+  const currentPlayerRef = useRef(currentPlayer);
+  currentPlayerRef.current = currentPlayer;
   const [currentPlayerRole, setCurrentPlayerRole] = useState<{
     id: string;
     name: string;
@@ -76,10 +77,10 @@ export default function useSocketConnect() {
       !socketConnected ||
       !lobbyId
     ) {
-      return Promise.resolve(false);
+      return Promise.resolve({ success: false, error: "Unable to connect to this lobby." });
     }
 
-    return new Promise<boolean>((resolve) => {
+    return new Promise<{ success: boolean; error?: string }>((resolve) => {
       socketRef.current.timeout(10000).emit(
         "lobbyjoin",
         lobbyId,
@@ -88,18 +89,24 @@ export default function useSocketConnect() {
           err: Error | null,
           res: {
             isValidId: boolean;
+            error?: string;
             player?: { id: string; name: string; isHost: boolean };
           },
         ) => {
           if (err) {
             console.error("Timed out while joining lobby:", err.message);
-            resolve(false);
+            resolve({ success: false, error: "The lobby server did not respond. Please try again." });
             return;
           }
 
           if (res?.isValidId) {
             setCurrentPlayer(res.player);
-            resolve(true);
+            resolve({ success: true });
+            return;
+          }
+
+          if (res?.error) {
+            resolve({ success: false, error: res.error });
             return;
           }
 
@@ -124,11 +131,11 @@ export default function useSocketConnect() {
               setLocation("/?invalidId=true", { replace: true });
             }
 
-            resolve(false);
+            resolve({ success: false, error: "This lobby is no longer available." });
             return;
           }
 
-          resolve(false);
+          resolve({ success: false, error: "Unable to join this lobby. Please try again." });
         },
       );
     });
@@ -208,9 +215,6 @@ export default function useSocketConnect() {
         Math.ceil((phaseDeadline - Date.now()) / 1000),
       );
       setPhaseCountdown(remainingSeconds);
-      if (remainingSeconds === 0) {
-        setPhaseDeadline(null);
-      }
     };
 
     updateCountdown();
@@ -237,6 +241,24 @@ export default function useSocketConnect() {
       pendingAbilityPromptAckRef,
     });
 
+    socket.on("connect", () => {
+      const player = currentPlayerRef.current;
+      if (!player.id || !lobbyId) {
+        return;
+      }
+
+      socket.emit(
+        "lobbyreconnect",
+        lobbyId,
+        player.id,
+        (response: { success?: boolean }) => {
+          if (!response?.success) {
+            setCurrentPlayer({ id: null, name: null, isHost: false });
+          }
+        },
+      );
+    });
+
     registerPlayerEvents(socket, roles, {
       setPlayers,
       setPlayerStatus,
@@ -246,20 +268,26 @@ export default function useSocketConnect() {
     registerPhaseEvents(socket, {
       setCurrentPhase,
       setLynchVotes,
+      setPlayerStatus,
       setPhaseDeadline,
       setGameStarted,
       setWinner,
+      setCurrentPlayerRole,
       setDiscussionSkipStatus,
       setPlayAgainStatus,
-      setKnownWerewolfIds,
+      setRevealedPlayerRoleIds,
       setRevealedCenterRoles,
+      setLatestAbilityResult,
+      setActiveAbilityPrompt,
+      setSelectedAbilityTargets,
+      pendingAbilityPromptAckRef,
     });
 
     registerAbilityEvents(socket, {
       setActiveAbilityPrompt,
       setSelectedAbilityTargets,
       setLatestAbilityResult,
-      setKnownWerewolfIds,
+      setRevealedPlayerRoleIds,
       pendingAbilityPromptAckRef,
     });
 
@@ -272,7 +300,7 @@ export default function useSocketConnect() {
       pendingAbilityPromptAckRef.current = null;
       socket.disconnect();
     };
-  }, [roles, setLocation]);
+  }, [lobbyId, roles, setLocation]);
 
   return [
     players,
@@ -298,7 +326,7 @@ export default function useSocketConnect() {
     submitPlayAgainVote,
     addBot,
     removeBot,
-    knownWerewolfIds,
+    revealedPlayerRoleIds,
     revealedCenterRoles,
     selectedRoleIds,
     updateSelectedRoles,

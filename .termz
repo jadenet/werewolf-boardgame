@@ -1,1 +1,0 @@
-{"tabs": [{"displayName": "frontend","script": ["npm run dev"], "directory": "frontend"}, {"displayName": "backend","script": "npm run dev", "directory": "backend"}]}

@@ -1,5 +1,5 @@
 import { emitAbilityResult, requestAbilityPrompt } from "../services/ability";
-import { getPlayersByRole } from "../services/role";
+import { getPlayersByRole, getRoleByIdentifier } from "../services/role";
 import { getPlayerFromId } from "../../lobby/lobby";
 import { Round, Player, Action, Ability } from "../types";
 
@@ -26,16 +26,21 @@ export default async function viewAllOfRole(
 
   // Werewolf identities are shown as a persistent badge on their player cards instead of
   // being spelled out in the (transient, but still logged) ability result message.
-  const isWerewolfReveal = action.target === "Werewolf";
+  const revealedRole = getRoleByIdentifier(action.target);
+  if (revealedRole?.id === "werewolf" || revealedRole?.id === "mason") {
+    getPlayerFromId(playerId)?.socket?.emit("knownRoleReveal", {
+      playerIds: playersWithRole,
+      roleId: revealedRole.id,
+    });
+    return;
+  }
 
   emitAbilityResult(playerId, {
     abilityId: ability.id,
     title: ability.name,
     message: playerNames.length === 0
       ? `No other ${action.target} players were found.`
-      : isWerewolfReveal
-        ? "Check the wolf icons on player cards to see who's with you."
-        : `${action.target}: ${playerNames.join(", ")}`,
+      : `${action.target}: ${playerNames.join(", ")}`,
     tone: "info",
     revealedPlayerIds: playersWithRole,
   });

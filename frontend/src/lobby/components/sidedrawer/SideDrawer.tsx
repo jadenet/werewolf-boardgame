@@ -1,6 +1,7 @@
 import LobbyChatTab from "./LobbyChatTab";
 import LobbySettingsTab from "./LobbySettingsTab";
 import LobbyRulesTab from "./LobbyRulesTab";
+import LobbyRolesTab from "./LobbyRolesTab";
 import PlayersTab from "./PlayersTab";
 import { Player, PlayerStatus, Role, RoundStatus } from "../../../Interfaces";
 
@@ -30,7 +31,7 @@ export default function SideDrawer(props: {
   getPlayerVolume: (playerId: Player["id"]) => number;
   onPlayerVolumeChange: (playerId: Player["id"], volume: number) => void;
   onRemoveBot: (playerId: Player["id"]) => void;
-  onKickPlayer: (playerId: string[]) => void;
+  onKickPlayer: (playerId: string) => void;
 }) {
   return (
     <div className="drawer-side h-[92vh]">
@@ -76,6 +77,22 @@ export default function SideDrawer(props: {
               onVolumeChange={props.onPlayerVolumeChange}
               onRemoveBot={props.onRemoveBot}
               onKickPlayer={props.onKickPlayer}
+            />
+          </div>
+
+          <input
+            type="radio"
+            name="sidebar"
+            aria-label="Roles"
+            role="tab"
+            className="tab"
+          />
+
+          <div role="tabpanel" className="tab-content">
+            <LobbyRolesTab
+              roleCatalog={props.roleCatalog}
+              selectedRoleIds={props.selectedRoleIds}
+              playerCount={props.players.length}
             />
           </div>
 

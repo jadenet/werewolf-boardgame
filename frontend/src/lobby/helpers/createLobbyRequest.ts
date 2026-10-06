@@ -13,5 +13,14 @@ export async function createLobbyRequest(gamemode: string, roles: string[]): Pro
     body: JSON.stringify({ roles, gamemode }),
   });
 
-  return response.json();
+  if (!response.ok) {
+    throw new Error(`Lobby creation failed (${response.status}).`);
+  }
+
+  const result = await response.json() as CreateLobbyResult;
+  if (result.status !== "success" || !result.id) {
+    throw new Error(result.errors?.join(" ") || "The server did not create a lobby.");
+  }
+
+  return result;
 }

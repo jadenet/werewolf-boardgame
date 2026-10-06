@@ -1,4 +1,4 @@
-import { Player, Round } from "../../Interfaces";
+import { Player, Role, Round } from "../../Interfaces";
 import getTruncatedString from "../../shared/utils/getTruncatedString.ts";
 import getVotesOnPlayerId from "../helpers/getVotesOnPlayerId.ts";
 import getPlayerFromPlayerId from "../helpers/getPlayerFromPlayerId.ts";
@@ -19,7 +19,7 @@ export default function PlayerCard(props: {
   abilityTargetSelectable?: boolean;
   abilityTargetSelected?: boolean;
   onAbilityTargetSelect?: (playerId: Player["id"]) => void;
-  isKnownWerewolf?: boolean;
+  revealedRole?: Role;
 }) {
   function emitPlayerClicked(player: Player) {
     if (props.onAbilityTargetSelect) {
@@ -95,15 +95,31 @@ export default function PlayerCard(props: {
 
         {props.abilityTargetSelectable && (
           <div className="absolute top-2 right-2">
-            <div className={`badge badge-sm ${props.abilityTargetSelected ? "badge-secondary" : "badge-accent"}`}>
+            <div className={`badge badge-sm mt-10 ${props.abilityTargetSelected ? "badge-secondary" : "badge-accent"}`}>
               {props.abilityTargetSelected ? "Selected" : "Ability"}
             </div>
           </div>
         )}
 
-        {props.isKnownWerewolf && (
-          <div className="absolute top-2 right-2">
-            <div className="badge badge-sm badge-error gap-1" title="Fellow werewolf">🐺 Werewolf</div>
+        {props.isTalking && (
+          <div
+            role="status"
+            aria-label={`${props.player.name} is speaking`}
+            className="absolute bottom-2 left-2 z-10 badge badge-sm badge-success gap-1 shadow-md"
+          >
+            <span className="h-2 w-2 rounded-full bg-current animate-pulse" />
+            Speaking
+          </div>
+        )}
+
+        {props.revealedRole && (
+          <div
+            className="absolute top-2 right-2 z-10 flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-base-100 bg-base-100 shadow-md"
+            role="img"
+            aria-label={`${props.player.name} is a ${props.revealedRole.name}`}
+            title={props.revealedRole.name}
+          >
+            <img src={props.revealedRole.image} alt="" className="h-full w-full object-cover" />
           </div>
         )}
 

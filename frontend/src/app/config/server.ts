@@ -2,7 +2,7 @@ export const SERVER_URL = import.meta.env.PROD
   ? "https://werewolf-backend.onrender.com"
   : "http://localhost:10000";
 
-let backendWakePromise: Promise<void> | null = null;
+let backendWakePromise: Promise<boolean> | null = null;
 
 export function buildServerUrl(path: string) {
   if (path.startsWith("/")) {
@@ -20,7 +20,7 @@ const WAKE_RETRY_DELAY_MS = 2000;
 // doesn't race a backend that isn't actually ready yet.
 export function wakeBackend() {
   if (!backendWakePromise) {
-    backendWakePromise = (async () => {
+    backendWakePromise = (async (): Promise<boolean> => {
       for (let attempt = 0; attempt < WAKE_RETRY_ATTEMPTS; attempt++) {
         const isAwake = await fetch(buildServerUrl("/lobbies"), {
           method: "GET",
@@ -30,14 +30,17 @@ export function wakeBackend() {
           .catch(() => false);
 
         if (isAwake) {
-          return;
+          return true;
         }
 
         if (attempt < WAKE_RETRY_ATTEMPTS - 1) {
           await new Promise((resolve) => setTimeout(resolve, WAKE_RETRY_DELAY_MS));
         }
       }
-    })();
+      return false;
+    })().finally(() => {
+      backendWakePromise = null;
+    });
   }
 
   return backendWakePromise;

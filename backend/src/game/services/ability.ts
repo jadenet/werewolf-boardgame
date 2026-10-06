@@ -130,12 +130,14 @@ export async function requestAbilityPrompt(
   const promptTimeoutMs = Math.max(1, Math.min(configuredTimeoutMs, remainingNightMs));
 
   if (requiredSelections === 0) {
-    emitAbilityResult(playerId, {
-      abilityId: ability.id,
-      title: ability.name,
-      message: getInstruction(ability, action.target, requiredSelections),
-      tone: "info",
-    });
+    if (action.type !== "ViewAllOfRole") {
+      emitAbilityResult(playerId, {
+        abilityId: ability.id,
+        title: ability.name,
+        message: getInstruction(ability, action.target, requiredSelections),
+        tone: "info",
+      });
+    }
     return [];
   }
 

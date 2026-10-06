@@ -2,10 +2,15 @@ import { Socket } from "socket.io-client";
 import { Player } from "../../../Interfaces";
 import { useEffect, useRef, useState } from "react";
 
-export default function NameModal(props: { socket: React.MutableRefObject<Socket>, onNameEnter: (name: string) => Promise<boolean> | boolean, socketConnected: boolean }) {
+export default function NameModal(props: {
+  socket: React.MutableRefObject<Socket>;
+  onNameEnter: (name: string) => Promise<boolean | { success: boolean; error?: string }> | boolean;
+  socketConnected: boolean;
+}) {
   const nameModal = useRef<HTMLDialogElement | null>(null);
   const [nameInputValue, setNameInputValue] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [joinError, setJoinError] = useState<string | null>(null);
 
   useEffect(() => {
     nameModal.current?.showModal();
@@ -14,12 +19,15 @@ export default function NameModal(props: { socket: React.MutableRefObject<Socket
   async function handleNameEnter(name: Player["name"]) {
     if (name.trim()) {
       setIsSubmitting(true);
-      const didJoinLobby = await props.onNameEnter(name.trim());
+      setJoinError(null);
+      const result = await props.onNameEnter(name.trim());
+      const didJoinLobby = typeof result === "boolean" ? result : result.success;
       if (didJoinLobby) {
         nameModal.current?.close();
         return;
       }
 
+      setJoinError(typeof result === "boolean" ? "Unable to join this lobby. Please try again." : result.error ?? "Unable to join this lobby. Please try again.");
       setIsSubmitting(false);
     }
   }
@@ -61,6 +69,7 @@ export default function NameModal(props: { socket: React.MutableRefObject<Socket
               <span className="label-text-alt text-warning">Connecting to server...</span>
             </label>
           )}
+          {joinError && <p role="alert" className="mt-2 text-sm text-error">{joinError}</p>}
         </div>
 
         <div className="modal-action justify-center">

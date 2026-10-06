@@ -11,8 +11,6 @@ import {
   VoteStatus,
 } from "../../Interfaces";
 
-const WEREWOLF_REVEAL_ABILITY_IDS = ["werewolf-ability", "minion-ability", "lone-wolf-ability"];
-
 type PendingAbilityAckRef = MutableRefObject<((response: AbilityPromptResponse) => void) | null>;
 type RoleSummary = { name: string; img: string };
 
@@ -101,13 +99,19 @@ export function registerPhaseEvents(
   setters: {
     setCurrentPhase: Dispatch<SetStateAction<Round["status"]>>;
     setLynchVotes: Dispatch<SetStateAction<Round["votes"]>>;
+    setPlayerStatus: Dispatch<SetStateAction<Map<string, PlayerStatus>>>;
     setPhaseDeadline: Dispatch<SetStateAction<number | null>>;
     setGameStarted: Dispatch<SetStateAction<boolean>>;
     setWinner: Dispatch<SetStateAction<Round["teamWinner"]>>;
+    setCurrentPlayerRole: Dispatch<SetStateAction<{ id: string; name: string; image: string } | null>>;
     setDiscussionSkipStatus: Dispatch<SetStateAction<VoteStatus | null>>;
     setPlayAgainStatus: Dispatch<SetStateAction<VoteStatus | null>>;
-    setKnownWerewolfIds: Dispatch<SetStateAction<Player["id"][]>>;
+    setRevealedPlayerRoleIds: Dispatch<SetStateAction<Record<string, Role["id"]>>>;
     setRevealedCenterRoles: Dispatch<SetStateAction<Role[] | null>>;
+    setLatestAbilityResult: Dispatch<SetStateAction<AbilityResult | null>>;
+    setActiveAbilityPrompt: Dispatch<SetStateAction<AbilityPrompt | null>>;
+    setSelectedAbilityTargets: Dispatch<SetStateAction<Player["id"][]>>;
+    pendingAbilityPromptAckRef: PendingAbilityAckRef;
   }
 ) {
   socket.on("phaseChange", (phase) => {
@@ -125,8 +129,17 @@ export function registerPhaseEvents(
       setters.setPlayAgainStatus(null);
     }
     if (phase === "PreGame") {
-      setters.setKnownWerewolfIds([]);
+      setters.setWinner(null);
+      setters.setCurrentPlayerRole(null);
+      setters.setLynchVotes(new Map());
+      setters.setPlayerStatus(new Map());
+      setters.setPhaseDeadline(null);
+      setters.setRevealedPlayerRoleIds({});
       setters.setRevealedCenterRoles(null);
+      setters.setLatestAbilityResult(null);
+      setters.setActiveAbilityPrompt(null);
+      setters.setSelectedAbilityTargets([]);
+      setters.pendingAbilityPromptAckRef.current = null;
     }
   });
 
@@ -143,7 +156,18 @@ export function registerPhaseEvents(
     setters.setGameStarted(false);
     setters.setCurrentPhase(null);
     setters.setWinner(null);
+    setters.setCurrentPlayerRole(null);
+    setters.setLynchVotes(new Map());
+    setters.setPlayerStatus(new Map());
+    setters.setPhaseDeadline(null);
+    setters.setDiscussionSkipStatus(null);
     setters.setPlayAgainStatus(null);
+    setters.setRevealedPlayerRoleIds({});
+    setters.setRevealedCenterRoles(null);
+    setters.setLatestAbilityResult(null);
+    setters.setActiveAbilityPrompt(null);
+    setters.setSelectedAbilityTargets([]);
+    setters.pendingAbilityPromptAckRef.current = null;
   });
 
   socket.on("lynchVotesChange", (newLynchVotes: [string, string][]) => {
@@ -162,6 +186,10 @@ export function registerPhaseEvents(
     setters.setRevealedCenterRoles(roles);
   });
 
+  socket.on("playerRolesReveal", (playerRoleIds: [Player["id"], Role["id"]][]) => {
+    setters.setRevealedPlayerRoleIds(Object.fromEntries(playerRoleIds));
+  });
+
   const durationEvents = ["startPreGame", "startNight", "startDiscussion", "startVoting"] as const;
   durationEvents.forEach((eventName) => {
     socket.on(eventName, (duration: number) => {
@@ -178,7 +206,7 @@ export function registerAbilityEvents(
     setActiveAbilityPrompt: Dispatch<SetStateAction<AbilityPrompt | null>>;
     setSelectedAbilityTargets: Dispatch<SetStateAction<Player["id"][]>>;
     setLatestAbilityResult: Dispatch<SetStateAction<AbilityResult | null>>;
-    setKnownWerewolfIds: Dispatch<SetStateAction<Player["id"][]>>;
+    setRevealedPlayerRoleIds: Dispatch<SetStateAction<Record<string, Role["id"]>>>;
     pendingAbilityPromptAckRef: PendingAbilityAckRef;
   }
 ) {
@@ -203,9 +231,13 @@ export function registerAbilityEvents(
     setters.pendingAbilityPromptAckRef.current = null;
     setters.setLatestAbilityResult(result);
 
-    if (result.revealedPlayerIds && WEREWOLF_REVEAL_ABILITY_IDS.includes(result.abilityId)) {
-      setters.setKnownWerewolfIds(result.revealedPlayerIds);
-    }
+  });
+
+  socket.on("knownRoleReveal", (reveal: { playerIds: Player["id"][]; roleId: Role["id"] }) => {
+    setters.setRevealedPlayerRoleIds((previous) => ({
+      ...previous,
+      ...Object.fromEntries(reveal.playerIds.map((playerId) => [playerId, reveal.roleId])),
+    }));
   });
 }
 

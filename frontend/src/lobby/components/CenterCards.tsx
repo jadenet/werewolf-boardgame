@@ -9,33 +9,41 @@ export default function CenterCards(props: {
   revealedRoles: Role[] | null;
 }) {
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-dashed border-base-300 bg-base-200/40 p-4 shadow-inner">
+    <div aria-label="Center cards" className="flex max-w-full items-end justify-center gap-3 px-2 py-4">
       {CENTER_CARD_IDS.map((cardId, index) => {
         const isSelectable = Boolean(props.validTargetIds?.includes(cardId));
         const isSelected = props.selectedTargetIds.includes(cardId);
         const revealedRole = props.revealedRoles?.[index];
 
         return (
-          <div
+          <button
+            type="button"
             key={cardId}
             onClick={() => isSelectable && props.onSelect?.(cardId)}
-            className={`flex flex-col items-center justify-center w-16 h-24 rounded-xl border-2 text-center transition-all duration-200 ${
+            disabled={!isSelectable}
+            aria-label={revealedRole ? `Center card ${index + 1}: ${revealedRole.name}` : `Center card ${index + 1}, face down`}
+            className={`relative flex aspect-[2/3] w-20 shrink-0 flex-col items-center overflow-hidden rounded-lg border text-center transition-transform duration-200 md:w-24 ${
               isSelected
-                ? "border-secondary bg-secondary/10 shadow-lg shadow-secondary/20 cursor-pointer"
+                ? "border-secondary bg-secondary/10 ring-2 ring-secondary/40"
                 : isSelectable
-                  ? "border-accent bg-accent/10 shadow-lg shadow-accent/20 cursor-pointer hover:scale-105"
-                  : "border-base-300 bg-base-100"
+                  ? "border-accent bg-accent/10 hover:-translate-y-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+                  : "border-base-300 bg-base-200"
             }`}
           >
             {revealedRole ? (
-              <span className="px-1 text-xs font-medium text-base-content">{revealedRole.name}</span>
+              <>
+                <img src={revealedRole.image} alt="" className="min-h-0 w-full flex-1 object-cover" />
+                <span className="w-full truncate bg-base-100 px-1 py-1 text-xs font-semibold text-base-content">
+                  {revealedRole.name}
+                </span>
+              </>
             ) : (
-              <span className="text-2xl">🂠</span>
+              <span className="flex flex-1 items-center justify-center text-3xl text-primary/70" aria-hidden="true">🂠</span>
             )}
-            <span className="mt-1 text-[10px] uppercase tracking-wide text-base-content/50">
+            <span className="w-full border-t border-base-300/70 bg-base-100/80 py-1 text-[10px] uppercase text-base-content/50">
               Card {index + 1}
             </span>
-          </div>
+          </button>
         );
       })}
     </div>

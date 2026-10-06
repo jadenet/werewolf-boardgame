@@ -8,10 +8,12 @@ export default function ValidateLobby() {
     const params = useParams<{ id?: string }>();
 
     useEffect(() => {
-      fetch(buildServerUrl(`/lobbies/${params.id}`)).then(async (result) => {
-        const text = await result.text();
-        setIsValidId(text === "true");
-      });
+      fetch(buildServerUrl(`/lobbies/${params.id}`))
+        .then(async (result) => {
+          const text = await result.text();
+          setIsValidId(result.ok && text === "true");
+        })
+        .catch(() => setIsValidId(false));
     }, [params.id]);
     if (isValidId === null) {
       return (

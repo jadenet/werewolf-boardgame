@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { createLobby, getLobbyFromId, getLobbies, removeLobby } from "./lobby/lobby";
+import { buildDefaultRoles } from "./game/services/role";
 import { registerLobbyJoinHandler } from "./socket/lobbyJoin";
 import express from "express";
 import cors from "cors";
@@ -47,6 +48,16 @@ app.get("/lobbies/:id", async (req, res) => {
 
 app.get("/roles", async (_, res) => {
   res.sendFile("./assets/roles.json", { root: import.meta.dirname });
+});
+
+app.get("/roles/default/:playerCount", async (req, res) => {
+  const playerCount = Number(req.params.playerCount);
+  if (!Number.isInteger(playerCount) || playerCount < 0 || playerCount > 10) {
+    res.status(400).send("Invalid player count");
+    return;
+  }
+
+  res.json(buildDefaultRoles(playerCount));
 });
 
 server.listen(Number(process.env.SERVER_PORT), "0.0.0.0", () => {});

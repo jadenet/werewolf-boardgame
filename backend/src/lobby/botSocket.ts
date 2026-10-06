@@ -18,8 +18,7 @@ function pickRandom<T>(items: T[]): T | undefined {
 }
 
 // A drop-in replacement for a socket.io `Socket` that lets bot players participate
-// in the same code paths real players use (discussion skips, voting, ability prompts),
-// by making its own decisions instead of waiting for real client input.
+// in voting and ability prompts without requiring real client input.
 export default class BotSocket {
   private lobby: Lobby;
   private playerId: Player["id"];
@@ -62,11 +61,6 @@ export default class BotSocket {
   on(_event: string, _callback: (...args: any[]) => void) {}
 
   once(event: string, callback: AckCallback) {
-    if (event === "discussionSkip") {
-      setTimeout(() => callback(), randomDecisionDelay());
-      return;
-    }
-
     if (event === "vote") {
       setTimeout(() => {
         const targetId = this.pickVoteTarget();
@@ -77,10 +71,6 @@ export default class BotSocket {
       return;
     }
 
-    if (event === "playAgainVote") {
-      setTimeout(() => callback(), randomDecisionDelay());
-      return;
-    }
   }
 
   // Plain fire-and-forget emits (e.g. ability results, phase/timer updates) are ignored.

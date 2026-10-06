@@ -49,9 +49,10 @@ export default function Lobbiesid() {
     submitPlayAgainVote,
     addBot,
     removeBot,
-    knownWerewolfIds,
+    revealedPlayerRoleIds,
     revealedCenterRoles,
     selectedRoleIds,
+    ,
     kickPlayer,
   ] = useSocketConnect();
 
@@ -176,15 +177,6 @@ export default function Lobbiesid() {
             />
           )}
 
-          {currentPhase === "End" && (
-            <GameOverModal
-              winner={winner}
-              playAgainStatus={playAgainStatus}
-              onPlayAgainVote={submitPlayAgainVote}
-              revealedCenterRoles={revealedCenterRoles}
-            />
-          )}
-
           <label
             htmlFor="my-drawer-2"
             className={`drawer-button btn btn-circle btn-primary ${
@@ -197,6 +189,13 @@ export default function Lobbiesid() {
           </label>
 
           <div className="flex flex-1 min-h-0 flex-col items-center overflow-y-auto p-4">
+            {currentPhase === "End" && (
+              <GameOverModal
+                winner={winner}
+                playAgainStatus={playAgainStatus}
+                onPlayAgainVote={submitPlayAgainVote}
+              />
+            )}
             <div className="flex flex-wrap items-center justify-center gap-6 p-8 mx-8">
               {players.slice(0, Math.ceil(players.length / 2)).map((player) => (
                 <PlayerCard
@@ -210,7 +209,7 @@ export default function Lobbiesid() {
                   isTalking={Boolean(talkingPlayerIds[player.id])}
                   isMuted={isPlayerMuted(player.id)}
                   onToggleMute={handleTogglePlayerMute}
-                  isKnownWerewolf={knownWerewolfIds.includes(player.id)}
+                  revealedRole={roleCatalog.find((role) => role.id === revealedPlayerRoleIds[player.id])}
                   abilityTargetSelectable={activeAbilityPrompt?.validTargetIds.includes(
                     player.id,
                   )}
@@ -246,7 +245,7 @@ export default function Lobbiesid() {
                   isTalking={Boolean(talkingPlayerIds[player.id])}
                   isMuted={isPlayerMuted(player.id)}
                   onToggleMute={handleTogglePlayerMute}
-                  isKnownWerewolf={knownWerewolfIds.includes(player.id)}
+                  revealedRole={roleCatalog.find((role) => role.id === revealedPlayerRoleIds[player.id])}
                   abilityTargetSelectable={activeAbilityPrompt?.validTargetIds.includes(
                     player.id,
                   )}

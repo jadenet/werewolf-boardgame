@@ -44,7 +44,7 @@ export default function LobbyChatTab(props: {
             props.messages.map((msg) => (
               <div
                 key={msg.id}
-                className={`rounded-xl border px-4 py-3 shadow-sm transition-colors ${
+                className={`min-w-0 max-w-full rounded-xl border px-4 py-3 shadow-sm transition-colors ${
                   msg.kind === "system"
                     ? "border-info/30 bg-info/10"
                     : "border-base-300 bg-base-100"
@@ -65,7 +65,7 @@ export default function LobbyChatTab(props: {
                     })}
                   </span>
                 </div>
-                <p className="break-words text-sm text-base-content">{msg.message}</p>
+                <p className="min-w-0 text-sm text-base-content [overflow-wrap:anywhere]">{msg.message}</p>
               </div>
             ))
           )}

@@ -59,8 +59,8 @@ export default function getTeamWinners(
   });
 
   const teamWinningConditions = {
-    Villagers: werewolfPlayers.length === 0 && eliminatedPlayers.length > 0,
-    Werewolves: werewolfPlayers.length > 0 && werewolfEliminations === 0,
+    Villagers: tannerEliminations === 0 && (werewolfEliminations > 0 || werewolfPlayers.length === 0),
+    Werewolves: tannerEliminations === 0 && werewolfPlayers.length > 0 && werewolfEliminations === 0,
     Solo: tannerEliminations > 0,
   };
 

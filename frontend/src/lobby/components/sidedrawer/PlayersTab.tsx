@@ -13,7 +13,7 @@ export default function PlayersTab(props: {
   getPlayerVolume: (playerId: Player["id"]) => number;
   onVolumeChange: (playerId: Player["id"], volume: number) => void;
   onRemoveBot: (playerId: Player["id"]) => void;
-  onKickPlayer: (playerId: string[]) => void;
+  onKickPlayer: (playerId: Player["id"]) => void;
 }) {
   return (
     <div className="mx-2 my-4 space-y-3 pb-4">
@@ -76,7 +76,7 @@ export default function PlayersTab(props: {
             {!isSelf && props.isHost && !props.gameStarted && (
               <button
                 className="btn btn-xs btn-circle btn-ghost text-error"
-                onClick={() => (player.isBot ? props.onRemoveBot(player.id) : props.onKickPlayer([player.id]))}
+                onClick={() => (player.isBot ? props.onRemoveBot(player.id) : props.onKickPlayer(player.id))}
                 aria-label={player.isBot ? `Remove ${player.name}` : `Kick ${player.name}`}
                 title={player.isBot ? `Remove ${player.name}` : `Kick ${player.name}`}
               >

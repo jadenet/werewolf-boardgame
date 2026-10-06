@@ -3,6 +3,7 @@ import BotSocket from "./botSocket";
 
 const players: Player[] = [];
 const lobbies: Lobby[] = [];
+export const MAX_PLAYER_COUNT = 10;
 
 const BOT_NAMES = [
   "Bot Ashley", "Bot Marcus", "Bot Priya", "Bot Diego", "Bot Yuki",
@@ -87,6 +88,15 @@ export function removePlayer(playerId: Player["id"]) {
   if (playerIndex !== -1) {
     players.splice(playerIndex, 1);
   }
+}
+
+export function removeDisconnectedPlayersFromLobby(lobby: Lobby) {
+  lobby.players
+    .filter((playerId) => getPlayerFromId(playerId)?.connected === false)
+    .forEach((playerId) => {
+      removePlayerFromLobby(lobby, playerId);
+      removePlayer(playerId);
+    });
 }
 
 export function getLobbyFromId(lobbyId: Lobby["id"]) {

@@ -1,9 +1,7 @@
 import { Server, Socket } from "socket.io";
-import { createBotPlayer } from "../lobby/lobby";
+import { createBotPlayer, MAX_PLAYER_COUNT } from "../lobby/lobby";
 import { toPlayerDTO } from "../lobby/playerDto";
 import { Lobby, Player } from "../game/types";
-
-const MAX_PLAYER_COUNT = 10;
 
 // Only the host can add a bot, and only before the game has started.
 export function registerAddBotHandler(io: Server, socket: Socket, lobby: Lobby) {

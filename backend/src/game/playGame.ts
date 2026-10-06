@@ -6,7 +6,8 @@ import {
   Round,
 } from "./types";
 import { assignRoles, getRoleById } from "./services/role";
-import { getPlayerFromId } from "../lobby/lobby";
+import { getPlayerFromId, removeDisconnectedPlayersFromLobby, removeLobby } from "../lobby/lobby";
+import { toPlayerDTO } from "../lobby/playerDto";
 import { Server } from "socket.io";
 import preGame from "./phases/preGame";
 import nightPhase from "./phases/night";
@@ -101,6 +102,10 @@ async function playRound(lobby: Lobby, io: Server) {
   round.status = "End";
   io.to(lobby.id).emit("winner", winner);
   io.to(lobby.id).emit(
+    "playerRolesReveal",
+    Array.from(round.playerRoles, ([playerId, roleIds]) => [playerId, roleIds[0]] as const)
+  );
+  io.to(lobby.id).emit(
     "centerRolesReveal",
     round.centerRoles.map((roleId) => getRoleById(roleId)).filter(Boolean)
   );
@@ -120,6 +125,14 @@ export default async function playGame(
   }
 
   lobby.gameStarted = false;
+  removeDisconnectedPlayersFromLobby(lobby);
+  if (lobby.players.length === 0) {
+    removeLobby(lobby.id);
+  }
+  io.to(lobby.id).emit(
+    "playersChanged",
+    lobby.players.map((playerId) => toPlayerDTO(playerId))
+  );
   io.to(lobby.id).emit("returnToLobby");
 }
 

@@ -17,12 +17,30 @@ export default async function votingPhase(
     }
   });
 
-  // Wait for all votes or timeout
+  // Keep the phase open for vote changes until its timer expires.
   await new Promise<void>((resolve) => {
-    let votesReceived = 0;
-    const totalPlayers = players.length;
+    let active = true;
+    const handlers = new Map<Player["id"], (targetId: string) => void>();
+
+    const finish = () => {
+      if (!active) {
+        return;
+      }
+      active = false;
+      handlers.forEach((handler, playerId) => {
+        const player = getPlayerFromId(playerId);
+        if (player && !player.isBot) {
+          player.socket?.off("vote", handler);
+        }
+      });
+      resolve();
+    };
 
     const voteHandler = (voterId: string, targetId: string) => {
+      if (!active) {
+        return;
+      }
+
       const voter = getPlayerFromId(voterId);
       const target = getPlayerFromId(targetId);
 
@@ -39,27 +57,26 @@ export default async function votingPhase(
           });
         }
       }
-
-      votesReceived++;
-      if (votesReceived >= totalPlayers) {
-        resolve();
-      }
     };
 
     // Set up vote listeners
     players.forEach((playerId) => {
       const player = getPlayerFromId(playerId);
       if (player && player.socket) {
-        player.socket.once("vote", (targetId: string) => {
+        const handler = (targetId: string) => {
           voteHandler(player.id, targetId);
-        });
+        };
+        handlers.set(player.id, handler);
+        if (player.isBot) {
+          player.socket.once("vote", handler);
+        } else {
+          player.socket.on("vote", handler);
+        }
       }
     });
 
     // Timeout after voting duration
-    setTimeout(() => {
-      resolve();
-    }, round.options.votingDuration * 1000);
+    setTimeout(finish, round.options.votingDuration * 1000);
   });
 
   return votes;

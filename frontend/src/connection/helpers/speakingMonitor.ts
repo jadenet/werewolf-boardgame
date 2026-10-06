@@ -25,6 +25,7 @@ export function startSpeakingMonitor(
   const sampleBuffer = new Uint8Array(analyser.frequencyBinCount);
   let speakingFrames = 0;
   let silentFrames = 0;
+  let isSpeaking = false;
 
   const intervalId = window.setInterval(() => {
     analyser.getByteFrequencyData(sampleBuffer);
@@ -38,11 +39,13 @@ export function startSpeakingMonitor(
       speakingFrames = 0;
     }
 
-    if (speakingFrames >= SPEAKING_FRAMES_TO_START) {
+    if (speakingFrames >= SPEAKING_FRAMES_TO_START && !isSpeaking) {
+      isSpeaking = true;
       onSpeakingChange(true);
     }
 
-    if (silentFrames >= SILENT_FRAMES_TO_STOP) {
+    if (silentFrames >= SILENT_FRAMES_TO_STOP && isSpeaking) {
+      isSpeaking = false;
       onSpeakingChange(false);
     }
   }, ANALYSIS_INTERVAL_MS);

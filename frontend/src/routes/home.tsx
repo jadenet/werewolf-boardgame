@@ -1,7 +1,7 @@
 import { useLocation } from "wouter";
-import { getRoleNames } from "../lobby/helpers/getRolesFromTeam";
 import { useState } from "react";
-import { buildServerUrl, wakeBackend } from "../app/config/server";
+import { wakeBackend } from "../app/config/server";
+import { createLobbyRequest } from "../lobby/helpers/createLobbyRequest";
 
 const images = [
   {
@@ -21,6 +21,7 @@ const images = [
 export default function Home() {
   const [, setLocation] = useLocation();
   const [isLoading, setIsLoading] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
   return (
     <main className="flex items-center justify-center">
       <div className="hero py-10 rounded-3xl bg-base-100">
@@ -58,27 +59,16 @@ export default function Home() {
                     onClick={async (e) => {
                       e.preventDefault();
                       setIsLoading(true);
+                      setCreateError(null);
                       try {
-                        await wakeBackend();
-                        const response = await fetch(
-                          buildServerUrl("/lobbies"),
-                          {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                              roles: getRoleNames(),
-                              gamemode: "Classic",
-                            }),
-                          },
-                        );
-
-                        const responseJson = await response.json();
-
-                        if (responseJson.status === "success") {
-                          setLocation(`/lobbies/${responseJson.id}`);
+                        if (!(await wakeBackend())) {
+                          throw new Error("The game server did not become ready. Please try again.");
                         }
+                        const lobby = await createLobbyRequest("Classic", []);
+                        setLocation(`/lobbies/${lobby.id}`);
                       } catch (error) {
                         console.error("Error creating lobby:", error);
+                        setCreateError(error instanceof Error ? error.message : "Unable to create a lobby. Please try again.");
                         setIsLoading(false);
                       }
                     }}
@@ -86,6 +76,11 @@ export default function Home() {
                     Create Lobby
                   </button>
                 </div>
+              )}
+              {createError && (
+                <p role="alert" className="mx-auto max-w-md text-sm text-error">
+                  {createError}
+                </p>
               )}
             </div>
           </div>
