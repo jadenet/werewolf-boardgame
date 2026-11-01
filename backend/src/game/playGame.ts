@@ -15,6 +15,7 @@ import discussionPhase from "./phases/discussion";
 import votingPhase from "./phases/voting";
 import getTeamWinners from "./helpers/getTeamWinners";
 import playAgainPhase from "./phases/playAgain";
+import { saveRound, snapshotStartingRoles } from "../db/gameHistory";
 
 const defaultOptions: Options = {
   discussionDuration: 60,
@@ -43,6 +44,7 @@ async function playRound(lobby: Lobby, io: Server) {
   };
 
   lobby.rounds.push(round);
+  const startingRoles = snapshotStartingRoles(round);
 
   io.to(lobby.id).emit("phaseChange", "PreGame");
   io.to(lobby.id).emit("startPreGame", defaultOptions.preGameDuration);
@@ -110,6 +112,11 @@ async function playRound(lobby: Lobby, io: Server) {
     round.centerRoles.map((roleId) => getRoleById(roleId)).filter(Boolean)
   );
   io.to(lobby.id).emit("phaseChange", "End");
+
+  // History is best-effort: a database outage shouldn't interrupt the game.
+  saveRound(lobby, round, startingRoles).catch((error) => {
+    console.error("Failed to save round history:", error);
+  });
 }
 
 export default async function playGame(

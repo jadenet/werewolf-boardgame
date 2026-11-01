@@ -1,0 +1,16 @@
+# Local Postgres for development. Start with `docker compose up -d`, then set
+# DATABASE_URL=postgres://werewolf:werewolf@localhost:5432/werewolf in your environment.
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: werewolf
+      POSTGRES_PASSWORD: werewolf
+      POSTGRES_DB: werewolf
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:
