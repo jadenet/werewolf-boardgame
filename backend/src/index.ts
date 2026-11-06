@@ -1,8 +1,6 @@
 import "dotenv/config";
 import { createLobby, getLobbyFromId, getLobbies, removeLobby } from "./lobby/lobby";
 import { buildDefaultRoles } from "./game/services/role";
-import { migrate } from "./db/migrate";
-import { getRecentRounds } from "./db/gameHistory";
 import { registerLobbyJoinHandler } from "./socket/lobbyJoin";
 import express from "express";
 import cors from "cors";
@@ -48,21 +46,6 @@ app.get("/lobbies/:id", async (req, res) => {
   res.send(lobby != undefined)
 });
 
-app.get("/rounds", async (req, res) => {
-  const limit = req.query.limit === undefined ? 20 : Number(req.query.limit);
-  if (!Number.isInteger(limit) || limit < 1 || limit > 100) {
-    res.status(400).send("Invalid limit");
-    return;
-  }
-
-  try {
-    res.json(await getRecentRounds(limit));
-  } catch (error) {
-    console.error("Failed to load round history:", error);
-    res.status(500).send("Failed to load round history");
-  }
-});
-
 app.get("/roles", async (_, res) => {
   res.sendFile("./assets/roles.json", { root: import.meta.dirname });
 });
@@ -77,10 +60,4 @@ app.get("/roles/default/:playerCount", async (req, res) => {
   res.json(buildDefaultRoles(playerCount));
 });
 
-migrate()
-  .catch((error) => {
-    console.error("Database migration failed:", error);
-  })
-  .finally(() => {
-    server.listen(Number(process.env.SERVER_PORT), "0.0.0.0", () => {});
-  });
+server.listen(Number(process.env.SERVER_PORT), "0.0.0.0", () => {});
