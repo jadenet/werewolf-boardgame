@@ -1,6 +1,6 @@
 import { Server, Socket } from "socket.io";
-import { getRoleById } from "../game/services/role";
-import { Lobby, Player, Role } from "../game/types";
+import { getRoleById } from "../../game/services/role";
+import { Lobby, Player, Role } from "../../game/types";
 
 const MAX_SELECTED_ROLES = 40;
 

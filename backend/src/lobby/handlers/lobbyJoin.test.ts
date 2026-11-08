@@ -6,8 +6,8 @@ import {
   MAX_PLAYER_COUNT,
   removeLobby,
   removePlayer,
-} from "../lobby/lobby";
-import { Lobby, Player } from "../game/types";
+} from "../lobby";
+import { Lobby, Player } from "../../game/types";
 import { registerLobbyJoinHandler } from "./lobbyJoin";
 
 describe("lobby join admission", () => {
@@ -24,7 +24,7 @@ describe("lobby join admission", () => {
       to: jest.fn(() => ({ emit: jest.fn() })),
     } as unknown as Server;
 
-    registerLobbyJoinHandler(io, socket);
+    registerLobbyJoinHandler(io, socket, jest.fn());
 
     const callback = jest.fn();
     handlers.get("lobbyjoin")?.(lobby.id, "New Player", callback);

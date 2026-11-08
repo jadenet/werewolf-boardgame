@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { createLobby, getLobbyFromId, getLobbies, removeLobby } from "./lobby/lobby";
 import { buildDefaultRoles } from "./game/services/role";
-import { registerLobbyJoinHandler } from "./socket/lobbyJoin";
+import { registerSocketHandlers } from "./socket/registerHandlers";
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
@@ -19,9 +19,7 @@ const io = new Server(server, {
   cors: { origin: ALLOWED_ORIGINS },
 });
 
-io.on("connection", (socket) => {
-  registerLobbyJoinHandler(io, socket);
-});
+registerSocketHandlers(io);
 
 app.use(bodyParser.json());
 

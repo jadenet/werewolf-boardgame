@@ -1,7 +1,7 @@
 import { Server, Socket } from "socket.io";
-import startGame from "../game/playGame";
-import { getRequiredRoleCount } from "../game/services/role";
-import { Lobby, Player } from "../game/types";
+import startGame from "../playGame";
+import { getRequiredRoleCount } from "../services/role";
+import { Lobby, Player } from "../types";
 
 const MINIMUM_PLAYER_COUNT = 3;
 

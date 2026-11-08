@@ -1,7 +1,7 @@
 import { Server, Socket } from "socket.io";
-import { getPlayerFromId, removePlayer, removePlayerFromLobby } from "../lobby/lobby";
-import { toPlayerDTO } from "../lobby/playerDto";
-import { Lobby, Player } from "../game/types";
+import { getPlayerFromId, removePlayer, removePlayerFromLobby } from "../lobby";
+import { toPlayerDTO } from "../playerDto";
+import { Lobby, Player } from "../../game/types";
 
 // Only the host can remove a bot, and only before the game has started.
 export function registerRemoveBotHandler(io: Server, socket: Socket, lobby: Lobby) {

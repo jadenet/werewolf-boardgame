@@ -6,8 +6,8 @@ import {
   getPlayerFromId,
   removeLobby,
   removePlayer,
-} from "../lobby/lobby";
-import { Lobby, Player } from "../game/types";
+} from "../lobby";
+import { Lobby, Player } from "../../game/types";
 import { cancelPendingDisconnect, registerDisconnectHandler } from "./disconnect";
 
 describe("lobby socket disconnect handling", () => {

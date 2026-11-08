@@ -1,6 +1,6 @@
 import { Socket } from "socket.io";
-import { getPlayerFromId } from "../lobby/lobby";
-import { Lobby } from "../game/types";
+import { getPlayerFromId } from "../../lobby/lobby";
+import { Lobby } from "../types";
 
 // Forwards a player's click on another player as a vote while a Voting round is active.
 export function registerPlayerClickedHandler(socket: Socket, lobby: Lobby) {

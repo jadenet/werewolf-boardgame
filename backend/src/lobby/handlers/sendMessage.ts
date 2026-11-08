@@ -1,6 +1,6 @@
 import { Server, Socket } from "socket.io";
-import { getPlayerFromId } from "../lobby/lobby";
-import { Lobby } from "../game/types";
+import { getPlayerFromId } from "../lobby";
+import { Lobby } from "../../game/types";
 
 // Broadcasts a chat message to the lobby; chat is disabled for everyone during Night.
 export function registerSendMessageHandler(io: Server, socket: Socket, lobby: Lobby, lobbyId: Lobby["id"]) {

@@ -1,7 +1,7 @@
 import { Server, Socket } from "socket.io";
-import { getPlayerFromId, removeLobby, removePlayer, removePlayerFromLobby } from "../lobby/lobby";
-import { toPlayerDTO } from "../lobby/playerDto";
-import { Lobby, Player } from "../game/types";
+import { getPlayerFromId, removeLobby, removePlayer, removePlayerFromLobby } from "../lobby";
+import { toPlayerDTO } from "../playerDto";
+import { Lobby, Player } from "../../game/types";
 
 const RECONNECT_GRACE_PERIOD_MS = 60_000;
 const pendingDisconnects = new Map<Player["id"], ReturnType<typeof setTimeout>>();
