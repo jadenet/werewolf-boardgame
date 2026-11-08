@@ -7,7 +7,7 @@ import {
   removeLobby,
   removePlayer,
 } from "../lobby";
-import { Lobby, Player } from "../../game/types";
+import { Player } from "../../game/types";
 import { cancelPendingDisconnect, registerDisconnectHandler } from "./disconnect";
 
 describe("lobby socket disconnect handling", () => {
